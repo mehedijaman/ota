@@ -1,7 +1,7 @@
 # ✈️ Online Travel Agency (OTA) Platform
 
-A full-stack **Online Travel Agency (OTA)** platform providing flight, hotel, and holiday bookings with wallet, refund, and admin management capabilities.
-Built with **Laravel, Vue.js, Inertia, Tailwind CSS, MySQL**, and designed for scalability, security, and enterprise readiness.
+A comprehensive full-stack **Online Travel Agency (OTA)** platform enabling flight, hotel, and holiday package bookings, complemented by integrated wallet management, refund processing, and robust administrative controls.
+The system is built using **Laravel, Vue.js, Inertia.js, Tailwind CSS, and MySQL**, and is architected to meet enterprise-grade standards for scalability, security, and long-term maintainability.
 
 ---
 
