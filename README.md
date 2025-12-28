@@ -1,59 +1,152 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+✈️ OTA Platform (Laravel + Vue + Inertia)
+A comprehensive Online Travel Agency (OTA) solution built with the VILT Stack (Vue, Inertia, Laravel, Tailwind). This platform supports B2C (End Users) and B2B (Travel Agents) for booking flights, hotels, holiday packages, and utility services.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+🚀 Features
+Flight Booking Engine: Integration with GDS (Amadeus/Sabre) for real-time one-way, round-trip, and multi-city search.
 
-## About Laravel
+Hotel & Holiday Packages: Dynamic inventory management and booking flows.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+B2B Agent Portal: specialized dashboard for travel agents with wallet/deposit system and custom markup tools.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Wallet System: Internal wallet for instant payments, refunds, and cashback rewards.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Utility Services: Visa assistance, Medical appointment booking, and Bill payments.
 
-## Learning Laravel
+Role-Based Access: Granular permissions for Super Admin, Support Staff, Agents, and Customers.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Omnichannel: REST API support for the companion Flutter Mobile App.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+🛠️ Technology Stack
+Backend: Laravel 10 (PHP 8.2+)
 
-## Laravel Sponsors
+Frontend: Vue.js 3, Inertia.js (SSR Enabled)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Styling: Tailwind CSS
 
-### Premium Partners
+Database: MySQL / PostgreSQL
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Caching: Redis (Critical for Flight Search results)
 
-## Contributing
+Search: Laravel Scout / Meilisearch (Optional)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Mobile App: Flutter (Dart) - [Link to Mobile Repo]
 
-## Code of Conduct
+📋 Prerequisites
+Ensure you have the following installed on your local machine:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+PHP >= 8.2
 
-## Security Vulnerabilities
+Composer
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Node.js & NPM
 
-## License
+MySQL or MariaDB
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Redis
+
+⚡ Installation Guide
+Follow these steps to set up the project locally.
+
+1. Clone the Repository
+   Bash
+
+git clone https://github.com/your-username/ota-platform.git
+cd ota-platform 2. Install Backend Dependencies
+Bash
+
+composer install 3. Install Frontend Dependencies
+Bash
+
+npm install 4. Environment Setup
+Copy the example environment file and configure your database credentials.
+
+Bash
+
+cp .env.example .env
+Open .env and set your configuration:
+
+Ini, TOML
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ota_db
+DB_USERNAME=root
+DB_PASSWORD=
+
+# Redis is required for caching flight search results
+
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379 5. Generate Application Key
+Bash
+
+php artisan key:generate 6. Database Setup
+Run migrations and seed the database with default roles and admin user.
+
+Bash
+
+php artisan migrate --seed 7. Run the Application
+You need to run both the Laravel server and the Vite development server.
+
+Terminal 1 (Backend):
+
+Bash
+
+php artisan serve
+Terminal 2 (Frontend):
+
+Bash
+
+npm run dev
+Terminal 3 (Queue Worker): Required for sending emails and generating PDF tickets.
+
+Bash
+
+php artisan queue:work
+Visit http://localhost:8000 to see the application.
+
+📂 Architecture Overview
+This project follows a Service-Repository Pattern to handle the complexity of OTA logic and support both Web (Inertia) and Mobile (API) from a single codebase.
+
+app/Services: Contains business logic (e.g., FlightSearchService, BookingService). Connects to external APIs.
+
+app/Http/Controllers/Web: Returns Inertia::render responses for the browser.
+
+app/Http/Controllers/Api: Returns JSON responses for the Flutter App.
+
+database/migrations: Centralized schema including the polymorphic bookings table.
+
+Key Data Models
+User (Polymorphic roles)
+
+Booking (Master table linked to flight_bookings, hotel_bookings)
+
+WalletTransaction (Financial ledger)
+
+🧪 Testing
+Run the PHPUnit test suite to ensure booking logic is stable.
+
+Bash
+
+php artisan test
+📚 API Documentation
+The API documentation for mobile developers is available via Postman Collection.
+
+[Link to Postman Documentation]
+
+Base URL: http://localhost:8000/api/v1
+
+🤝 Contributing
+Create a Feature Branch (git checkout -b feature/AmazingFeature)
+
+Commit your changes (git commit -m 'Add some AmazingFeature')
+
+Push to the Branch (git push origin feature/AmazingFeature)
+
+Open a Pull Request
+
+📄 License
+Distributed under the MIT License. See LICENSE for more information.
+
+Project Manager: Your Name Lead Developer: Your Name
