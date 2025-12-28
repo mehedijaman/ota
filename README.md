@@ -62,15 +62,11 @@ npm run dev
 php artisan queue:work
 ```
 
----
-
 ## 🧪 Testing
 
 ```bash
 php artisan test
 ```
-
----
 
 ## 🚀 Deployment
 
