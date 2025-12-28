@@ -10,10 +10,21 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^3.1",
         "daniel-cintra/modular": "^0.4.20",
         "daniel-cintra/modular-blog": "^0.4.4",
+        "lab404/laravel-impersonate": "^1.7",
         "laravel/framework": "^12.0",
-        "laravel/tinker": "^2.10.1"
+        "laravel/sanctum": "^4.2",
+        "laravel/socialite": "^5.24",
+        "laravel/tinker": "^2.10.1",
+        "maatwebsite/excel": "^3.1",
+        "milon/barcode": "^12.0",
+        "opcodesio/log-viewer": "^3.21",
+        "raziul/sslcommerz-laravel": "^1.0",
+        "spatie/laravel-medialibrary": "^11.17",
+        "theihasan/laravel-bkash": "^1.3",
+        "xenon/laravelbdsms": "^1.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -72,6 +83,9 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "pint": [
+            "@php ./vendor/bin/pint"
         ]
     },
     "extra": {
