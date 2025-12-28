@@ -39,8 +39,6 @@ Built with **Laravel, Vue.js, Inertia, Tailwind CSS, MySQL**, and designed for s
 - **Payments:** Payment Gateway APIs
 - **Third-Party APIs:** Flights GDS, Hotel APIs
 
----
-
 ## 🎨 UI / UX
 
 - Website UI inspired by https://sharetrip.net
