@@ -6,14 +6,12 @@ use Ihasan\Bkash\Facades\Bkash;
 use Ihasan\Bkash\Models\BkashPayment;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Str;
 
 class BkashController extends Controller
 {
     /**
      * Handle the callback from bKash
      *
-     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function callback(Request $request)
@@ -32,7 +30,7 @@ class BkashController extends Controller
                 ->where('transaction_status', 'Completed')
                 ->first();
 
-            if ($payment && !empty($payment->trx_id)) {
+            if ($payment && ! empty($payment->trx_id)) {
                 $response = Bkash::queryPayment($paymentId);
             } else {
                 $response = Bkash::executePayment($paymentId);
@@ -63,7 +61,6 @@ class BkashController extends Controller
     /**
      * Display success page
      *
-     * @param Request $request
      * @return \Illuminate\View\View
      */
     public function success(Request $request)
@@ -76,7 +73,6 @@ class BkashController extends Controller
     /**
      * Display failed page
      *
-     * @param Request $request
      * @return \Illuminate\View\View
      */
     public function failed(Request $request)

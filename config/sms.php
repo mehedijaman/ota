@@ -1,4 +1,5 @@
 <?php
+
 /*
 |--------------------------------------------------------------------------
 | Configuration For Multiple Gateways
@@ -28,6 +29,7 @@ use Xenon\LaravelBDSms\Provider\DianaHost;
 use Xenon\LaravelBDSms\Provider\DianaSms;
 use Xenon\LaravelBDSms\Provider\DnsBd;
 use Xenon\LaravelBDSms\Provider\DurjoySoft;
+use Xenon\LaravelBDSms\Provider\EAmarseba;
 use Xenon\LaravelBDSms\Provider\ElitBuzz;
 use Xenon\LaravelBDSms\Provider\Esms;
 use Xenon\LaravelBDSms\Provider\Grameenphone;
@@ -62,7 +64,6 @@ use Xenon\LaravelBDSms\Provider\TwentyFourBulkSmsBD;
 use Xenon\LaravelBDSms\Provider\Viatech;
 use Xenon\LaravelBDSms\Provider\WinText;
 use Xenon\LaravelBDSms\Provider\ZamanIt;
-use Xenon\LaravelBDSms\Provider\EAmarseba;
 
 return [
     /*
@@ -79,7 +80,7 @@ return [
      | You can choose one according to need
      |-----------------------------------------------------------------------------------------------
      */
-    'log_driver' => 'database', //database, file
+    'log_driver' => 'database', // database, file
 
     /*
      *-----------------------------------------------------------------------------------------------
@@ -100,7 +101,7 @@ return [
             'senderid' => env('SMS_ADN_SENDER_ID', ''),
             'api_key' => env('SMS_ADN_API_KEY', ''),
             'api_secret' => env('SMS_ADN_API_SECRET', ''),
-            'request_type' => env('SMS_ADN_API_REQUEST_TYPE', 'SINGLE_SMS'), //SINGLE_SMS, OTP, GENERAL_CAMPAIGN, MULTIBODY_CAMPAIGN
+            'request_type' => env('SMS_ADN_API_REQUEST_TYPE', 'SINGLE_SMS'), // SINGLE_SMS, OTP, GENERAL_CAMPAIGN, MULTIBODY_CAMPAIGN
             'message_type' => env('SMS_ADN_API_MESSAGE_TYPE', 'TEXT'),
         ],
         AjuraTech::class => [
@@ -338,6 +339,5 @@ return [
             'type' => env('SMS_ZAMANIT_TYPE', ''),
             'senderid' => env('SMS_ZAMANIT_SENDER_ID', ''),
         ],
-    ]
+    ],
 ];
-

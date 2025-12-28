@@ -15,6 +15,7 @@ class CreateLaravelbdSmsTable extends Migration
     {
         /**
          * table prefix @lbs_
+         *
          * @table lbs_log
          */
         Schema::create('lbs_log', function (Blueprint $table) {
