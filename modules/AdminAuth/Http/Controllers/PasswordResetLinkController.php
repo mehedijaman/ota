@@ -15,7 +15,7 @@ class PasswordResetLinkController extends AppController
      */
     public function forgotPasswordForm()
     {
-        return inertia('AdminAuth/ForgotPage');
+        return inertia('AdminAuth/ForgotPassword');
     }
 
     /**

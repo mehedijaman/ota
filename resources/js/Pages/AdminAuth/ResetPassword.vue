@@ -1,70 +1,203 @@
 <template>
+    <Head title="Reset Password"></Head>
     <AppAuthShell>
-        <AppAuthLogo />
+        <!-- Logo -->
+        <div class="mb-8 flex justify-center lg:justify-start">
+            <AppAuthLogo />
+        </div>
 
-        <AppCard class="min-w-[360px] space-y-4">
-            <template #title>
-                <h3 class="font-semibold tracking-tight">
-                    {{ __('Password Reset') }}
-                </h3>
-            </template>
+        <!-- Header -->
+        <div class="mb-8">
+            <h1
+                class="text-2xl font-bold tracking-tight text-neutral-12 md:text-3xl"
+            >
+                {{ __('Create new password') }}
+            </h1>
+            <p class="mt-2 text-neutral-11">
+                {{
+                    __(
+                        'Your new password must be different from previously used passwords.'
+                    )
+                }}
+            </p>
+        </div>
 
-            <template #description>
-                {{ __('Fill the form below to reset your password') }}.
-            </template>
+        <!-- Form -->
+        <form @submit.prevent="submitForm" class="space-y-6">
+            <AppFormErrors class="mb-4" />
 
-            <template #content>
-                <AppFormErrors class="mb-4" />
+            <!-- Email field (readonly) -->
+            <div class="space-y-2">
+                <AppLabel
+                    for="email"
+                    class="text-sm font-medium text-neutral-12"
+                >
+                    {{ __('Email Address') }}
+                </AppLabel>
+                <AppInputText
+                    id="email"
+                    v-model="form.email"
+                    type="email"
+                    class="h-12 w-full cursor-not-allowed rounded-lg border-neutral-6 bg-neutral-3 px-4 text-base text-neutral-11 shadow-sm dark:border-neutral-7 dark:bg-neutral-4"
+                    readonly
+                    :class="{
+                        'input-error': errorsFields.includes('email')
+                    }"
+                />
+            </div>
 
-                <form>
-                    <div class="mb-4">
-                        <AppLabel for="email">{{ __('Email') }}</AppLabel>
-                        <AppInputText
-                            id="email"
-                            v-model="form.email"
-                            type="text"
-                            class="w-full"
-                            :class="{
-                                'input-error': errorsFields.includes('email')
-                            }"
+            <!-- New Password field -->
+            <div class="space-y-2">
+                <AppLabel
+                    for="password"
+                    class="text-sm font-medium text-neutral-12"
+                >
+                    {{ __('New Password') }}
+                </AppLabel>
+                <AppInputPassword
+                    id="password"
+                    v-model="form.password"
+                    name="password"
+                    class="h-12 w-full rounded-lg border-neutral-6 bg-white px-4 text-base shadow-sm transition-all duration-200 focus:border-primary-9 focus:ring-2 focus:ring-primary-9/20 dark:border-neutral-7 dark:bg-neutral-3"
+                    autocomplete="new-password"
+                    :class="{
+                        'input-error': errorsFields.includes('password')
+                    }"
+                />
+            </div>
+
+            <!-- Confirm Password field -->
+            <div class="space-y-2">
+                <AppLabel
+                    for="password_confirmation"
+                    class="text-sm font-medium text-neutral-12"
+                >
+                    {{ __('Confirm Password') }}
+                </AppLabel>
+                <AppInputPassword
+                    id="password_confirmation"
+                    v-model="form.password_confirmation"
+                    name="password_confirmation"
+                    class="h-12 w-full rounded-lg border-neutral-6 bg-white px-4 text-base shadow-sm transition-all duration-200 focus:border-primary-9 focus:ring-2 focus:ring-primary-9/20 dark:border-neutral-7 dark:bg-neutral-3"
+                    autocomplete="new-password"
+                    :class="{
+                        'input-error':
+                            errorsFields.includes('password_confirmation')
+                    }"
+                />
+            </div>
+
+            <!-- Password requirements -->
+            <div class="rounded-lg bg-neutral-2 p-4 dark:bg-neutral-3">
+                <p class="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-9">
+                    {{ __('Password requirements') }}
+                </p>
+                <ul class="space-y-1 text-sm text-neutral-11">
+                    <li class="flex items-center gap-2">
+                        <svg
+                            class="h-4 w-4 text-neutral-9"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M5 13l4 4L19 7"
+                            />
+                        </svg>
+                        {{ __('Minimum 8 characters') }}
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg
+                            class="h-4 w-4 text-neutral-9"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M5 13l4 4L19 7"
+                            />
+                        </svg>
+                        {{ __('At least one uppercase letter') }}
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg
+                            class="h-4 w-4 text-neutral-9"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M5 13l4 4L19 7"
+                            />
+                        </svg>
+                        {{ __('At least one number') }}
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Submit button -->
+            <AppButton
+                class="flex h-12 w-full items-center justify-center rounded-lg bg-primary-9 text-base font-semibold text-white shadow-lg shadow-primary-9/25 transition-all duration-200 hover:bg-primary-10 hover:shadow-xl hover:shadow-primary-9/30 focus:outline-none focus:ring-2 focus:ring-primary-9 focus:ring-offset-2 disabled:opacity-50"
+                type="submit"
+                :disabled="form.processing"
+            >
+                <span v-if="form.processing" class="flex items-center gap-2">
+                    <svg
+                        class="h-5 w-5 animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
                         />
-                    </div>
-
-                    <div class="mb-4">
-                        <AppLabel for="email">{{ __('Password') }}</AppLabel>
-                        <AppInputPassword
-                            id="password"
-                            v-model="form.password"
-                            name="password"
-                            class="w-full"
-                            autocomplete="current-password"
-                            :class="{
-                                'input-error': errorsFields.includes('password')
-                            }"
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         />
-                    </div>
+                    </svg>
+                    {{ __('Resetting password...') }}
+                </span>
+                <span v-else>{{ __('Reset password') }}</span>
+            </AppButton>
 
-                    <div class="mb-4">
-                        <AppLabel for="password_confirmation">{{
-                            __('Password Confirmation')
-                        }}</AppLabel>
-                        <AppInputPassword
-                            id="password_confirmation"
-                            v-model="form.password_confirmation"
-                            name="password_confirmation"
-                            class="w-full"
-                            :class="{
-                                'input-error': errorsFields.includes('password')
-                            }"
+            <!-- Back to login -->
+            <div class="text-center">
+                <AppLink
+                    :href="route('adminAuth.loginForm')"
+                    class="inline-flex items-center gap-2 text-sm font-medium text-neutral-11 transition-colors hover:text-primary-9"
+                >
+                    <svg
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
                         />
-                    </div>
-
-                    <AppButton class="btn btn-primary" @click="submitForm">
-                        {{ __('Save') }}
-                    </AppButton>
-                </form>
-            </template>
-        </AppCard>
+                    </svg>
+                    {{ __('Back to sign in') }}
+                </AppLink>
+            </div>
+        </form>
     </AppAuthShell>
 </template>
 
@@ -77,6 +210,7 @@ export default {
 </script>
 
 <script setup>
+import { Head } from '@inertiajs/vue3'
 import { useForm } from '@inertiajs/vue3'
 import useFormErrors from '@/Composables/useFormErrors'
 
