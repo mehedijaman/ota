@@ -1,70 +1,38 @@
 <template>
     <div :class="baseClasses" :aria-hidden="!isVisible.toString()">
-        <!-- Sidebar Container -->
-        <div
-            class="fixed z-40 flex h-screen w-[260px] flex-col overflow-hidden border-r border-neutral-6/20 bg-gradient-to-b from-slate-50 via-white to-slate-50/80 dark:border-neutral-7/20 dark:from-neutral-2 dark:via-neutral-2 dark:to-neutral-1"
-        >
-            <!-- Decorative gradient orb -->
-            <div
-                class="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-primary-9/10 blur-3xl dark:bg-primary-9/5"
-            ></div>
-            <div
-                class="pointer-events-none absolute -left-10 top-1/3 h-32 w-32 rounded-full bg-primary-7/10 blur-3xl dark:bg-primary-7/5"
-            ></div>
-
-            <!-- Logo / Brand Header -->
-            <div
-                class="relative flex h-16 shrink-0 items-center gap-3 px-5"
-            >
-                <div class="relative">
-                    <div
-                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-9 via-primary-10 to-primary-11 shadow-lg shadow-primary-9/25 ring-1 ring-white/20"
-                    >
-                        <svg
-                            class="h-[18px] w-[18px] text-white"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            stroke-width="2.5"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M13 10V3L4 14h7v7l9-11h-7z"
-                            />
-                        </svg>
-                    </div>
+        <!-- Sidebar Content -->
+        <div class="sidebar-container fixed z-40 h-screen w-64 overflow-hidden">
+            <!-- Dark navy background -->
+            <div class="absolute inset-0 sidebar-bg"></div>
+            
+            <aside aria-label="Sidebar" class="relative flex flex-col h-full">
+                <!-- Logo Section -->
+                <div class="px-4 py-5">
+                    <Link :href="route('dashboard.index')" class="flex items-center gap-3 group">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/25 transition-transform duration-300 group-hover:scale-105">
+                            <i class="ri-hotel-line text-white text-lg"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <span class="text-base font-bold text-white tracking-tight">OTA</span>
+                            <p class="text-[10px] text-slate-400 font-medium">Online Travel Agency</p>
+                        </div>
+                    </Link>
                 </div>
-                <div>
-                    <h1 class="text-base font-bold tracking-tight text-neutral-12">
-                        Admin Panel
-                    </h1>
-                    <p class="text-[10px] font-medium text-neutral-9 dark:text-neutral-8">
-                        Management System
-                    </p>
-                </div>
-            </div>
 
-            <!-- Divider -->
-            <div class="mx-4 h-px bg-gradient-to-r from-transparent via-neutral-6/40 to-transparent dark:via-neutral-6/20"></div>
+                <!-- Divider -->
+                <div class="mx-4 h-px bg-slate-700/50 mb-3"></div>
 
-            <!-- Scrollable Menu Area -->
-            <aside
-                aria-label="Sidebar"
-                class="sidebar-scroll relative flex-1 overflow-y-auto overflow-x-hidden"
-            >
-                <div class="px-3 py-4">
+                <!-- Scrollable Menu -->
+                <div class="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar">
                     <slot></slot>
                 </div>
             </aside>
-            
         </div>
 
-        <!-- Backdrop overlay for mobile -->
         <transition name="fade">
             <div
                 v-if="backdrop && isVisible"
-                class="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm"
                 @click="$emit('sidebar:toggle')"
             ></div>
         </transition>
@@ -73,7 +41,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { usePage, router } from '@inertiajs/vue3'
+import { usePage, Link } from '@inertiajs/vue3'
 import useIsMobile from '@/Composables/useIsMobile'
 
 const props = defineProps({
@@ -96,34 +64,23 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['sidebar:toggle'])
+const page = usePage()
 
 const isVisible = ref(true)
 
-// User info from page props
-const page = usePage()
-const userName = computed(
-    () => page.props.authUser?.name || page.props.auth?.user?.name || 'User'
-)
-const userRole = computed(() => {
-    const roles = page.props.authUser?.roles || page.props.auth?.user?.roles
-    if (roles && roles.length > 0) {
-        return roles[0].name || 'Member'
-    }
-    return 'Administrator'
-})
-const userInitials = computed(() => {
-    const name = userName.value
-    if (!name) return 'U'
-    const parts = name.split(' ')
-    if (parts.length >= 2) {
-        return (parts[0][0] + parts[1][0]).toUpperCase()
-    }
-    return name.substring(0, 2).toUpperCase()
+// User info computed properties
+const userName = computed(() => {
+    const user = page.props.auth?.user
+    return user?.profile?.name || user?.name || user?.email?.split('@')[0] || 'User'
 })
 
-const logout = () => {
-    router.post(route('adminAuth.logout'))
-}
+const userRole = computed(() => {
+    if (page.props.auth?.isSuperAdmin) return 'Super Admin'
+    if (page.props.auth?.isTenant) return 'Business Owner'
+    return 'Staff'
+})
+
+const userInitial = computed(() => userName.value.charAt(0).toUpperCase())
 
 onMounted(() => {
     document.addEventListener('inertia:start', hideMenuOnNavigation)
@@ -151,12 +108,13 @@ const baseClasses = computed(() => {
         'fixed',
         'transition-transform',
         'h-screen',
-        'w-[260px]',
+        'w-64',
         'overflow-y-auto',
         'transition-all',
         'ease-out',
         'duration-300',
-        'z-30'
+        'z-30',
+        'print:hidden'
     ]
 
     switch (props.placement) {
@@ -197,36 +155,44 @@ const toggle = () => {
 }
 
 defineExpose({
-    toggle
+    toggle,
+    show,
+    hide
 })
 </script>
 
 <style scoped>
+/* @reference "tailwindcss/theme"; */
 @reference "../../../css/app.css";
+
+/* Dark navy sidebar background */
+.sidebar-bg {
+    background: linear-gradient(180deg, #0d1526 0%, #0a1120 100%);
+}
 
 .fade-enter-active,
 .fade-leave-active {
     transition-property: opacity;
-    transition-duration: 200ms;
-    transition-timing-function: ease-out;
+    transition-duration: 300ms;
+    transition-timing-function: ease-in;
 }
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
 }
 
-/* Custom scrollbar styles */
-.sidebar-scroll::-webkit-scrollbar {
-    width: 3px;
+/* Dark scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
 }
-.sidebar-scroll::-webkit-scrollbar-track {
+.custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
 }
-.sidebar-scroll::-webkit-scrollbar-thumb {
-    background-color: var(--color-neutral-5);
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.2);
     border-radius: 10px;
 }
-.sidebar-scroll::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-neutral-7);
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.3);
 }
 </style>

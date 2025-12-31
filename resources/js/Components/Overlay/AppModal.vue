@@ -1,20 +1,33 @@
 <template>
-    <transition name="fade">
-        <div v-show="isModalOpen" :class="backdropClasses" @click="hideModal">
-            <div
-                class="bg-neutral-2 text-neutral-11 mx-auto my-auto min-w-[360px] rounded-lg p-4 lg:w-1/3"
-                :class="[placementClass, 'absolute']"
-                @click.stop
-            >
-                <!-- Modal Header Slot -->
-                <slot v-if="$slots.header" name="header"> </slot>
+    <transition name="modal-fade">
+        <div
+            v-show="isModalOpen"
+            :class="[backdropClasses]"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+            @click="hideModal"
+        >
+            <transition name="modal-scale">
+                <div
+                    v-show="isModalOpen"
+                    :class="[
+                        modalSizeClass,
+                        placementClass,
+                        'relative rounded-lg bg-white shadow-xl dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100'
+                    ]"
+                    @click.stop
+                >
+                    <!-- Modal Header -->
+                    <slot v-if="$slots.header" name="header" />
 
-                <!-- Modal Main Content Slot -->
-                <slot v-if="$slots.body" name="body"> </slot>
+                    <!-- Modal Body -->
+                    <div class="max-h-[80vh] overflow-y-auto px-6 py-4">
+                        <slot v-if="$slots.body" name="body" />
+                    </div>
 
-                <!-- Modal Footer Slot -->
-                <slot v-if="$slots.footer" name="footer"></slot>
-            </div>
+                    <!-- Modal Footer -->
+                    <slot v-if="$slots.footer" name="footer" />
+                </div>
+            </transition>
         </div>
     </transition>
 </template>
@@ -25,15 +38,20 @@ import { computed } from 'vue'
 const props = defineProps({
     backdropClasses: {
         type: String,
-        default: 'bg-neutral-12/50 fixed inset-0 z-50'
+        default: 'bg-neutral-900/50'
     },
     placement: {
         type: String,
-        default: 'center'
+        default: 'center' // center, top, bottom, etc.
     },
     isModalOpen: {
         type: Boolean,
         default: false
+    },
+    size: {
+        type: String,
+        default: 'md', // sm, md, lg, xl, full
+        validator: (value) => ['sm', 'md', 'lg', 'xl', 'full'].includes(value)
     }
 })
 
@@ -42,25 +60,34 @@ const emit = defineEmits(['modal:toggle'])
 const placementClass = computed(() => {
     switch (props.placement) {
         case 'center':
-            return 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'
+            return '' // Handled by flex parent
         case 'top':
-            return 'absolute top-0 left-1/2 transform -translate-x-1/2'
+            return 'mb-auto mt-10'
         case 'bottom':
-            return 'absolute bottom-0 left-1/2 transform -translate-x-1/2'
+            return 'mt-auto mb-10'
         case 'left':
-            return 'absolute top-1/2 left-0 transform -translate-y-1/2'
+            return 'mr-auto ml-10'
         case 'right':
-            return 'absolute top-1/2 right-0 transform -translate-y-1/2'
-        case 'top-left':
-            return 'absolute top-0 left-0'
-        case 'top-right':
-            return 'absolute top-0 right-0'
-        case 'bottom-left':
-            return 'absolute bottom-0 left-0'
-        case 'bottom-right':
-            return 'absolute bottom-0 right-0'
+            return 'ml-auto mr-10'
         default:
             return ''
+    }
+})
+
+const modalSizeClass = computed(() => {
+    switch (props.size) {
+        case 'sm':
+            return 'w-full max-w-sm'
+        case 'md':
+            return 'w-full max-w-lg'
+        case 'lg':
+            return 'w-full max-w-2xl'
+        case 'xl':
+            return 'w-full max-w-4xl'
+        case 'full':
+            return 'w-full h-full max-w-none rounded-none'
+        default:
+            return 'w-full max-w-lg'
     }
 })
 
@@ -72,13 +99,25 @@ function hideModal() {
 <style scoped>
 @reference "../../../css/app.css";
 
-/* Fade Transition */
-.fade-enter-active,
-.fade-leave-active {
-    @apply transition-opacity duration-300 ease-out;
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+    @apply transition-opacity duration-200 ease-in-out;
 }
-.fade-enter-from,
-.fade-leave-to {
+.modal-fade-enter-from,
+.modal-fade-leave-to {
     @apply opacity-0;
+}
+
+.modal-scale-enter-active {
+    @apply transition-all duration-200 ease-out;
+}
+.modal-scale-leave-active {
+    @apply transition-all duration-150 ease-in;
+}
+.modal-scale-enter-from {
+    @apply scale-95 opacity-0;
+}
+.modal-scale-leave-to {
+    @apply scale-95 opacity-0;
 }
 </style>

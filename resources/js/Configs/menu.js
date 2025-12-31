@@ -11,6 +11,7 @@ export default {
         {
             label: 'Blog',
             permission: 'Blog',
+            icon: 'ri-book-2-line',
             children: [
                 {
                     label: 'Posts',
@@ -42,6 +43,7 @@ export default {
         {
             label: 'Access Control List',
             permission: 'Acl',
+            icon: 'ri-shield-user-line',
             children: [
                 {
                     label: 'Users',
