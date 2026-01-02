@@ -1,0 +1,1 @@
+import{c as e}from"./create-vue-app-GOPtd5jY.js";import{_ as t,u as o,v as n}from"./_plugin-vue_export-helper-zhoAvAt0.js";const c={},m={class:"text-md mb-16 font-normal text-gray-600 md:text-xl"};function r(s,p){return n(),o("p",m," From ExampleComponent.vue: Let's do it! ")}const a=t(c,[["render",r]]);e({IndexExampleComponent:a}).mount("#app");
