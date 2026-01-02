@@ -11,4 +11,13 @@ return [
 
     Modules\Index\IndexServiceProvider::class,
     Modules\Blog\BlogServiceProvider::class,
+    Modules\Flight\FlightServiceProvider::class,
+    Modules\Hotel\HotelServiceProvider::class,
+    Modules\Holiday\HolidayServiceProvider::class,
+    Modules\Visa\VisaServiceProvider::class,
+    Modules\BillPayment\BillPaymentServiceProvider::class,
+    Modules\Faq\FaqServiceProvider::class,
+    Modules\Medical\MedicalServiceProvider::class,
+    Modules\Tour\TourServiceProvider::class,
+    Modules\Bill\BillServiceProvider::class,
 ];

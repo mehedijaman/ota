@@ -1,0 +1,71 @@
+<template>
+    <Head :title="title"></Head>
+    <AppSectionHeader :title="title" :bread-crumb="breadCrumb">
+    </AppSectionHeader>
+
+    <AppCard class="w-full md:w-3/4 xl:w-1/2">
+        <template #title> {{ title }} </template>
+        <template #content>
+            <AppFormErrors class="mb-4" />
+            <form>
+                <div>
+                    <AppLabel for="name">{{ __('Name') }}</AppLabel>
+                    <AppInputText
+                        id="name"
+                        v-model="form.name"
+                        type="text"
+                        :class="{
+                            'input-error': errorsFields.includes('name')
+                        }"
+                    />
+                </div>
+            </form>
+        </template>
+        <template #footer>
+            <AppButton class="btn btn-primary" @click="submitForm">
+                {{ __('Save') }}
+            </AppButton>
+        </template>
+    </AppCard>
+</template>
+
+<script setup>
+import { useForm } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
+import useTitle from '@/Composables/useTitle'
+import useFormContext from '@/Composables/useFormContext'
+import useFormErrors from '@/Composables/useFormErrors'
+
+const { title } = useTitle('Visa')
+
+const props = defineProps({
+  visa: {
+    type: Object,
+    default: null
+  }
+})
+
+const breadCrumb = [
+  { label: 'Home', href: route('dashboard.index') },
+  { label: 'Visas', href: route('visa.index') },
+  { label: 'Visa', last: true }
+]
+
+const form = useForm({
+  name: props.visa ? props.visa.name : '',
+})
+
+const { isCreate, isEdit } = useFormContext()
+
+const submitForm = () => {
+  if (isCreate.value) {
+    form.post(route('visa.store'))
+  } 
+
+  if(isEdit.value) {
+    form.put(route('visa.update', props.visa.id))
+  }
+}
+
+const { errorsFields } = useFormErrors()
+</script>
