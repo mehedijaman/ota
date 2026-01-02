@@ -98,7 +98,7 @@
         <!-- Tour Card 4 -->
         <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden border border-gray-100 flex flex-col">
             <div class="relative h-48 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1512453979798-5ea90b792950?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Dubai" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                <img src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Dubai" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
                 <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold text-slate-800 flex items-center gap-1">
                     <span>⭐ 4.6</span>
                 </div>
