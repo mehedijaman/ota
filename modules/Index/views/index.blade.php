@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-    <section class="py-10 md:py-12">
+    {{-- <section class="py-10 md:py-12">
 
         <div class="container max-w-screen-xl mx-auto px-4">
 
@@ -27,5 +27,25 @@
 
         </div>
 
-    </section>
+    </section> --}}    
+
+
+<x-hero></x-hero>
+
+<x-exclusive-offers></x-exclusive-offers>
+
+<x-explore-bangladesh></x-explore-bangladesh>
+
+<x-top-airlines></x-top-airlines>
+
+<x-popular-destinations></x-popular-destinations>
+
+<x-best-hotels></x-best-hotels>
+
+<x-tour-packages></x-tour-packages>
+
+<x-business-cta></x-business-cta>
+
+<x-app-download></x-app-download>
+
 @endsection

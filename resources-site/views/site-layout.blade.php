@@ -30,7 +30,9 @@
 
 <body>
     <div id="app">
+        <x-header></x-header>
         @yield('content')
+        <x-footer></x-footer>
     </div>
 
     @yield('bodyEndScripts')
