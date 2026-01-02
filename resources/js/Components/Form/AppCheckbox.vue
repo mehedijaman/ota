@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
     modelValue: {
@@ -45,17 +45,12 @@ function updateBooleanValue(event) {
     emit('update:modelValue', event.target.checked)
 }
 
-// array type
-const isChecked = ref(false)
-
-onMounted(() => {
-    if (Array.isArray(props.modelValue)) {
-        props.modelValue.forEach((value) => {
-            if (value.id === props.value.id) {
-                isChecked.value = true
-            }
-        })
+// array type - make isChecked reactive to modelValue changes
+const isChecked = computed(() => {
+    if (Array.isArray(props.modelValue) && props.value) {
+        return props.modelValue.some((item) => item.id === props.value.id)
     }
+    return false
 })
 
 const updateArrayValue = (event) => {
@@ -64,11 +59,10 @@ const updateArrayValue = (event) => {
         if (event.target.checked) {
             updatedValue.push(props.value)
         } else {
-            props.modelValue.forEach((value, index) => {
-                if (value.id === props.value.id) {
-                    updatedValue.splice(index, 1)
-                }
-            })
+            const index = updatedValue.findIndex((item) => item.id === props.value.id)
+            if (index > -1) {
+                updatedValue.splice(index, 1)
+            }
         }
         emit('update:modelValue', updatedValue)
     }

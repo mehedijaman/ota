@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'Modular: Ready to build')
+@section('meta-title', 'Travelly:Online Travel Agency')
 
-@section('meta-description', 'Your amazing site')
+@section('meta-description', 'Travelly:Online Travel Agency')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')

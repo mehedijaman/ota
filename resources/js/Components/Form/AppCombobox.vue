@@ -1,35 +1,34 @@
 <template>
     <div ref="wrapperRef" class="relative w-48">
+        <!-- Button -->
         <AppButton
-            class="bg-neutral-1 text-neutral-12 placeholder-neutral-9 ring-neutral-7 focus:ring-neutral-7 mt-1 flex w-full justify-between rounded-md border-0 px-3 py-2 align-middle ring-1 shadow-xs ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-            :class="{
-                'input-error': hasError
-            }"
+            class="bg-skin-neutral-1 text-skin-neutral-12 placeholder-skin-neutral-9 mt-1 flex w-full justify-between rounded-md border-0 px-3 py-2 align-middle shadow-sm ring-1 ring-blue-100 ring-inset hover:cursor-pointer focus:ring-1 focus:ring-blue-500 focus:ring-inset sm:text-sm sm:leading-6 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700 dark:focus:ring-blue-500"
             aria-haspopup="true"
             :aria-expanded="isOpen"
             @click="toggleState"
         >
-            <span class="mr-2 inline-block"> {{ comboLabelText }} </span>
+            <span class="mr-2 inline-block">{{ comboLabelText }}</span>
             <span>
                 <i
-                    v-show="modelValue"
-                    class="ri-close-circle-line hover:text-neutral-9 mr-2 inline-block"
+                    v-if="hasSelection"
+                    class="ri-close-circle-line hover:text-skin-neutral-9 mr-2 inline-block dark:hover:text-gray-300"
                     @click.prevent="clearSelection"
                 ></i>
-                <i class="ri-arrow-down-line hover:text-neutral-9"></i>
+                <i class="ri-arrow-down-line hover:text-skin-neutral-9 dark:hover:text-gray-300"></i>
             </span>
         </AppButton>
 
+        <!-- Dropdown -->
         <transition name="slide-fade">
-            <div v-show="isOpen" class="absolute z-50 mt-1 w-full">
-                <div v-show="useSearch" class="bg-neutral-1 p-1 shadow-sm">
-                    <!-- search input -->
-                    <label :for="getElementId()" class="sr-only">Search</label>
+            <div v-show="isOpen" class="absolute z-50 mt-1 w-full rounded-md shadow-lg dark:shadow-none">
+                <!-- Search -->
+                <div v-if="useSearch" class="bg-white p-1 shadow rounded-t-md dark:bg-gray-800 dark:border-gray-700">
+                    <label :for="getElementId()" class="sr-only">Search </label>
                     <div class="relative">
                         <div
                             class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
                         >
-                            <i class="ri-search-line" aria-hidden="true"></i>
+                            <i class="ri-search-line dark:text-gray-400" aria-hidden="true"></i>
                         </div>
                         <AppInputText
                             :id="getElementId()"
@@ -38,7 +37,7 @@
                             role="searchbox"
                             aria-autocomplete="list"
                             type="text"
-                            class="pl-10"
+                            class="pl-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                             :placeholder="searchPlaceholder"
                             @keypress.enter="validateOptionHighlighted"
                             @keydown="handleArrowKeys"
@@ -47,16 +46,16 @@
                     </div>
                 </div>
 
-                <!-- combo options -->
-                <ul class="bg-neutral-1 p-1 shadow-sm" role="listbox">
+                <!-- Options -->
+                <ul class="bg-white p-1 shadow rounded-b-md dark:bg-gray-800 max-h-60 overflow-y-auto" role="listbox">
                     <li
                         v-for="(option, index) in filteredOptions"
                         :key="option.value"
                         role="option"
                         :aria-selected="index === highlightedIndex"
-                        class="hover:bg-neutral-3 hover:text-neutral-12 block px-4 py-2 text-sm hover:cursor-pointer"
+                        class="hover:text-skin-neutral-12 block px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                         :class="{
-                            'bg-neutral-3 text-neutral-12':
+                            'bg-skin-neutral-3 text-skin-neutral-12 dark:bg-gray-700':
                                 index === highlightedIndex
                         }"
                         @click="updateModelValue(option)"
@@ -95,90 +94,49 @@ const props = defineProps({
         type: Array,
         default: () => []
     },
-    hasError: {
+    emitValue: {
         type: Boolean,
         default: false
     }
 })
 
-const wrapperRef = ref(null)
+const emit = defineEmits(['update:modelValue'])
 
+const wrapperRef = ref(null)
 const { isClickOutside } = useClickOutside(wrapperRef)
 
+const isOpen = ref(false)
+const searchInputRef = ref(null)
+const searchOptionText = ref('')
+const highlightedIndex = ref(0)
+
+// Close when clicked outside
 watch(isClickOutside, (val) => {
-    if (val) {
-        isOpen.value = false
-    }
+    if (val) isOpen.value = false
 })
 
 onMounted(() => {
-    isOpen.value && (highlightedIndex.value = 0)
+    if (isOpen.value) highlightedIndex.value = 0
 })
 
-const getElementId = () => {
-    return slug(props.comboLabel)
-}
+// Utils
+const getElementId = () => slug(props.comboLabel)
 
-const emit = defineEmits(['update:modelValue'])
-
-const isOpen = ref(false)
-
-const searchInputRef = ref(null)
 const toggleState = () => {
     isOpen.value = !isOpen.value
-
     highlightedIndex.value = 0
 
     window.setTimeout(() => {
-        if (isOpen.value) {
+        if (isOpen.value && props.useSearch) {
             searchOptionText.value = ''
-            searchInputRef.value.focusInput()
+            searchInputRef.value?.focusInput()
         }
     }, 100)
 }
 
 const updateModelValue = (option) => {
-    emit('update:modelValue', option)
+    emit('update:modelValue', props.emitValue ? option.value : option)
     toggleState()
-}
-
-const searchOptionText = ref('')
-
-const filteredOptions = computed(() => {
-    if (searchOptionText.value) {
-        return props.options.filter((option) =>
-            option.label
-                .toLowerCase()
-                .includes(searchOptionText.value.toLowerCase())
-        )
-    } else {
-        return props.options
-    }
-})
-
-const validateOptionHighlighted = () => {
-    if (filteredOptions.value[highlightedIndex.value]) {
-        updateModelValue(filteredOptions.value[highlightedIndex.value])
-    }
-}
-
-const highlightedIndex = ref(0)
-
-const handleArrowKeys = (event) => {
-    switch (event.key) {
-        case 'ArrowUp':
-            if (highlightedIndex.value > 0) {
-                highlightedIndex.value--
-            }
-            break
-        case 'ArrowDown':
-            if (highlightedIndex.value < filteredOptions.value.length - 1) {
-                highlightedIndex.value++
-            }
-            break
-        default:
-            break
-    }
 }
 
 const clearSelection = (e) => {
@@ -188,22 +146,74 @@ const clearSelection = (e) => {
     isOpen.value = false
 }
 
-const comboLabelText = computed(() => {
-    if (props.modelValue) {
-        return props.modelValue.label
-    } else {
-        return props.comboLabel
+// Filtering
+const filteredOptions = computed(() => {
+    if (searchOptionText.value) {
+        return props.options.filter((option) =>
+            option.label
+                .toLowerCase()
+                .includes(searchOptionText.value.toLowerCase())
+        )
     }
+    return props.options
+})
+
+// Keyboard
+const validateOptionHighlighted = () => {
+    if (filteredOptions.value[highlightedIndex.value]) {
+        updateModelValue(filteredOptions.value[highlightedIndex.value])
+    }
+}
+
+const handleArrowKeys = (event) => {
+    switch (event.key) {
+        case 'ArrowUp':
+            if (highlightedIndex.value > 0) highlightedIndex.value--
+            break
+        case 'ArrowDown':
+            if (highlightedIndex.value < filteredOptions.value.length - 1)
+                highlightedIndex.value++
+            break
+    }
+}
+
+const hasSelection = computed(() => {
+    if (props.emitValue) {
+        return (
+            props.modelValue !== null &&
+            props.modelValue !== '' &&
+            props.modelValue !== undefined
+        )
+    }
+    return props.modelValue !== null && typeof props.modelValue === 'object'
+})
+
+const comboLabelText = computed(() => {
+    if (props.modelValue !== null && props.modelValue !== '') {
+        if (props.emitValue) {
+            // When only value is stored, find the matching option
+            const found = props.options.find(
+                (o) => o.value === props.modelValue
+            )
+            return found ? found.label : props.comboLabel
+        } else if (props.modelValue.label) {
+            // When storing whole object
+            return props.modelValue.label
+        }
+    }
+    return props.comboLabel
 })
 </script>
 
 <style scoped>
-@reference "../../../css/app.css";
+/* Add this line to reference your main Tailwind stylesheet */
+@reference "../../../css/app.css"; /* Adjust the path as needed */
 
 .slide-fade-enter-active,
 .slide-fade-leave-active {
     @apply transition-all duration-200 ease-in;
 }
+
 .slide-fade-enter-from,
 .slide-fade-leave-to {
     @apply -translate-y-2 opacity-0;

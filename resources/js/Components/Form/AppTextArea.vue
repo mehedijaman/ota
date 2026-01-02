@@ -2,7 +2,7 @@
     <textarea
         ref="textarea"
         placeholder="Enter your message here"
-        class="bg-neutral-1 text-neutral-12 placeholder-neutral-9 ring-neutral-7 focus:ring-neutral-7 mt-1 block w-full rounded-md border-0 px-3 py-2 ring-1 shadow-xs ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+        class="peer border-neutral-8 block w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder-transparent shadow-sm transition-all duration-200 outline-none hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         :class="{ 'overflow-y-hidden': autoResize }"
         :value="modelValue"
         @input="handleInput"
