@@ -20,6 +20,7 @@
             <a href="{{ route('site.faq.index') }}" class="hover:text-blue-600">FAQ</a>
             <a href="{{ route('site.about') }}" class="hover:text-blue-600">About</a>
             <a href="{{ route('site.why-us') }}" class="hover:text-blue-600">Why Us</a>
+            <a href="{{ route('site.blog.index') }}" class="hover:text-blue-600">Blogs</a>
         </nav>
 
         <button class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm">
