@@ -1,15 +1,5 @@
 @extends('site-layout')
 
-@section('meta-title', 'Bill')
-
-@section('meta-description', 'Bill')
-
-@section('bodyEndScripts')
-    @vite('resources-site/js/index-app.js')
-@endsection
-
-@extends('site-layout')
-
 @section('meta-title', 'Pay Bills | Travelly')
 
 @section('meta-description', 'Pay your electricity, gas, internet, and other utility bills instantly with Travelly. Secure and fast.')

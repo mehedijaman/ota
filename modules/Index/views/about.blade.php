@@ -1,15 +1,5 @@
 @extends('site-layout')
 
-@section('meta-title', 'About')
-
-@section('meta-description', 'About')
-
-@section('bodyEndScripts')
-    @vite('resources-site/js/index-app.js')
-@endsection
-
-@extends('site-layout')
-
 @section('meta-title', 'About Us | Travelly')
 
 @section('meta-description', 'Learn about Travelly, our mission, vision, and the team dedicated to making your travel seamless.')

@@ -1,15 +1,5 @@
 @extends('site-layout')
 
-@section('meta-title', 'Terms and Conditions')
-
-@section('meta-description', 'Terms and Conditions')
-
-@section('bodyEndScripts')
-    @vite('resources-site/js/index-app.js')
-@endsection
-
-@extends('site-layout')
-
 @section('meta-title', 'Terms and Conditions | Travelly')
 
 @section('meta-description', 'Read our terms and conditions regarding bookings, payments, cancellations, and user responsibilities.')

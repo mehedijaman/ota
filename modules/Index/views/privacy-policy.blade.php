@@ -1,15 +1,5 @@
 @extends('site-layout')
 
-@section('meta-title', 'Privacy Policy')
-
-@section('meta-description', 'Privacy Policy')
-
-@section('bodyEndScripts')
-    @vite('resources-site/js/index-app.js')
-@endsection
-
-@extends('site-layout')
-
 @section('meta-title', 'Privacy Policy | Travelly')
 
 @section('meta-description', 'Learn how Travelly collects, uses, and protects your personal data.')

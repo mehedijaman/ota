@@ -1,15 +1,5 @@
 @extends('site-layout')
 
-@section('meta-title', 'Visa')
-
-@section('meta-description', 'Visa')
-
-@section('bodyEndScripts')
-    @vite('resources-site/js/index-app.js')
-@endsection
-
-@extends('site-layout')
-
 @section('meta-title', 'Apply for Visas Online | Travelly')
 
 @section('meta-description', 'Hassle-free visa application assistance for top destinations. Get your visa approved quickly with Travelly.')

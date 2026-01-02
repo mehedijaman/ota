@@ -1,15 +1,5 @@
 @extends('site-layout')
 
-@section('meta-title', 'Flight')
-
-@section('meta-description', 'Flight')
-
-@section('bodyEndScripts')
-    @vite('resources-site/js/index-app.js')
-@endsection
-
-@extends('site-layout')
-
 @section('meta-title', 'Find Cheap Flights | Travelly')
 
 @section('meta-description', 'Book cheap flights to top destinations. Compare airlines and save on your next trip with Travelly.')

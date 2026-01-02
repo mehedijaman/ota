@@ -1,15 +1,5 @@
 @extends('site-layout')
 
-@section('meta-title', 'Why Us')
-
-@section('meta-description', 'Why Us')
-
-@section('bodyEndScripts')
-    @vite('resources-site/js/index-app.js')
-@endsection
-
-@extends('site-layout')
-
 @section('meta-title', 'Why Choose Us | Travelly')
 
 @section('meta-description', 'Discover why millions of travelers trust Travelly for their bookings. Best prices, reliable support, and seamless experiences.')

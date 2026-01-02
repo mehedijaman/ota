@@ -1,15 +1,5 @@
 @extends('site-layout')
 
-@section('meta-title', 'Medical')
-
-@section('meta-description', 'Medical')
-
-@section('bodyEndScripts')
-    @vite('resources-site/js/index-app.js')
-@endsection
-
-@extends('site-layout')
-
 @section('meta-title', 'Medical Tourism | Travelly')
 
 @section('meta-description', 'Find world-class medical treatments and hospitals abroad. Trusted healthcare partners.')

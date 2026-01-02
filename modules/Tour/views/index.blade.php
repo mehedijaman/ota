@@ -1,15 +1,5 @@
 @extends('site-layout')
 
-@section('meta-title', 'Tour')
-
-@section('meta-description', 'Tour')
-
-@section('bodyEndScripts')
-    @vite('resources-site/js/index-app.js')
-@endsection
-
-@extends('site-layout')
-
 @section('meta-title', 'Explore World Tours | Travelly')
 
 @section('meta-description', 'Discover amazing tour packages to the world\'s most beautiful destinations. Adventure awaits with Travelly.')
