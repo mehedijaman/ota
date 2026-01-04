@@ -11,4 +11,9 @@ class SiteVisaController extends SiteController
     {
         return view('visa::index');
     }
+
+    public function requirements(string $country): View
+    {
+        return view('visa::requirements', ['country' => $country]);
+    }
 }

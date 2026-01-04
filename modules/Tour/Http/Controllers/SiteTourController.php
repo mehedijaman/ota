@@ -11,4 +11,14 @@ class SiteTourController extends SiteController
     {
         return view('tour::index');
     }
+
+    public function search(): View
+    {
+        return view('tour::search-tour');
+    }
+
+    public function show(int $id): View
+    {
+        return view('tour::show-tour', ['id' => $id]);
+    }
 }
