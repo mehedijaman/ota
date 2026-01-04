@@ -1,6 +1,6 @@
 @extends('site-layout')
 
-@section('meta-title', 'Medical Tourism | Triptonic')
+@section('meta-title', 'Medical Tourism | TriptonicBD')
 
 @section('meta-description', 'Find world-class medical treatments and hospitals abroad. Trusted healthcare partners.')
 

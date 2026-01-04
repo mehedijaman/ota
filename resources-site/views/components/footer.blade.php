@@ -11,7 +11,7 @@
                             <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
                         </svg>
                     </div>
-                    <span class="font-bold text-2xl text-white tracking-tight">Triptonic</span>
+                    <span class="font-bold text-2xl text-white tracking-tight">TriptonicBD</span>
                 </a>
                 <p class="text-slate-400 mb-6 leading-relaxed max-w-sm">
                     Your trusted partner for all travel needs. We make exploring the world easy, affordable, and unforgettable.
@@ -63,7 +63,7 @@
 
         <!-- Bottom Bar -->
         <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-slate-500 text-sm">© {{ date('Y') }} Triptonic. All rights reserved.</p>
+            <p class="text-slate-500 text-sm">© {{ date('Y') }} TriptonicBD. All rights reserved.</p>
             <div class="flex gap-6 text-sm">
                  <a href="#" class="text-slate-500 hover:text-white transition-colors">Sitemap</a>
                  <a href="#" class="text-slate-500 hover:text-white transition-colors">Cookies</a>

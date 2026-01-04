@@ -1,6 +1,6 @@
 @extends('site-layout')
 
-@section('meta-title', 'Help Center & FAQ | Triptonic')
+@section('meta-title', 'Help Center & FAQ | TriptonicBD')
 
 @section('meta-description', 'Find answers to your questions about bookings, payments, cancellations, and more.')
 

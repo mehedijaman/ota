@@ -11,4 +11,9 @@ class SiteFlightController extends SiteController
     {
         return view('flight::index');
     }
+
+    public function search(): View
+    {
+        return view('flight::search-flight');
+    }
 }

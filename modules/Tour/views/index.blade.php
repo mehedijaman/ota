@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'Explore World Tours | Triptonic')
+@section('meta-title', 'Explore World Tours | TriptonicBD')
 
-@section('meta-description', 'Discover amazing tour packages to the world\'s most beautiful destinations. Adventure awaits with Triptonic.')
+@section('meta-description', 'Discover amazing tour packages to the world\'s most beautiful destinations. Adventure awaits with TriptonicBD.')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')

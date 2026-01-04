@@ -6,7 +6,7 @@
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
 
         <div class="relative z-10 text-center md:text-left">
-            <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">Grow Your Business with Triptonic</h3>
+            <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">Grow Your Business with TriptonicBD</h3>
             <p class="text-blue-200 text-lg max-w-xl">Join our network of over 5,000+ partners and reach millions of travelers worldwide. Access exclusive tools and insights.</p>
         </div>
         <div class="relative z-10 shrinking-0">

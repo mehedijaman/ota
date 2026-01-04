@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'Triptonic:Online Travel Agency')
+@section('meta-title', 'TriptonicBD:Online Travel Agency')
 
-@section('meta-description', 'Triptonic:Online Travel Agency')
+@section('meta-description', 'TriptonicBD:Online Travel Agency')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')

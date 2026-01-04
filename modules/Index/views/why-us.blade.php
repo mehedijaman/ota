@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'Why Choose Us | Triptonic')
+@section('meta-title', 'Why Choose Us | TriptonicBD')
 
-@section('meta-description', 'Discover why millions of travelers trust Triptonic for their bookings. Best prices, reliable support, and seamless experiences.')
+@section('meta-description', 'Discover why millions of travelers trust TriptonicBD for their bookings. Best prices, reliable support, and seamless experiences.')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')
@@ -21,7 +21,7 @@
 
         <div class="container max-w-4xl mx-auto px-4 text-center text-white relative z-10">
             <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
-                Why <span class="text-transparent bg-clip-text bg-linear-to-r from-yellow-300 to-orange-400">Triptonic?</span>
+                Why <span class="text-transparent bg-clip-text bg-linear-to-r from-yellow-300 to-orange-400">TriptonicBD?</span>
             </h1>
             <p class="text-xl text-yellow-50 max-w-2xl mx-auto font-light">
                 We don't just book trips. We craft unforgettable experiences.

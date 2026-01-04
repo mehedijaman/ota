@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'Apply for Visas Online | Triptonic')
+@section('meta-title', 'Apply for Visas Online | TriptonicBD')
 
-@section('meta-description', 'Hassle-free visa application assistance for top destinations. Get your visa approved quickly with Triptonic.')
+@section('meta-description', 'Hassle-free visa application assistance for top destinations. Get your visa approved quickly with TriptonicBD.')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')

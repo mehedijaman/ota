@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'Privacy Policy | Triptonic')
+@section('meta-title', 'Privacy Policy | TriptonicBD')
 
-@section('meta-description', 'Learn how Triptonic collects, uses, and protects your personal data.')
+@section('meta-description', 'Learn how TriptonicBD collects, uses, and protects your personal data.')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')
