@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'Pay Bills | Travelly')
+@section('meta-title', 'Pay Bills | Triptonic')
 
-@section('meta-description', 'Pay your electricity, gas, internet, and other utility bills instantly with Travelly. Secure and fast.')
+@section('meta-description', 'Pay your electricity, gas, internet, and other utility bills instantly with Triptonic. Secure and fast.')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')

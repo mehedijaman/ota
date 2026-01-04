@@ -1,6 +1,6 @@
 @extends('site-layout')
 
-@section('meta-title', 'Terms and Conditions | Travelly')
+@section('meta-title', 'Terms and Conditions | Triptonic')
 
 @section('meta-description', 'Read our terms and conditions regarding bookings, payments, cancellations, and user responsibilities.')
 
@@ -35,7 +35,7 @@
             <div class="lg:col-span-9 prose prose-slate max-w-none prose-headings:font-bold prose-headings:text-slate-800 prose-p:text-slate-600 prose-li:text-slate-600">
                 <div id="introduction" class="scroll-mt-32 mb-12">
                     <h2>1. Introduction</h2>
-                    <p>Welcome to Travelly. These Terms and Conditions govern your use of our website and services. By accessing or using our platform, you agree to be bound by these terms.</p>
+                    <p>Welcome to Triptonic. These Terms and Conditions govern your use of our website and services. By accessing or using our platform, you agree to be bound by these terms.</p>
                 </div>
 
                 <div id="bookings" class="scroll-mt-32 mb-12">
@@ -56,12 +56,12 @@
                 <div id="cancellations" class="scroll-mt-32 mb-12">
                     <h2>4. Cancellations & Refunds</h2>
                     <p>Cancellation policies vary by service provider. Please review the specific terms associated with your booking before confirming.</p>
-                    <p>Travelly service fees are generally non-refundable. Refunds, if applicable, will be processed back to the original payment method within 7-14 business days.</p>
+                    <p>Triptonic service fees are generally non-refundable. Refunds, if applicable, will be processed back to the original payment method within 7-14 business days.</p>
                 </div>
 
                  <div id="liability" class="scroll-mt-32 mb-12">
                     <h2>5. Limitation of Liability</h2>
-                    <p>Travelly shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our services.</p>
+                    <p>Triptonic shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our services.</p>
                 </div>
             </div>
         </div>

@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'Apply for Visas Online | Travelly')
+@section('meta-title', 'Apply for Visas Online | Triptonic')
 
-@section('meta-description', 'Hassle-free visa application assistance for top destinations. Get your visa approved quickly with Travelly.')
+@section('meta-description', 'Hassle-free visa application assistance for top destinations. Get your visa approved quickly with Triptonic.')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')

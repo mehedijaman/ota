@@ -15,7 +15,7 @@
                 Discover Your Next <span class="text-cyan-400">Adventure</span>
             </h1>
             <p class="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto font-light">
-                Find the best deals on flights, hotels, tours, and more. Experience the world with Travelly.
+                Find the best deals on flights, hotels, tours, and more. Experience the world with Triptonic.
             </p>
         </div>
 

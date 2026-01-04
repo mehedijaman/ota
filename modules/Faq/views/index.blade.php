@@ -1,6 +1,6 @@
 @extends('site-layout')
 
-@section('meta-title', 'Help Center & FAQ | Travelly')
+@section('meta-title', 'Help Center & FAQ | Triptonic')
 
 @section('meta-description', 'Find answers to your questions about bookings, payments, cancellations, and more.')
 

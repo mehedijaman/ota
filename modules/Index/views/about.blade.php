@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'About Us | Travelly')
+@section('meta-title', 'About Us | Triptonic')
 
-@section('meta-description', 'Learn about Travelly, our mission, vision, and the team dedicated to making your travel seamless.')
+@section('meta-description', 'Learn about Triptonic, our mission, vision, and the team dedicated to making your travel seamless.')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')
@@ -38,7 +38,7 @@
                     From a Simple Idea <br> to a Global Platform.
                 </h2>
                 <p class="text-slate-600 text-lg leading-relaxed">
-                    Started in 2024, Travelly began with a simple mission: to simplify the complex world of travel booking. Frustrated by hidden fees and confusing interfaces, we set out to build something better.
+                    Started in 2024, Triptonic began with a simple mission: to simplify the complex world of travel booking. Frustrated by hidden fees and confusing interfaces, we set out to build something better.
                 </p>
                 <p class="text-slate-600 text-lg leading-relaxed">
                     Today, we help thousands of travelers explore the world with confidence, offering flights, hotels, tours, and more—all in one seamless experience.

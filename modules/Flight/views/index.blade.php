@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'Find Cheap Flights | Travelly')
+@section('meta-title', 'Find Cheap Flights | Triptonic')
 
-@section('meta-description', 'Book cheap flights to top destinations. Compare airlines and save on your next trip with Travelly.')
+@section('meta-description', 'Book cheap flights to top destinations. Compare airlines and save on your next trip with Triptonic.')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')

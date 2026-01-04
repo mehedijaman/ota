@@ -1,8 +1,8 @@
 @extends('site-layout')
 
-@section('meta-title', 'Book Top Hotels | Travelly')
+@section('meta-title', 'Book Top Hotels | Triptonic')
 
-@section('meta-description', 'Find the best deals on hotels, resorts, and vacation rentals. Book your perfect stay with Travelly.')
+@section('meta-description', 'Find the best deals on hotels, resorts, and vacation rentals. Book your perfect stay with Triptonic.')
 
 @section('bodyEndScripts')
     @vite('resources-site/js/index-app.js')
