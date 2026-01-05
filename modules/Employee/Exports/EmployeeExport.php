@@ -11,11 +11,11 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class EmployeeExport implements FromCollection, WithHeadings, WithStyles
 {
-    protected $validated;
+    protected $filters;
 
-    public function __construct($validated)
+    public function __construct(array $filters = [])
     {
-        $this->validated = $validated;
+        $this->filters = $filters;
     }
 
     /**
@@ -25,25 +25,28 @@ class EmployeeExport implements FromCollection, WithHeadings, WithStyles
      */
     public function collection()
     {
-        return Employee::filter($this->validated)
+        return Employee::query()
+            ->with(['designation', 'department', 'area'])
+            ->when($this->filters['designation'] ?? null, fn ($q, $v) => $q->where('designation_id', $v))
+            ->when($this->filters['department'] ?? null, fn ($q, $v) => $q->where('department_id', $v))
+            ->when($this->filters['area'] ?? null, fn ($q, $v) => $q->where('area_id', $v))
+            ->when(isset($this->filters['active']), fn ($q) => $q->where('is_active', $this->filters['active']))
+            ->orderBy('name')
             ->get()
             ->map(fn ($employee) => $this->transformEmployee($employee));
     }
 
     /**
      * Transform the employee model into the exportable format.
-     *
-     * @param  Employee  $employee
      */
-    private function transformEmployee($employee): array
+    private function transformEmployee(Employee $employee): array
     {
         return [
             'code' => $employee->code,
-            'company' => optional($employee->company)->name,
             'name' => $employee->name,
-            'designation' => optional($employee->designation)->name,
-            'section' => optional($employee->section)->name,
-            'department' => optional($employee->department)->name,
+            'designation' => $employee->designation?->name,
+            'department' => $employee->department?->name,
+            'area' => $employee->area?->name,
             'joining_date' => $employee->joining_date,
             'type' => $employee->type,
             'service_length' => $employee->service_length,
@@ -61,7 +64,7 @@ class EmployeeExport implements FromCollection, WithHeadings, WithStyles
             'email' => $employee->email,
             'phone' => $employee->phone,
             'emergency_contact' => $employee->emergency_contact,
-            'status' => $employee->active,
+            'status' => $employee->is_active ? 'Active' : 'Inactive',
             'resign_date' => $employee->resign_date,
         ];
     }
@@ -73,11 +76,10 @@ class EmployeeExport implements FromCollection, WithHeadings, WithStyles
     {
         return [
             'Code',
-            'Company',
             'Name',
             'Designation',
-            'Section',
             'Department',
+            'Area',
             'Joining Date',
             'Type',
             'Service Length',
@@ -110,7 +112,7 @@ class EmployeeExport implements FromCollection, WithHeadings, WithStyles
                 'font' => ['bold' => true],
                 'fill' => [
                     'fillType' => Fill::FILL_SOLID,
-                    'color' => ['argb' => 'FFFF00'], // Yellow background color for the header row
+                    'color' => ['argb' => 'FFFF00'],
                 ],
             ],
         ];
