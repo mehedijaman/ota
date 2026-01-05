@@ -218,4 +218,30 @@ class EmployeeController extends BackendController
     {
         return Excel::download(new \Modules\Employee\Exports\EmployeeExport([]), 'employees.xlsx');
     }
+
+    public function createUser(Request $request, Employee $employee): RedirectResponse
+    {
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Check if user already exists
+        $existingUser = \Modules\User\Models\User::where('profile_type', 'employee')
+            ->where('profile_id', $employee->id)
+            ->first();
+
+        if ($existingUser) {
+            return back()->with('error', 'User already exists for this employee.');
+        }
+
+        \Modules\User\Models\User::create([
+            'name' => $employee->name,
+            'email' => $employee->email,
+            'password' => bcrypt($request->password),
+            'profile_type' => 'employee',
+            'profile_id' => $employee->id,
+        ]);
+
+        return back()->with('success', 'User account created successfully.');
+    }
 }

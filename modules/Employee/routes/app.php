@@ -42,6 +42,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{employee:uuid}/edit', 'edit')->name('edit')->can('employee-edit');
         Route::put('{employee:uuid}', 'update')->name('update')->can('employee-edit');
         Route::delete('{employee:uuid}', 'destroy')->name('destroy')->can('employee-delete');
+
+        // Create User Account
+        Route::post('{employee:uuid}/create-user', 'createUser')->name('createUser')->can('employee-edit');
     });
 
     // Designation Routes

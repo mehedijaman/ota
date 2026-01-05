@@ -49,6 +49,9 @@ class EmployeeService
                 'email' => $employee->email,
                 'phone' => $employee->phone,
                 'is_active' => $employee->is_active,
+                'has_user' => \Modules\User\Models\User::where('profile_type', 'employee')
+                    ->where('profile_id', $employee->id)
+                    ->exists(),
                 'updated_at' => $employee->updated_at->format('d/m/Y H:i').'h',
                 'created_at' => $employee->created_at->format('d/m/Y H:i').'h',
             ]);
