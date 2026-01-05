@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Visa\Http\Controllers\VisaController;
 
 Route::get('visa', [
-    VisaController::class, 'index', 
+    VisaController::class, 'index',
 ])->name('visa.index');
 
 Route::get('visa/create', [

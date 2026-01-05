@@ -1,4 +1,4 @@
-@extends('report-layout')
+{{-- @extends('report-layout') --}}
 
 @section('content')
     {{-- <x-report-header :header="$report['header']"></x-report-header> --}}
@@ -32,7 +32,7 @@
                         <td class="px-1">{{ $employee['code'] }}</td>
                         <td class="px-1">{{ $employee['name'] }}</td>
                         <td class="px-1">
-                            {{ $employee['designation']?->name }}
+                            {{ $employee['designation'] }}
                         </td>
                         <td class="px-1">
                             {{ date('d/m/Y', strtotime($employee['joining_date'])) }}

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Faq\Http\Controllers\FaqController;
 
 Route::get('faq', [
-    FaqController::class, 'index', 
+    FaqController::class, 'index',
 ])->name('faq.index');
 
 Route::get('faq/create', [

@@ -2,11 +2,11 @@
 
 namespace Modules\Medical\Http\Controllers;
 
-use Modules\Support\Http\Controllers\BackendController;
-use Modules\Medical\Http\Requests\MedicalValidate;
-use Modules\Medical\Models\Medical;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
+use Modules\Medical\Http\Requests\MedicalValidate;
+use Modules\Medical\Models\Medical;
+use Modules\Support\Http\Controllers\BackendController;
 
 class MedicalController extends BackendController
 {
@@ -17,13 +17,13 @@ class MedicalController extends BackendController
             ->paginate(request('rowsPerPage', 10))
             ->withQueryString()
             ->through(fn ($medical) => [
-                    'id' => $medical->id,
-                    'name' => $medical->name,
-                    'created_at' => $medical->created_at->format('d/m/Y H:i') . 'h'
+                'id' => $medical->id,
+                'name' => $medical->name,
+                'created_at' => $medical->created_at->format('d/m/Y H:i').'h',
             ]);
 
         return inertia('Medical/MedicalIndex', [
-            'medicals' => $medicals
+            'medicals' => $medicals,
         ]);
     }
 
@@ -45,7 +45,7 @@ class MedicalController extends BackendController
         $medical = Medical::find($id);
 
         return inertia('Medical/MedicalForm', [
-            'medical' => $medical
+            'medical' => $medical,
         ]);
     }
 

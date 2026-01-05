@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Medical\Http\Controllers\MedicalController;
 
 Route::get('medical', [
-    MedicalController::class, 'index', 
+    MedicalController::class, 'index',
 ])->name('medical.index');
 
 Route::get('medical/create', [

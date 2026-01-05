@@ -2,11 +2,11 @@
 
 namespace Modules\Visa\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
+use Inertia\Response;
 use Modules\Support\Http\Controllers\BackendController;
 use Modules\Visa\Http\Requests\VisaValidate;
 use Modules\Visa\Models\Visa;
-use Illuminate\Http\RedirectResponse;
-use Inertia\Response;
 
 class VisaController extends BackendController
 {
@@ -17,13 +17,13 @@ class VisaController extends BackendController
             ->paginate(request('rowsPerPage', 10))
             ->withQueryString()
             ->through(fn ($visa) => [
-                    'id' => $visa->id,
-                    'name' => $visa->name,
-                    'created_at' => $visa->created_at->format('d/m/Y H:i') . 'h'
+                'id' => $visa->id,
+                'name' => $visa->name,
+                'created_at' => $visa->created_at->format('d/m/Y H:i').'h',
             ]);
 
         return inertia('Visa/VisaIndex', [
-            'visas' => $visas
+            'visas' => $visas,
         ]);
     }
 
@@ -45,7 +45,7 @@ class VisaController extends BackendController
         $visa = Visa::find($id);
 
         return inertia('Visa/VisaForm', [
-            'visa' => $visa
+            'visa' => $visa,
         ]);
     }
 

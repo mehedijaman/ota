@@ -13,6 +13,11 @@ use Modules\Support\Http\Controllers\BackendController;
 
 class EmployeeReportController extends BackendController
 {
+    public function index(Request $request)
+    {
+        return $this->print($request);
+    }
+
     public function print(Request $request)
     {
         // Validate request

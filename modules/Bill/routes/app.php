@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Bill\Http\Controllers\BillController;
 
 Route::get('bill', [
-    BillController::class, 'index', 
+    BillController::class, 'index',
 ])->name('bill.index');
 
 Route::get('bill/create', [

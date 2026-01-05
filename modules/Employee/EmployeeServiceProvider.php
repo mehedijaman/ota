@@ -11,5 +11,7 @@ class EmployeeServiceProvider extends BaseServiceProvider
         parent::boot();
 
         $this->loadMigrationsFrom(__DIR__.'/Database/Migrations');
+
+        $this->loadViewsFrom(__DIR__.'/views', 'employee');
     }
 }

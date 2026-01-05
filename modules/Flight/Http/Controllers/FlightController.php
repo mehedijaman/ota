@@ -2,11 +2,11 @@
 
 namespace Modules\Flight\Http\Controllers;
 
-use Modules\Support\Http\Controllers\BackendController;
-use Modules\Flight\Http\Requests\FlightValidate;
-use Modules\Flight\Models\Flight;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
+use Modules\Flight\Http\Requests\FlightValidate;
+use Modules\Flight\Models\Flight;
+use Modules\Support\Http\Controllers\BackendController;
 
 class FlightController extends BackendController
 {
@@ -17,13 +17,13 @@ class FlightController extends BackendController
             ->paginate(request('rowsPerPage', 10))
             ->withQueryString()
             ->through(fn ($flight) => [
-                    'id' => $flight->id,
-                    'name' => $flight->name,
-                    'created_at' => $flight->created_at->format('d/m/Y H:i') . 'h'
+                'id' => $flight->id,
+                'name' => $flight->name,
+                'created_at' => $flight->created_at->format('d/m/Y H:i').'h',
             ]);
 
         return inertia('Flight/FlightIndex', [
-            'flights' => $flights
+            'flights' => $flights,
         ]);
     }
 
@@ -45,7 +45,7 @@ class FlightController extends BackendController
         $flight = Flight::find($id);
 
         return inertia('Flight/FlightForm', [
-            'flight' => $flight
+            'flight' => $flight,
         ]);
     }
 

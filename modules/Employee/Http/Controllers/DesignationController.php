@@ -7,32 +7,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
-use Modules\Company\Jobs\SyncDesignationWithAPI;
 use Modules\Employee\Exports\DesignationExport;
 use Modules\Employee\Http\Requests\DesignationValidate;
 use Modules\Employee\Imports\DesignationImport;
 use Modules\Employee\Models\Designation;
+use Modules\Employee\Services\DesignationService;
 use Modules\Support\Http\Controllers\BackendController;
 
 class DesignationController extends BackendController
 {
+    public function __construct(
+        protected DesignationService $designationService
+    ) {}
+
     public function index(): Response
     {
-        $designations = Designation::orderBy('id')
-            ->with('employees')
-            ->search(request('searchContext'), request('searchTerm'))
-            ->paginate(request('rowsPerPage', 20))
-            ->withQueryString()
-            ->through(fn ($designation) => [
-                'uuid' => $designation->uuid,
-                'name' => $designation->name,
-                'code' => $designation->code,
-                'employee_count' => $designation->employees->count(),
-                'is_active' => $designation->is_active,
-            ]);
-
         return inertia('Employee/DesignationIndex', [
-            'designations' => $designations,
+            'designations' => $this->designationService->getAll(),
         ]);
     }
 
@@ -43,9 +34,7 @@ class DesignationController extends BackendController
 
     public function store(DesignationValidate $request): RedirectResponse
     {
-        Designation::create($request->validated());
-
-        // SyncDesignationWithAPI::dispatch($designation, 'create');
+        $this->designationService->create($request->validated());
 
         return redirect()->route('designation.index')
             ->with('success', 'Designation created.');
@@ -53,18 +42,14 @@ class DesignationController extends BackendController
 
     public function edit(Designation $designation): Response
     {
-        // $designation = Designation::find($id);
-
         return inertia('Employee/DesignationForm', [
             'designation' => $designation,
         ]);
     }
 
-    public function update(DesignationValidate $request, Designation $designation)
+    public function update(DesignationValidate $request, Designation $designation): RedirectResponse
     {
-        $designation->update($request->validated());
-
-        // SyncDesignationWithAPI::dispatch($designation, 'update');
+        $this->designationService->update($designation, $request->validated());
 
         return redirect()->route('designation.index')
             ->with('success', 'Designation updated.');
@@ -72,13 +57,12 @@ class DesignationController extends BackendController
 
     public function destroy(Designation $designation): RedirectResponse
     {
-        // Check if the designation has employees
-        if ($designation->employees()->count() > 0) {
-            return redirect()->route('designation.index')
-                ->with('error', 'Designation cannot be deleted because it has employees.');
-        }
+        $result = $this->designationService->delete($designation);
 
-        $designation->delete();
+        if (! $result['success']) {
+            return redirect()->route('designation.index')
+                ->with('error', $result['message']);
+        }
 
         return redirect()->route('designation.index')
             ->with('success', 'Designation deleted.');
@@ -86,56 +70,44 @@ class DesignationController extends BackendController
 
     public function recycleBin(): Response
     {
-        $designations = Designation::onlyTrashed()
-            ->orderBy('id')
-            ->search(request('searchContext'), request('searchTerm'))
-            ->paginate(request('rowsPerPage', 20))
-            ->withQueryString()
-            ->through(fn ($designation) => [
-                'id' => $designation->id,
-                'name' => $designation->name,
-                'code' => $designation->code,
-                'active' => $designation->active,
-            ]);
-
         return inertia('Employee/DesignationRecycleBin', [
-            'designations' => $designations,
+            'designations' => $this->designationService->getRecycleBin(),
         ]);
     }
 
     public function restore(int $id): RedirectResponse
     {
-        Designation::onlyTrashed()->findOrFail($id)->restore(); // Restore soft deleted record
+        $this->designationService->restore($id);
 
         return redirect()->route('designation.recycleBin')
             ->with('success', 'Designation restored.');
     }
 
-    public function destroyForce(int $id): RedirectResponse
+    public function forceDestroy(int $id): RedirectResponse
     {
-        Designation::onlyTrashed()->findOrFail($id)->forceDelete(); // Force delete soft deleted record
+        $this->designationService->forceDelete($id);
 
         return redirect()->route('designation.recycleBin')
-            ->with('success', 'Designation deleted.');
+            ->with('success', 'Designation deleted permanently.');
     }
 
     public function emptyRecycleBin(): RedirectResponse
     {
-        Designation::onlyTrashed()->forceDelete();
+        $this->designationService->emptyRecycleBin();
 
         return redirect()->route('designation.recycleBin')
-            ->with('success', 'Designation emptied.');
+            ->with('success', 'Recycle bin emptied.');
     }
 
-    public function restoreRecycleBin(): RedirectResponse
+    public function restoreAll(): RedirectResponse
     {
-        Designation::onlyTrashed()->restore(); // Restore soft deleted records
+        $this->designationService->restoreAll();
 
         return redirect()->route('designation.recycleBin')
-            ->with('success', 'Designation restored.');
+            ->with('success', 'All designations restored.');
     }
 
-    public function import()
+    public function import(): Response
     {
         return inertia('Employee/DesignationImport');
     }
@@ -151,28 +123,18 @@ class DesignationController extends BackendController
         return response()->download($filePath);
     }
 
-    /**
-     * Handle the employee import request.
-     *
-     * @return RedirectResponse
-     */
-    public function postImport(Request $request)
+    public function postImport(Request $request): RedirectResponse
     {
-        // Validate file input
         $validatedData = $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:10240',  // max 10MB
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
         ]);
 
-        // Log the file upload attempt
-        $this->logFileUpload($request);
-
         try {
-            // Import employee data from the uploaded file
             Excel::import(new DesignationImport, $validatedData['file']);
 
-            return redirect()->route('designation.index')->with('success', 'Designations imported successfully.');
+            return redirect()->route('designation.index')
+                ->with('success', 'Designations imported successfully.');
         } catch (\Exception $e) {
-            // Log the import error and return a response with error details
             Log::error('Error importing designations', [
                 'file_name' => $validatedData['file']->getClientOriginalName(),
                 'error_message' => $e->getMessage(),
@@ -181,20 +143,6 @@ class DesignationController extends BackendController
             return back()->withErrors([
                 'file' => 'Failed to import designations. Please check the file format.',
             ]);
-        }
-    }
-
-    /**
-     * Log the uploaded file information or error if no file was uploaded.
-     */
-    private function logFileUpload(Request $request): void
-    {
-        if ($request->hasFile('file')) {
-            Log::info('File uploaded successfully', [
-                'file_name' => $request->file('file')->getClientOriginalName(),
-            ]);
-        } else {
-            Log::warning('No file uploaded');
         }
     }
 

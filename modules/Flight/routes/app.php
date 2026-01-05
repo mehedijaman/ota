@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Flight\Http\Controllers\FlightController;
 
 Route::get('flight', [
-    FlightController::class, 'index', 
+    FlightController::class, 'index',
 ])->name('flight.index');
 
 Route::get('flight/create', [

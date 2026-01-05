@@ -2,11 +2,11 @@
 
 namespace Modules\Hotel\Http\Controllers;
 
-use Modules\Support\Http\Controllers\BackendController;
-use Modules\Hotel\Http\Requests\HotelValidate;
-use Modules\Hotel\Models\Hotel;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
+use Modules\Hotel\Http\Requests\HotelValidate;
+use Modules\Hotel\Models\Hotel;
+use Modules\Support\Http\Controllers\BackendController;
 
 class HotelController extends BackendController
 {
@@ -17,13 +17,13 @@ class HotelController extends BackendController
             ->paginate(request('rowsPerPage', 10))
             ->withQueryString()
             ->through(fn ($hotel) => [
-                    'id' => $hotel->id,
-                    'name' => $hotel->name,
-                    'created_at' => $hotel->created_at->format('d/m/Y H:i') . 'h'
+                'id' => $hotel->id,
+                'name' => $hotel->name,
+                'created_at' => $hotel->created_at->format('d/m/Y H:i').'h',
             ]);
 
         return inertia('Hotel/HotelIndex', [
-            'hotels' => $hotels
+            'hotels' => $hotels,
         ]);
     }
 
@@ -45,7 +45,7 @@ class HotelController extends BackendController
         $hotel = Hotel::find($id);
 
         return inertia('Hotel/HotelForm', [
-            'hotel' => $hotel
+            'hotel' => $hotel,
         ]);
     }
 

@@ -5,11 +5,8 @@ namespace Modules\Employee\Imports;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Modules\Company\Models\Area;
-use Modules\Company\Models\Company;
-use Modules\Company\Models\Department;
-use Modules\Company\Models\Section;
-use Modules\Company\Models\Shift;
+use Modules\Employee\Models\Area;
+use Modules\Employee\Models\Department;
 use Modules\Employee\Models\Designation;
 use Modules\Employee\Models\Employee;
 
@@ -27,16 +24,15 @@ class EmployeeImport implements ToModel, WithHeadingRow
             };
 
             // Look up the ID for mandatory fields
-            $company_id = Company::where('name', $row['company'])->first()?->id;
             $area_id = Area::where('name', $row['area'])->first()?->id;
             $department_id = Department::where('name', $row['department'])->first()?->id;
             $code = $getValue('code');
             $name = $getValue('name');
 
-            Log::info('Processing row', compact('company_id', 'area_id', 'department_id', 'code', 'name'));
+            Log::info('Processing row', compact('area_id', 'department_id', 'code', 'name'));
 
             // Check if mandatory fields are present and not blank
-            $required = compact('company_id', 'area_id', 'department_id', 'code', 'name');
+            $required = compact('area_id', 'department_id', 'code', 'name');
 
             if (count(array_filter($required)) !== count($required)) {
                 Log::error('Skipping row due to missing mandatory fields', $required);
@@ -54,19 +50,14 @@ class EmployeeImport implements ToModel, WithHeadingRow
 
             // Look up the ID for optional fields
             $designation_id = Designation::where('name', $getValue('designation'))->first()?->id;
-            $shift_id = Shift::where('name', $getValue('shift'))->first()?->id;
-            $section_id = Section::where('name', $getValue('section'))->first()?->id;
 
             // Prepare employee data array
             $employeeData = [
-                'company_id' => $company_id,
                 'department_id' => $department_id,
                 'area_id' => $area_id,
                 'code' => $code,
                 'name' => $name,
                 'designation_id' => $designation_id,
-                'shift_id' => $shift_id,
-                'section_id' => $section_id,
                 'type' => $getValue('type'),
                 'card_type' => $getValue('card_type'),
                 'joining_date' => $getValue('joining_date'),

@@ -2,11 +2,11 @@
 
 namespace Modules\Bill\Http\Controllers;
 
-use Modules\Support\Http\Controllers\BackendController;
-use Modules\Bill\Http\Requests\BillValidate;
-use Modules\Bill\Models\Bill;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
+use Modules\Bill\Http\Requests\BillValidate;
+use Modules\Bill\Models\Bill;
+use Modules\Support\Http\Controllers\BackendController;
 
 class BillController extends BackendController
 {
@@ -17,13 +17,13 @@ class BillController extends BackendController
             ->paginate(request('rowsPerPage', 10))
             ->withQueryString()
             ->through(fn ($bill) => [
-                    'id' => $bill->id,
-                    'name' => $bill->name,
-                    'created_at' => $bill->created_at->format('d/m/Y H:i') . 'h'
+                'id' => $bill->id,
+                'name' => $bill->name,
+                'created_at' => $bill->created_at->format('d/m/Y H:i').'h',
             ]);
 
         return inertia('Bill/BillIndex', [
-            'bills' => $bills
+            'bills' => $bills,
         ]);
     }
 
@@ -45,7 +45,7 @@ class BillController extends BackendController
         $bill = Bill::find($id);
 
         return inertia('Bill/BillForm', [
-            'bill' => $bill
+            'bill' => $bill,
         ]);
     }
 

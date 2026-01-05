@@ -2,11 +2,11 @@
 
 namespace Modules\Faq\Http\Controllers;
 
-use Modules\Support\Http\Controllers\BackendController;
-use Modules\Faq\Http\Requests\FaqValidate;
-use Modules\Faq\Models\Faq;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
+use Modules\Faq\Http\Requests\FaqValidate;
+use Modules\Faq\Models\Faq;
+use Modules\Support\Http\Controllers\BackendController;
 
 class FaqController extends BackendController
 {
@@ -17,13 +17,13 @@ class FaqController extends BackendController
             ->paginate(request('rowsPerPage', 10))
             ->withQueryString()
             ->through(fn ($faq) => [
-                    'id' => $faq->id,
-                    'name' => $faq->name,
-                    'created_at' => $faq->created_at->format('d/m/Y H:i') . 'h'
+                'id' => $faq->id,
+                'name' => $faq->name,
+                'created_at' => $faq->created_at->format('d/m/Y H:i').'h',
             ]);
 
         return inertia('Faq/FaqIndex', [
-            'faqs' => $faqs
+            'faqs' => $faqs,
         ]);
     }
 
@@ -45,7 +45,7 @@ class FaqController extends BackendController
         $faq = Faq::find($id);
 
         return inertia('Faq/FaqForm', [
-            'faq' => $faq
+            'faq' => $faq,
         ]);
     }
 

@@ -2,11 +2,11 @@
 
 namespace Modules\Tour\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
+use Inertia\Response;
 use Modules\Support\Http\Controllers\BackendController;
 use Modules\Tour\Http\Requests\TourValidate;
 use Modules\Tour\Models\Tour;
-use Illuminate\Http\RedirectResponse;
-use Inertia\Response;
 
 class TourController extends BackendController
 {
@@ -17,13 +17,13 @@ class TourController extends BackendController
             ->paginate(request('rowsPerPage', 10))
             ->withQueryString()
             ->through(fn ($tour) => [
-                    'id' => $tour->id,
-                    'name' => $tour->name,
-                    'created_at' => $tour->created_at->format('d/m/Y H:i') . 'h'
+                'id' => $tour->id,
+                'name' => $tour->name,
+                'created_at' => $tour->created_at->format('d/m/Y H:i').'h',
             ]);
 
         return inertia('Tour/TourIndex', [
-            'tours' => $tours
+            'tours' => $tours,
         ]);
     }
 
@@ -45,7 +45,7 @@ class TourController extends BackendController
         $tour = Tour::find($id);
 
         return inertia('Tour/TourForm', [
-            'tour' => $tour
+            'tour' => $tour,
         ]);
     }
 

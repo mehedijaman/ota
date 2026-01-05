@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Tour\Http\Controllers\TourController;
 
 Route::get('tour', [
-    TourController::class, 'index', 
+    TourController::class, 'index',
 ])->name('tour.index');
 
 Route::get('tour/create', [

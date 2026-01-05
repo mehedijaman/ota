@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Hotel\Http\Controllers\HotelController;
 
 Route::get('hotel', [
-    HotelController::class, 'index', 
+    HotelController::class, 'index',
 ])->name('hotel.index');
 
 Route::get('hotel/create', [

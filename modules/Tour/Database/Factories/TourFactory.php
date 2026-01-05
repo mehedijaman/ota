@@ -14,8 +14,8 @@ class TourFactory extends Factory
         $name = $this->faker->unique()->sentence(4);
 
         return [
-            'name' => $name,            
-            
+            'name' => $name,
+
             'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
             'updated_at' => $this->faker->dateTimeBetween('-5 month', 'now'),
         ];
