@@ -3,37 +3,37 @@ export default {
     items: [
         {
             label: 'Dashboard',
-            permission: 'Dashboard',
+            permission: 'dashboard',
             icon: 'ri-dashboard-line',
             link: route('dashboard.index')
         },
 
         {
             label: 'Blog',
-            permission: 'Blog',
+            permission: 'blog',
             icon: 'ri-book-2-line',
             children: [
                 {
                     label: 'Posts',
-                    permission: 'Blog: Post - List',
+                    permission: 'blog-post-list',
                     icon: 'ri-draft-line',
                     link: route('blogPost.index')
                 },
                 {
                     label: 'Categories',
-                    permission: 'Blog: Category - List',
+                    permission: 'blog-category-list',
                     icon: 'ri-folders-line',
                     link: route('blogCategory.index')
                 },
                 {
                     label: 'Tags',
-                    permission: 'Blog: Tag - List',
+                    permission: 'blog-tag-list',
                     icon: 'ri-price-tag-3-line',
                     link: route('blogTag.index')
                 },
                 {
                     label: 'Authors',
-                    permission: 'Blog: Author - List',
+                    permission: 'blog-author-list',
                     icon: 'ri-team-line',
                     link: route('blogAuthor.index')
                 }
@@ -41,25 +41,63 @@ export default {
         },
 
         {
+            label: 'Employee',
+            permission: 'employee',
+            icon: 'ri-book-2-line',
+            children: [
+                {
+                    label: 'Employee List',
+                    permission: 'employee-list',
+                    icon: 'ri-user-line',
+                    link: route('employee.index')
+                },
+                {
+                    label: 'New Employee',
+                    permission: 'employee-create',
+                    icon: 'ri-user-add-line',
+                    link: route('employee.create')
+                },
+                {
+                    label: 'Designations',
+                    permission: 'employee-designation-list',
+                    icon: 'ri-price-tag-3-line',
+                    link: route('designation.index')
+                },
+                {
+                    label: 'Departments',
+                    permission: 'employee-department-list',
+                    icon: 'ri-team-line',
+                    link: route('department.index')
+                },
+                {
+                    label: 'Areas',
+                    permission: 'employee-area-list',
+                    icon: 'ri-price-tag-3-line',
+                    link: route('area.index')
+                }
+            ]
+        },
+
+        {
             label: 'Access Control List',
-            permission: 'Acl',
+            permission: 'acl',
             icon: 'ri-shield-user-line',
             children: [
                 {
                     label: 'Users',
-                    permission: 'Acl: User - List',
+                    permission: 'acl-user-list',
                     icon: 'ri-user-line',
                     link: route('user.index')
                 },
                 {
                     label: 'Permissions',
-                    permission: 'Acl: Permission - List',
+                    permission: 'acl-permission-list',
                     icon: 'ri-shield-keyhole-line',
                     link: route('aclPermission.index')
                 },
                 {
                     label: 'Roles',
-                    permission: 'Acl: Role - List',
+                    permission: 'acl-role-list',
                     icon: 'ri-account-box-line',
                     link: route('aclRole.index')
                 }

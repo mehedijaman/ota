@@ -20,4 +20,7 @@ return [
     Modules\Medical\MedicalServiceProvider::class,
     Modules\Tour\TourServiceProvider::class,
     Modules\Bill\BillServiceProvider::class,
+    Modules\Employee\EmployeeServiceProvider::class,
+    Modules\Customer\CustomerServiceProvider::class,
+    Modules\Agent\AgentServiceProvider::class,
 ];

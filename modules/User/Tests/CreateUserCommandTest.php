@@ -57,7 +57,7 @@ it('creates a user with valid input', function () {
         ->and($user->email)->toBe($input['email'])
         ->and(Hash::check($input['password'], $user->password))->toBeTrue()
         ->and($user->roles)->toHaveCount(1)
-        ->and($user->hasRole('root'))->toBeTrue();
+        ->and($user->hasRole('superadmin'))->toBeTrue();
 });
 
 it('validates user name', function () {

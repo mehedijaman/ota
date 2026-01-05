@@ -12,8 +12,8 @@ uses(TestCase::class, RefreshDatabase::class);
 
 beforeEach(function () {
     $this->user = User::factory()->create();
-    Role::create(['name' => 'root']);
-    $this->user->assignRole('root');
+    Role::create(['name' => 'superadmin']);
+    $this->user->assignRole('superadmin');
 
     $this->loggedRequest = $this->actingAs($this->user);
 

@@ -15,7 +15,7 @@ class AclRoleSeeder extends Seeder
         Role::truncate();
 
         Role::create([
-            'name' => 'root',
+            'name' => 'superadmin',
             'guard_name' => 'user',
         ]);
 

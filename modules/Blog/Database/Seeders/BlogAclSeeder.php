@@ -23,31 +23,31 @@ class BlogAclSeeder extends Seeder
     {
         return [
             // Main Menu
-            'Blog',
+            'blog',
 
             // BlogPost/PostIndex.vue
-            'Blog: Post - List',
-            'Blog: Post - Create',
-            'Blog: Post - Edit',
-            'Blog: Post - Delete',
+            'blog-post-list',
+            'blog-post-create',
+            'blog-post-edit',
+            'blog-post-delete',
 
             // BlogCategory/CategoryIndex.vue
-            'Blog: Category - List',
-            'Blog: Category - Create',
-            'Blog: Category - Edit',
-            'Blog: Category - Delete',
+            'blog-category-list',
+            'blog-category-create',
+            'blog-category-edit',
+            'blog-category-delete',
 
             // BlogAuthor/AuthorIndex.vue
-            'Blog: Author - List',
-            'Blog: Author - Create',
-            'Blog: Author - Edit',
-            'Blog: Author - Delete',
+            'blog-author-list',
+            'blog-author-create',
+            'blog-author-edit',
+            'blog-author-delete',
 
             // BlogTag/TagIndex.vue
-            'Blog: Tag - List',
-            'Blog: Tag - Create',
-            'Blog: Tag - Edit',
-            'Blog: Tag - Delete',
+            'blog-tag-list',
+            'blog-tag-create',
+            'blog-tag-edit',
+            'blog-tag-delete',
         ];
     }
 }

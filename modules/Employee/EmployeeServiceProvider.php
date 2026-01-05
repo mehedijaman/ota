@@ -1,0 +1,15 @@
+<?php
+
+namespace Modules\Employee;
+
+use Modules\Support\BaseServiceProvider;
+
+class EmployeeServiceProvider extends BaseServiceProvider
+{
+    public function boot()
+    {
+        parent::boot();
+
+        $this->loadMigrationsFrom(__DIR__.'/Database/Migrations');
+    }
+}
