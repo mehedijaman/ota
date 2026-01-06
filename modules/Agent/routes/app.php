@@ -3,26 +3,24 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Agent\Http\Controllers\AgentController;
 
-Route::get('agent', [
-    AgentController::class, 'index',
-])->name('agent.index');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::prefix('agents')->controller(AgentController::class)->name('agent.')->group(function () {
 
-Route::get('agent/create', [
-    AgentController::class, 'create',
-])->name('agent.create');
+        // Recycle Bin
+        Route::get('/recycle-bin', 'recycleBin')->name('recycleBin')->can('agent-delete');
+        Route::post('/recycle-bin/{id}/restore', 'restore')->name('restore')->can('agent-delete');
+        Route::delete('/recycle-bin/{id}/force', 'destroyForce')->name('destroyForce')->can('agent-delete');
+        Route::delete('/recycle-bin/empty', 'emptyRecycleBin')->name('emptyRecycleBin')->can('agent-delete');
+        Route::post('/recycle-bin/restore-all', 'restoreRecycleBin')->name('restoreRecycleBin')->can('agent-delete');
 
-Route::post('agent', [
-    AgentController::class, 'store',
-])->name('agent.store');
-
-Route::get('agent/{id}/edit', [
-    AgentController::class, 'edit',
-])->name('agent.edit');
-
-Route::put('agent/{id}', [
-    AgentController::class, 'update',
-])->name('agent.update');
-
-Route::delete('agent/{id}', [
-    AgentController::class, 'destroy',
-])->name('agent.destroy');
+        // Standard CRUD
+        Route::get('/', 'index')->name('index')->can('agent-list');
+        Route::get('create', 'create')->name('create')->can('agent-create');
+        Route::get('{agent:uuid}', 'show')->name('show')->can('agent-view');
+        Route::post('/', 'store')->name('store')->can('agent-create');
+        Route::get('{agent:uuid}/edit', 'edit')->name('edit')->can('agent-edit');
+        Route::put('{agent:uuid}', 'update')->name('update')->can('agent-edit');
+        Route::delete('{agent:uuid}', 'destroy')->name('destroy')->can('agent-delete');
+        Route::post('{agent:uuid}/create-user', 'createUser')->name('createUser')->can('agent-edit');
+    });
+});

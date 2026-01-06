@@ -27,6 +27,7 @@ class SupportServiceProvider extends BaseServiceProvider
         Relation::morphMap([
             'user' => 'Modules\User\Models\User',
             'employee' => 'Modules\Employee\Models\Employee',
+            'agent' => 'Modules\Agent\Models\Agent',
         ]);
 
         parent::boot();

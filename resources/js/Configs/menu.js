@@ -79,6 +79,26 @@ export default {
         },
 
         {
+            label: 'Agents',
+            permission: 'agent',
+            icon: 'ri-building-line',
+            children: [
+                {
+                    label: 'Agent List',
+                    permission: 'agent-list',
+                    icon: 'ri-building-2-line',
+                    link: route('agent.index')
+                },
+                {
+                    label: 'New Agent',
+                    permission: 'agent-create',
+                    icon: 'ri-add-circle-line',
+                    link: route('agent.create')
+                }
+            ]
+        },
+
+        {
             label: 'Access Control List',
             permission: 'acl',
             icon: 'ri-shield-user-line',
@@ -102,7 +122,7 @@ export default {
                     link: route('aclRole.index')
                 }
             ]
-        },
+        }
         // {
         //     label: 'Maintenance',
         //     permission: 'maintenance',

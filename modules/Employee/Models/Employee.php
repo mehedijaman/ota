@@ -26,7 +26,7 @@ class Employee extends BaseModel implements HasMedia
 
     protected $table = 'employees';
 
-    protected $appends = ['photo_url', 'service_length'];
+    protected $appends = ['photo_url', 'service_length', 'has_user'];
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -46,6 +46,13 @@ class Employee extends BaseModel implements HasMedia
     public function getPhotoUrlAttribute(): ?string
     {
         return $this->getFirstMediaUrl('photo') ?: null;
+    }
+
+    public function getHasUserAttribute(): bool
+    {
+        return \Modules\User\Models\User::where('profile_type', 'employee')
+            ->where('profile_id', $this->id)
+            ->exists();
     }
 
     /**
