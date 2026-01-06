@@ -41,6 +41,12 @@ class HandleInertiaRequests extends Middleware
                 'permissions' => $user ? (new ListUserPermissions)->run($user->id) : [],
                 'isSuperAdmin' => $user ? ($user->hasRole('superadmin') ? true : false) : false,
             ],
+            'impersonation' => [
+                'isImpersonating' => $user && app('impersonate')->isImpersonating(),
+                'impersonatorName' => $user && app('impersonate')->isImpersonating() 
+                    ? app('impersonate')->getImpersonator()?->name 
+                    : null,
+            ],
             'ziggy' => fn () => array_merge((new Ziggy)->toArray(), [
                 'location' => $request->url(),
             ]),

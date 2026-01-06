@@ -67,6 +67,7 @@
     </AppDataTable>
 
     <AppPaginator
+        v-if="tags.data.length"
         :links="tags.links"
         :from="tags.from || 0"
         :to="tags.to || 0"
@@ -74,7 +75,7 @@
         class="mt-4 justify-center"
     ></AppPaginator>
 
-    <AppAlert v-if="!tags.data.length" class="mt-4"> No tags found. </AppAlert>
+    <AppEmptyState v-else></AppEmptyState>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>
@@ -82,6 +83,7 @@
 <script setup>
 import { ref } from 'vue'
 import useAuthCan from '@/Composables/useAuthCan'
+import AppEmptyState from '@/Components/Misc/AppEmptyState.vue'
 
 defineProps({
     tags: {

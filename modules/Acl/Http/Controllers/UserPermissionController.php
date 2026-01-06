@@ -9,10 +9,10 @@ use Spatie\Permission\Models\Permission;
 
 class UserPermissionController extends BackendController
 {
-    public function edit($id)
+    public function edit(string $uuid)
     {
-        $user = User::findOrFail($id);
-        $userPermissions = (new GetUserPermissions)->run($id);
+        $user = User::where('uuid', $uuid)->firstOrFail();
+        $userPermissions = (new GetUserPermissions)->run($user->id);
 
         $permissions = Permission::orderBy('name')->get(['id', 'name']);
 
@@ -23,9 +23,9 @@ class UserPermissionController extends BackendController
         ]);
     }
 
-    public function update($id)
+    public function update(string $uuid)
     {
-        $user = User::findOrFail($id);
+        $user = User::where('uuid', $uuid)->firstOrFail();
 
         $user->syncPermissions(request('userPermissions'));
 

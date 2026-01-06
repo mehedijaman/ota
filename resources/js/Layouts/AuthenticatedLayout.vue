@@ -1,6 +1,9 @@
 <template>
     <Head title="Modular"></Head>
 
+    <!-- Impersonation Banner -->
+    <AppImpersonationBanner :sidebar-open="isSideBarOpen" />
+
     <AppSideBar
         ref="sidebarRef"
         :backdrop="isMobile"
@@ -19,8 +22,11 @@
     </AppSideBar>
 
     <main
-        class="flex flex-1 flex-col pb-9"
-        :class="{ 'md:pl-64': isSideBarOpen }"
+        class="flex flex-1 flex-col pb-9 transition-[padding-top] duration-300"
+        :class="[
+            { 'md:pl-64': isSideBarOpen },
+            isImpersonating ? 'pt-12' : 'pt-0'
+        ]"
     >
         <AppFlashMessage />
         <AppTopBar
@@ -40,10 +46,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Head, usePage } from '@inertiajs/vue3'
 import useIsMobile from '@/Composables/useIsMobile'
 import menu from '@/Configs/menu'
+import AppImpersonationBanner from '@/Components/App/AppImpersonationBanner.vue'
 
 const page = usePage()
 
@@ -51,6 +58,10 @@ const isSideBarOpen = ref(true)
 const sidebarRef = ref()
 
 const { isMobile } = useIsMobile()
+
+const isImpersonating = computed(() => {
+    return page.props.impersonation?.isImpersonating ?? false
+})
 
 onMounted(() => {
     if (isMobile.value) {

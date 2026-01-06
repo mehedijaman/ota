@@ -1,65 +1,85 @@
 <template>
     <AppSectionHeader :title="__('Users')" :bread-crumb="breadCrumb">
         <template #right>
-            <AppButton
-                v-if="can('acl-user-create')"
-                class="btn btn-primary"
-                @click="$inertia.visit(route('user.create'))"
-            >
-                <i class="ri-add-fill mr-1"></i>
-                {{ __('Create User') }}
-            </AppButton>
+            <div class="flex gap-2">
+                <AppButton
+                    v-if="can('acl-user-list')"
+                    class="btn btn-secondary"
+                    @click="$inertia.visit(route('user.recycleBin'))"
+                >
+                    <i class="ri-recycle-line mr-1"></i>
+                    {{ __('Recycle Bin') }}
+                </AppButton>
+                <AppButton
+                    v-if="can('acl-user-create')"
+                    class="btn btn-primary"
+                    @click="$inertia.visit(route('user.create'))"
+                >
+                    <i class="ri-add-fill mr-1"></i>
+                    {{ __('Create User') }}
+                </AppButton>
+            </div>
         </template>
     </AppSectionHeader>
 
-    <AppCard class="w-full">
+    <AppCard class="w-full" no-padding>
         <template #title>
-            <i class="ri-filter-line"></i>
-            Filter Users
+            <div 
+                class="flex w-full items-center justify-between cursor-pointer select-none -my-1 -mx-2 py-1 px-2 rounded-lg hover:bg-neutral-3/50 transition-colors"
+                @click="showFilters = !showFilters"
+            >
+                <div class="flex items-center gap-3">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-2">
+                        <i class="ri-filter-line text-primary-9"></i>
+                    </div>
+                    <span>{{ __('Filter Users') }}</span>
+                    <span 
+                        v-if="hasActiveFilters" 
+                        class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-9 px-1.5 text-xs font-bold text-white"
+                    >
+                        {{ activeFilterCount }}
+                    </span>
+                </div>
+                <div class="flex items-center gap-1 text-sm text-neutral-11">
+                    <span class="hidden sm:inline">{{ showFilters ? 'Hide' : 'Show' }}</span>
+                    <i 
+                        class="text-xl transition-transform duration-200" 
+                        :class="showFilters ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"
+                    ></i>
+                </div>
+            </div>
         </template>
         <template #content>
-            <AppFormErrors class="mb-4" />
+            <div v-show="showFilters" class="p-4 sm:p-5">
+                <AppFormErrors class="mb-4" />
 
-            <form class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <!-- Role Filter -->
-                <div>
-                    <AppLabel for="role">{{ __('Role') }}</AppLabel>
-                    <AppCombobox
-                        class="w-full"
-                        v-model="filterForm.role"
-                        :options="roles"
-                        combo-label="Select Role"
-                        emit-value
-                    />
+                <form class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <!-- Role Filter -->
+                    <div>
+                        <AppLabel for="role">{{ __('Role') }}</AppLabel>
+                        <AppCombobox
+                            class="w-full"
+                            v-model="filterForm.role"
+                            :options="roles"
+                            combo-label="Select Role"
+                            emit-value
+                        />
+                    </div>
+                </form>
+
+                <div class="mt-4 flex justify-end gap-2">
+                    <AppButton
+                        class="btn btn-secondary"
+                        @click="$inertia.visit(route('user.index'))"
+                    >
+                        <i class="ri-refresh-line mr-1"></i>
+                        {{ __('Reset') }}
+                    </AppButton>
+                    <AppButton class="btn btn-primary" @click="applyFilter">
+                        <i class="ri-filter-line mr-1"></i>
+                        {{ __('Apply') }}
+                    </AppButton>
                 </div>
-
-                <!-- Status Filter -->
-                <!-- <div>
-                    <AppLabel for="is_active">{{ __('Status') }}</AppLabel>
-                    <AppCombobox
-                        class="w-full"
-                        v-model="filterForm.is_active"
-                        :options="statusOptions"
-                        combo-label="Select Status"
-                        emit-value
-                    />
-                </div> -->
-            </form>
-        </template>
-
-        <template #footer>
-            <div class="flex justify-end gap-2">
-                <AppButton
-                    class="btn btn-secondary"
-                    @click="$inertia.visit(route('user.index'))"
-                >
-                    <i class="ri-refresh-line mr-1"></i>
-                    Reset Filter
-                </AppButton>
-                <AppButton class="btn btn-primary" @click="applyFilter">
-                    <i class="ri-filter-line mr-1"></i>
-                    Filter List
-                </AppButton>
             </div>
         </template>
     </AppCard>
@@ -115,21 +135,28 @@
 
                     <AppDataTableData>
                         <span
-                            v-if="item.roles && item.roles.length"
-                            class="text-sm"
+                            class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                            :class="item.profile_type === 'Employee' 
+                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'"
                         >
-                            {{ item.roles.join(', ') }}
+                            {{ item.profile_type }}
                         </span>
-                        <span v-else class="text-sm text-gray-400"
-                            >No roles</span
-                        >
                     </AppDataTableData>
 
                     <AppDataTableData>
-                        <span v-if="item.is_active" class="badge badge-success"
-                            >Active</span
-                        >
-                        <span v-else class="badge badge-warning">Inactive</span>
+                        <div class="flex flex-wrap gap-1">
+                            <span
+                                v-for="role in item.roles"
+                                :key="role"
+                                class="inline-flex items-center rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"
+                            >
+                                {{ role }}
+                            </span>
+                            <span v-if="!item.roles || item.roles.length === 0" class="text-sm text-gray-400">
+                                No roles
+                            </span>
+                        </div>
                     </AppDataTableData>
 
                     <AppDataTableData>
@@ -139,7 +166,7 @@
                                 class="btn btn-icon btn-primary"
                                 @click="
                                     $inertia.visit(
-                                        route('aclUserRole.edit', item.uuid)
+                                        route('aclUserRole.edit', { uuid: item.uuid })
                                     )
                                 "
                             >
@@ -155,7 +182,7 @@
                                     $inertia.visit(
                                         route(
                                             'aclUserPermission.edit',
-                                            item.uuid
+                                            { uuid: item.uuid }
                                         )
                                     )
                                 "
@@ -164,7 +191,7 @@
                             </AppButton>
                         </AppTooltip>
 
-                        <!-- impersonate user (only for tenant users) -->
+                        <!-- impersonate user -->
                         <AppTooltip
                             :text="__('Login as this user')"
                             class="mr-2"
@@ -184,7 +211,7 @@
                                 class="btn btn-icon btn-primary"
                                 @click="
                                     $inertia.visit(
-                                        route('user.edit', item.uuid)
+                                        route('user.edit', { uuid: item.uuid })
                                     )
                                 "
                             >
@@ -198,7 +225,7 @@
                                 class="btn btn-icon btn-destructive"
                                 @click="
                                     confirmDelete(
-                                        route('user.destroy', item.uuid)
+                                        route('user.destroy', { uuid: item.uuid })
                                     )
                                 "
                             >
@@ -232,7 +259,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
 import useAuthCan from '@/Composables/useAuthCan'
 
@@ -254,22 +281,38 @@ const breadCrumb = [
     { label: 'Users', last: true }
 ]
 
-const headers = ['ID', 'Name', 'Email', 'Roles', 'Status', 'Actions']
+const headers = ['ID', 'Name', 'Email', 'Type', 'Roles', 'Actions']
 
-const statusOptions = [
-    { value: null, label: 'All Status' },
-    { value: 1, label: 'Active' },
-    { value: 0, label: 'Inactive' }
-]
+// --- Collapsible Filter ---
+const STORAGE_KEY = 'user_filter_expanded'
+const showFilters = ref(localStorage.getItem(STORAGE_KEY) === 'true')
+
+// Persist state to localStorage
+watch(showFilters, (value) => {
+    localStorage.setItem(STORAGE_KEY, value.toString())
+})
 
 // --- Filter Form ---
 const currentParams = new URLSearchParams(window.location.search)
 
 const filterForm = useForm({
-    role: currentParams.get('role') ?? null,
-    is_active: currentParams.get('is_active')
-        ? parseInt(currentParams.get('is_active'))
-        : null
+    role: currentParams.get('role') ?? null
+})
+
+// Check if any filters are active
+const hasActiveFilters = computed(() => {
+    return !!filterForm.role
+})
+
+const activeFilterCount = computed(() => {
+    return filterForm.role ? 1 : 0
+})
+
+onMounted(() => {
+    // Show filters if any are active (override localStorage)
+    if (hasActiveFilters.value) {
+        showFilters.value = true
+    }
 })
 
 // Apply filter
@@ -277,11 +320,7 @@ const applyFilter = () => {
     filterForm.get(route('user.index'), {
         preserveScroll: true,
         preserveState: true,
-        replace: true,
-        params: {
-            role: filterForm.role,
-            is_active: filterForm.is_active
-        }
+        replace: true
     })
 }
 
@@ -311,10 +350,7 @@ const impersonateUser = () => {
     if (!selectedUser.value) return
 
     impersonating.value = true
-    router.visit(route('impersonate.start', selectedUser.value.id), {
-        onFinish: () => {
-            impersonating.value = false
-        }
-    })
+    // Use window.location for full page reload to properly refresh auth state
+    window.location.href = route('impersonate.start', { uuid: selectedUser.value.uuid })
 }
 </script>

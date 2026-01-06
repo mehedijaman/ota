@@ -14,6 +14,14 @@
         </div>
 
         <div class="flex items-center">
+            <a
+                :href="route('site.index')"
+                target="_blank"
+                class="btn btn-icon hover:bg-neutral-4 mr-2"
+            >
+                <i class="ri-home-line"></i>
+        </a>
+
             <AppButton
                 href="#"
                 class="btn btn-icon hover:bg-neutral-4"

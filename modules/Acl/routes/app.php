@@ -87,23 +87,23 @@ Route::put('acl-role-permission/{id}', [
     ->can('acl-role-permission-edit');
 
 // acl - user role
-Route::get('acl-user-role/{id}/edit', [
+Route::get('acl-user-role/{uuid}/edit', [
     UserRoleController::class, 'edit',
 ])->name('aclUserRole.edit')
     ->can('acl-user-role-edit');
 
-Route::put('acl-user-role/{id}', [
+Route::put('acl-user-role/{uuid}', [
     UserRoleController::class, 'update',
 ])->name('aclUserRole.update')
     ->can('acl-user-role-edit');
 
 // acl - user => permissions
-Route::get('acl-user-permission/{id}/edit', [
+Route::get('acl-user-permission/{uuid}/edit', [
     UserPermissionController::class, 'edit',
 ])->name('aclUserPermission.edit')
     ->can('acl-user-permission-edit');
 
-Route::put('acl-user-permission/{id}', [
+Route::put('acl-user-permission/{uuid}', [
     UserPermissionController::class, 'update',
 ])->name('aclUserPermission.update')
     ->can('acl-user-permission-edit');

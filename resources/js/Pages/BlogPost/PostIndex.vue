@@ -86,6 +86,7 @@
     </AppDataTable>
 
     <AppPaginator
+        v-if="posts.data.length"
         :links="posts.links"
         :from="posts.from || 0"
         :to="posts.to || 0"
@@ -93,9 +94,7 @@
         class="mt-4 justify-center"
     ></AppPaginator>
 
-    <AppAlert v-if="!posts.data.length" class="mt-4">
-        No posts found.
-    </AppAlert>
+    <AppEmptyState v-else></AppEmptyState>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>

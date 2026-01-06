@@ -102,6 +102,25 @@ export default {
                     link: route('aclRole.index')
                 }
             ]
-        }
+        },
+        // {
+        //     label: 'Maintenance',
+        //     permission: 'maintenance',
+        //     icon: 'ri-settings-2-line',
+        //     children: [
+        //         {
+        //             label: 'Log Viewer',
+        //             permission: 'maintenance-log-viewer',
+        //             icon: 'ri-user-line',
+        //             link: route('logViewer.index')
+        //         },
+        //         // {
+        //         //     label: 'Backup',
+        //         //     permission: 'maintenance-backup-list',
+        //         //     icon: 'ri-shield-keyhole-line',
+        //         //     link: route('backup.index')
+        //         // },
+        //     ]
+        // }
     ]
 }

@@ -203,8 +203,8 @@
                         id="role_ids"
                         v-model="form.role_ids"
                         :options="roles"
-                        option-label="name"
-                        option-value="id"
+                        option-label="label"
+                        option-value="value"
                         :placeholder="__('Select Roles')"
                         :class="{ 'input-error': errorsFields.includes('role_ids') }"
                     />
@@ -315,6 +315,8 @@ import { Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useFormContext from '@/Composables/useFormContext'
 import useFormErrors from '@/Composables/useFormErrors'
+import AppSelect from '@/Components/Form/AppSelect.vue'
+import AppMultiSelect from '@/Components/Form/AppMultiSelect.vue'
 
 const { title } = useTitle('User')
 

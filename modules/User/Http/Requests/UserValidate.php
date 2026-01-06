@@ -20,6 +20,9 @@ class UserValidate extends Request
             'password' => $this->passwordRules(),
             'profile_type' => 'string',
             'profile_id' => 'integer|numeric',
+            'employee_id' => 'nullable|integer',
+            'role_ids' => 'nullable|array',
+            'role_ids.*' => 'integer|exists:roles,id',
         ];
     }
 

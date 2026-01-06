@@ -8,11 +8,11 @@ use Spatie\Permission\Models\Role;
 
 class UserRoleController extends BackendController
 {
-    public function edit($id)
+    public function edit(string $uuid)
     {
         $user = User::with(['roles' => function ($q) {
             $q->get(['id', 'name']);
-        }])->findOrFail($id);
+        }])->where('uuid', $uuid)->firstOrFail();
 
         $user->roles->map(function ($role) {
             unset($role->pivot);
@@ -28,9 +28,9 @@ class UserRoleController extends BackendController
         ]);
     }
 
-    public function update($id)
+    public function update(string $uuid)
     {
-        $user = User::findOrFail($id);
+        $user = User::where('uuid', $uuid)->firstOrFail();
 
         $user->syncRoles(request('userRoles'));
 

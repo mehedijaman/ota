@@ -308,6 +308,6 @@ const formatPermissionName = (name) => {
 
 const submitForm = () => {
     const routeName = props.isSuperadmin ? 'superadmin.aclUserPermission.update' : 'aclUserPermission.update'
-    form.put(route(routeName, props.user.uuid))
+    form.put(route(routeName, { uuid: props.user.uuid }))
 }
 </script>

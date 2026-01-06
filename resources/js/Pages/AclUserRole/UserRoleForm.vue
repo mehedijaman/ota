@@ -82,6 +82,6 @@ const chunks = computed(() => {
 })
 
 const submitForm = () => {
-    form.put(route('aclUserRole.update', props.user.id))
+    form.put(route('aclUserRole.update', { uuid: props.user.uuid }))
 }
 </script>

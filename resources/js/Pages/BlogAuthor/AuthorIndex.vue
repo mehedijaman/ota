@@ -89,6 +89,7 @@
     </AppDataTable>
 
     <AppPaginator
+        v-if="authors.data.length"
         :links="authors.links"
         :from="authors.from || 0"
         :to="authors.to || 0"
@@ -96,9 +97,7 @@
         class="mt-4 justify-center"
     ></AppPaginator>
 
-    <AppAlert v-if="!authors.data.length" class="mt-4">
-        No authors found.
-    </AppAlert>
+    <AppEmptyState v-else></AppEmptyState>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>

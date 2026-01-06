@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Lab404\Impersonate\Models\Impersonate;
 use Modules\AdminAuth\Notifications\ResetPassword;
 use Modules\Support\Traits\Searchable;
 // use Modules\Support\Traits\ActivityLog;
@@ -16,11 +17,22 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, HasRoles, Notifiable, Searchable, SoftDeletes;
+    use HasFactory, HasRoles, Impersonate, Notifiable, Searchable, SoftDeletes;
 
     protected static function newFactory()
     {
         return UserFactory::new();
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            if (empty($user->uuid)) {
+                $user->uuid = \Illuminate\Support\Str::uuid()->toString();
+            }
+        });
     }
 
     /**
