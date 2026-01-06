@@ -687,6 +687,7 @@ import { Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useFormContext from '@/Composables/useFormContext'
 import useFormErrors from '@/Composables/useFormErrors'
+import AppSelect from '@/Components/Form/AppSelect.vue'
 
 const props = defineProps({
     customer: {
@@ -777,14 +778,21 @@ const getDocumentIcon = (mimeType) => {
 }
 
 const submitForm = () => {
-    if (isCreate.value) {
-        form.post(route('customer.store'))
+    const postData = (data) => {
+        return isCreate.value ? data : { ...data, _method: 'PUT' }
     }
 
-    if (isEdit.value) {
-        form.post(route('customer.update', props.customer.uuid), {
-            _method: 'PUT'
+    if (isCreate.value) {
+        form.transform(postData).post(route('customer.store'), {
+            forceFormData: true
         })
+    } else {
+        form.transform(postData).post(
+            route('customer.update', props.customer.uuid),
+            {
+                forceFormData: true
+            }
+        )
     }
 }
 </script>
