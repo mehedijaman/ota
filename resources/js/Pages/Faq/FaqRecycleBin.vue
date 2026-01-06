@@ -71,7 +71,11 @@
                         >
                             <AppButton
                                 class="btn btn-icon btn-secondary"
-                                @click="confirmRestore(item.uuid)"
+                                @click="
+                                    confirmRestore(
+                                        route('faq.restore', item.uuid)
+                                    )
+                                "
                             >
                                 <i class="ri-refresh-line"></i>
                             </AppButton>
@@ -83,7 +87,11 @@
                         >
                             <AppButton
                                 class="btn btn-icon btn-destructive"
-                                @click="confirmForceDelete(item.uuid)"
+                                @click="
+                                    confirmForceDelete(
+                                        route('faq.destroyForce', item.uuid)
+                                    )
+                                "
                             >
                                 <i class="ri-delete-bin-line"></i>
                             </AppButton>
@@ -103,9 +111,7 @@
         class="mt-4 justify-center"
     ></AppPaginator>
 
-    <AppAlert v-if="!faqs.data.length" class="mt-4">
-        Recycle bin is empty.
-    </AppAlert>
+    <AppEmptyState v-if="!faqs.data.length"></AppEmptyState>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>
@@ -115,6 +121,7 @@ import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useAuthCan from '@/Composables/useAuthCan'
+import AppEmptyState from '@/Components/Misc/AppEmptyState.vue'
 
 const { title } = useTitle('FAQs - Recycle Bin')
 const { can } = useAuthCan()
@@ -152,39 +159,36 @@ const statusClass = (status) => {
     return classes[status] || classes.draft
 }
 
-const confirmRestore = (uuid) => {
-    confirmDialogRef.value.openModal(
-        route('faq.restore', uuid),
-        'put',
-        'Restore FAQ',
-        'Are you sure you want to restore this FAQ?'
-    )
+const confirmRestore = (restoreRoute) => {
+    confirmDialogRef.value.openCustomModal({
+        route: restoreRoute,
+        title: 'Restore Confirmation',
+        message: 'Are you sure you want to restore this FAQ?',
+        buttonClass: 'btn btn-primary',
+        buttonText: 'Restore',
+        method: 'put',
+        modalType: 'primary'
+    })
 }
 
-const confirmForceDelete = (uuid) => {
-    confirmDialogRef.value.openModal(
-        route('faq.destroyForce', uuid),
-        'delete',
-        'Delete Permanently',
-        'Are you sure you want to permanently delete this FAQ? This action cannot be undone.'
-    )
+const confirmForceDelete = (deleteRoute) => {
+    confirmDialogRef.value.openModal(deleteRoute)
 }
 
 const confirmEmptyRecycleBin = () => {
-    confirmDialogRef.value.openModal(
-        route('faq.emptyRecycleBin'),
-        'delete',
-        'Empty Recycle Bin',
-        'Are you sure you want to permanently delete all FAQs in the recycle bin? This action cannot be undone.'
-    )
+    confirmDialogRef.value.openModal(route('faq.emptyRecycleBin'))
 }
 
 const confirmRestoreAll = () => {
-    confirmDialogRef.value.openModal(
-        route('faq.restoreRecycleBin'),
-        'put',
-        'Restore All FAQs',
-        'Are you sure you want to restore all FAQs in the recycle bin?'
-    )
+    confirmDialogRef.value.openCustomModal({
+        route: route('faq.restoreRecycleBin'),
+        title: 'Restore All Confirmation',
+        message:
+            'Are you sure you want to restore all FAQs in the recycle bin?',
+        buttonClass: 'btn btn-primary',
+        buttonText: 'Restore All',
+        method: 'put',
+        modalType: 'primary'
+    })
 }
 </script>

@@ -116,9 +116,7 @@
         class="mt-4 justify-center"
     ></AppPaginator>
 
-    <AppAlert v-if="!categories.data.length" class="mt-4">
-        No FAQ categories found.
-    </AppAlert>
+    <AppEmptyState v-if="!categories.data.length"></AppEmptyState>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>
@@ -128,6 +126,7 @@ import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useAuthCan from '@/Composables/useAuthCan'
+import AppEmptyState from '@/Components/Misc/AppEmptyState.vue'
 
 const { title } = useTitle('FAQ Categories')
 const { can } = useAuthCan()

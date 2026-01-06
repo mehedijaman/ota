@@ -128,7 +128,7 @@
         class="mt-4 justify-center"
     ></AppPaginator>
 
-    <AppAlert v-if="!faqs.data.length" class="mt-4"> No FAQs found. </AppAlert>
+    <AppEmptyState v-if="!faqs.data.length"></AppEmptyState>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>
@@ -138,6 +138,7 @@ import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useAuthCan from '@/Composables/useAuthCan'
+import AppEmptyState from '@/Components/Misc/AppEmptyState.vue'
 
 const { title } = useTitle('FAQs')
 const { can } = useAuthCan()

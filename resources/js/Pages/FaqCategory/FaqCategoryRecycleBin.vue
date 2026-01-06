@@ -71,7 +71,11 @@
                         >
                             <AppButton
                                 class="btn btn-icon btn-secondary"
-                                @click="confirmRestore(item.uuid)"
+                                @click="
+                                    confirmRestore(
+                                        route('faqCategory.restore', item.uuid)
+                                    )
+                                "
                             >
                                 <i class="ri-refresh-line"></i>
                             </AppButton>
@@ -83,7 +87,14 @@
                         >
                             <AppButton
                                 class="btn btn-icon btn-destructive"
-                                @click="confirmForceDelete(item.uuid)"
+                                @click="
+                                    confirmForceDelete(
+                                        route(
+                                            'faqCategory.destroyForce',
+                                            item.uuid
+                                        )
+                                    )
+                                "
                             >
                                 <i class="ri-delete-bin-line"></i>
                             </AppButton>
@@ -103,9 +114,7 @@
         class="mt-4 justify-center"
     ></AppPaginator>
 
-    <AppAlert v-if="!categories.data.length" class="mt-4">
-        Recycle bin is empty.
-    </AppAlert>
+    <AppEmptyState v-if="!categories.data.length"></AppEmptyState>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>
@@ -115,6 +124,7 @@ import { ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useAuthCan from '@/Composables/useAuthCan'
+import AppEmptyState from '@/Components/Misc/AppEmptyState.vue'
 
 const { title } = useTitle('FAQ Categories - Recycle Bin')
 const { can } = useAuthCan()
@@ -136,39 +146,36 @@ const headers = ['Name', 'Status', 'Deleted At', 'Actions']
 
 const confirmDialogRef = ref(null)
 
-const confirmRestore = (uuid) => {
-    confirmDialogRef.value.openModal(
-        route('faqCategory.restore', uuid),
-        'put',
-        'Restore Category',
-        'Are you sure you want to restore this category?'
-    )
+const confirmRestore = (restoreRoute) => {
+    confirmDialogRef.value.openCustomModal({
+        route: restoreRoute,
+        title: 'Restore Confirmation',
+        message: 'Are you sure you want to restore this category?',
+        buttonClass: 'btn btn-primary',
+        buttonText: 'Restore',
+        method: 'put',
+        modalType: 'primary'
+    })
 }
 
-const confirmForceDelete = (uuid) => {
-    confirmDialogRef.value.openModal(
-        route('faqCategory.destroyForce', uuid),
-        'delete',
-        'Delete Permanently',
-        'Are you sure you want to permanently delete this category? This action cannot be undone.'
-    )
+const confirmForceDelete = (deleteRoute) => {
+    confirmDialogRef.value.openModal(deleteRoute)
 }
 
 const confirmEmptyRecycleBin = () => {
-    confirmDialogRef.value.openModal(
-        route('faqCategory.emptyRecycleBin'),
-        'delete',
-        'Empty Recycle Bin',
-        'Are you sure you want to permanently delete all categories in the recycle bin? This action cannot be undone.'
-    )
+    confirmDialogRef.value.openModal(route('faqCategory.emptyRecycleBin'))
 }
 
 const confirmRestoreAll = () => {
-    confirmDialogRef.value.openModal(
-        route('faqCategory.restoreRecycleBin'),
-        'put',
-        'Restore All Categories',
-        'Are you sure you want to restore all categories in the recycle bin?'
-    )
+    confirmDialogRef.value.openCustomModal({
+        route: route('faqCategory.restoreRecycleBin'),
+        title: 'Restore All Confirmation',
+        message:
+            'Are you sure you want to restore all categories in the recycle bin?',
+        buttonClass: 'btn btn-primary',
+        buttonText: 'Restore All',
+        method: 'put',
+        modalType: 'primary'
+    })
 }
 </script>

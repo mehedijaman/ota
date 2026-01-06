@@ -101,6 +101,7 @@ import { useForm, Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useFormContext from '@/Composables/useFormContext'
 import useFormErrors from '@/Composables/useFormErrors'
+import AppSelect from '@/Components/Form/AppSelect.vue'
 
 const { title } = useTitle('FAQ Category')
 

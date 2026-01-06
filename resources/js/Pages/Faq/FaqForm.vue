@@ -47,7 +47,7 @@
                             >Question
                             <span class="text-red-500">*</span></AppLabel
                         >
-                        <AppTextArea
+                        <AppInputText
                             id="question"
                             v-model="form.question"
                             placeholder="Enter the FAQ question"
@@ -64,13 +64,12 @@
                             >Answer
                             <span class="text-red-500">*</span></AppLabel
                         >
-                        <AppTextArea
-                            id="answer"
+                        <AppTipTapEditor
                             v-model="form.answer"
-                            placeholder="Enter the FAQ answer"
-                            :rows="6"
+                            editor-id="answer"
                             :class="{
-                                'input-error': errorsFields.includes('answer')
+                                'app-tip-tap-error':
+                                    errorsFields.includes('answer')
                             }"
                         />
                     </div>
@@ -177,6 +176,8 @@ import { useForm, Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useFormContext from '@/Composables/useFormContext'
 import useFormErrors from '@/Composables/useFormErrors'
+import AppSelect from '@/Components/Form/AppSelect.vue'
+import AppInputText from '@/Components/Form/AppInputText.vue'
 
 const { title } = useTitle('FAQ')
 
