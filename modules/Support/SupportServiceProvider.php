@@ -28,6 +28,7 @@ class SupportServiceProvider extends BaseServiceProvider
             'user' => 'Modules\User\Models\User',
             'employee' => 'Modules\Employee\Models\Employee',
             'agent' => 'Modules\Agent\Models\Agent',
+            'customer' => 'Modules\Customer\Models\Customer',
         ]);
 
         parent::boot();

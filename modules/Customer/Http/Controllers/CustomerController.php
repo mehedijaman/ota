@@ -3,27 +3,25 @@
 namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Response;
 use Modules\Customer\Http\Requests\CustomerValidate;
 use Modules\Customer\Models\Customer;
+use Modules\Customer\Services\CustomerService;
 use Modules\Support\Http\Controllers\BackendController;
 
 class CustomerController extends BackendController
 {
+    public function __construct(
+        protected CustomerService $customerService
+    ) {
+        parent::__construct();
+    }
+
     public function index(): Response
     {
-        $customers = Customer::orderBy('name')
-            ->search(request('searchContext'), request('searchTerm'))
-            ->paginate(request('rowsPerPage', 10))
-            ->withQueryString()
-            ->through(fn ($customer) => [
-                'id' => $customer->id,
-                'name' => $customer->name,
-                'created_at' => $customer->created_at->format('d/m/Y H:i').'h',
-            ]);
-
         return inertia('Customer/CustomerIndex', [
-            'customers' => $customers,
+            'customers' => $this->customerService->getAll(),
         ]);
     }
 
@@ -34,36 +32,115 @@ class CustomerController extends BackendController
 
     public function store(CustomerValidate $request): RedirectResponse
     {
-        Customer::create($request->validated());
+        try {
+            $this->customerService->create($request->validated());
 
-        return redirect()->route('customer.index')
-            ->with('success', 'Customer created.');
+            return redirect()->route('customer.index')
+                ->with('success', 'Customer created.');
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
+        }
     }
 
-    public function edit(int $id): Response
+    public function show(Customer $customer): Response
     {
-        $customer = Customer::find($id);
-
-        return inertia('Customer/CustomerForm', [
-            'customer' => $customer,
+        return inertia('Customer/CustomerShow', [
+            'customer' => $customer->append('documents'),
         ]);
     }
 
-    public function update(CustomerValidate $request, int $id): RedirectResponse
+    public function edit(Customer $customer): Response
     {
-        $customer = Customer::findOrFail($id);
-
-        $customer->update($request->validated());
-
-        return redirect()->route('customer.index')
-            ->with('success', 'Customer updated.');
+        return inertia('Customer/CustomerForm', [
+            'customer' => $customer->append('documents'),
+        ]);
     }
 
-    public function destroy(int $id): RedirectResponse
+    public function update(CustomerValidate $request, Customer $customer): RedirectResponse
     {
-        Customer::findOrFail($id)->delete();
+        try {
+            $this->customerService->update($customer, $request->validated());
 
-        return redirect()->route('customer.index')
-            ->with('success', 'Customer deleted.');
+            return redirect()->route('customer.index')
+                ->with('success', 'Customer updated.');
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
+        }
+    }
+
+    public function destroy(Customer $customer): RedirectResponse
+    {
+        try {
+            $this->customerService->delete($customer);
+
+            return redirect()->route('customer.index')
+                ->with('success', 'Customer deleted.');
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
+        }
+    }
+
+    public function recycleBin(): Response
+    {
+        return inertia('Customer/CustomerRecycleBin', [
+            'customers' => $this->customerService->getRecycleBin(),
+        ]);
+    }
+
+    public function restore(int $id): RedirectResponse
+    {
+        $this->customerService->restore($id);
+
+        return redirect()->route('customer.recycleBin')
+            ->with('success', 'Customer restored.');
+    }
+
+    public function destroyForce(int $id): RedirectResponse
+    {
+        $this->customerService->forceDelete($id);
+
+        return redirect()->route('customer.recycleBin')
+            ->with('success', 'Customer deleted permanently.');
+    }
+
+    public function emptyRecycleBin(): RedirectResponse
+    {
+        $this->customerService->emptyRecycleBin();
+
+        return redirect()->route('customer.recycleBin')
+            ->with('success', 'Recycle bin emptied.');
+    }
+
+    public function restoreRecycleBin(): RedirectResponse
+    {
+        $this->customerService->restoreAll();
+
+        return redirect()->route('customer.recycleBin')
+            ->with('success', 'All customers restored.');
+    }
+
+    public function createUser(Request $request, Customer $customer): RedirectResponse
+    {
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $existingUser = \Modules\User\Models\User::where('profile_type', 'customer')
+            ->where('profile_id', $customer->id)
+            ->first();
+
+        if ($existingUser) {
+            return back()->with('error', 'User already exists for this customer.');
+        }
+
+        \Modules\User\Models\User::create([
+            'name' => $customer->full_name,
+            'email' => $customer->email,
+            'password' => bcrypt($request->password),
+            'profile_type' => 'customer',
+            'profile_id' => $customer->id,
+        ]);
+
+        return back()->with('success', 'User account created successfully.');
     }
 }

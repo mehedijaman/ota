@@ -99,6 +99,26 @@ export default {
         },
 
         {
+            label: 'Customers',
+            permission: 'customer',
+            icon: 'ri-user-star-line',
+            children: [
+                {
+                    label: 'Customer List',
+                    permission: 'customer-list',
+                    icon: 'ri-contacts-line',
+                    link: route('customer.index')
+                },
+                {
+                    label: 'New Customer',
+                    permission: 'customer-create',
+                    icon: 'ri-user-add-line',
+                    link: route('customer.create')
+                }
+            ]
+        },
+
+        {
             label: 'Access Control List',
             permission: 'acl',
             icon: 'ri-shield-user-line',

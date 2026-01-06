@@ -3,26 +3,24 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Customer\Http\Controllers\CustomerController;
 
-Route::get('customer', [
-    CustomerController::class, 'index',
-])->name('customer.index');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::prefix('customers')->controller(CustomerController::class)->name('customer.')->group(function () {
 
-Route::get('customer/create', [
-    CustomerController::class, 'create',
-])->name('customer.create');
+        // Recycle Bin
+        Route::get('/recycle-bin', 'recycleBin')->name('recycleBin')->can('customer-delete');
+        Route::post('/recycle-bin/{id}/restore', 'restore')->name('restore')->can('customer-delete');
+        Route::delete('/recycle-bin/{id}/force', 'destroyForce')->name('destroyForce')->can('customer-delete');
+        Route::delete('/recycle-bin/empty', 'emptyRecycleBin')->name('emptyRecycleBin')->can('customer-delete');
+        Route::post('/recycle-bin/restore-all', 'restoreRecycleBin')->name('restoreRecycleBin')->can('customer-delete');
 
-Route::post('customer', [
-    CustomerController::class, 'store',
-])->name('customer.store');
-
-Route::get('customer/{id}/edit', [
-    CustomerController::class, 'edit',
-])->name('customer.edit');
-
-Route::put('customer/{id}', [
-    CustomerController::class, 'update',
-])->name('customer.update');
-
-Route::delete('customer/{id}', [
-    CustomerController::class, 'destroy',
-])->name('customer.destroy');
+        // Standard CRUD
+        Route::get('/', 'index')->name('index')->can('customer-list');
+        Route::get('create', 'create')->name('create')->can('customer-create');
+        Route::get('{customer:uuid}', 'show')->name('show')->can('customer-view');
+        Route::post('/', 'store')->name('store')->can('customer-create');
+        Route::get('{customer:uuid}/edit', 'edit')->name('edit')->can('customer-edit');
+        Route::put('{customer:uuid}', 'update')->name('update')->can('customer-edit');
+        Route::delete('{customer:uuid}', 'destroy')->name('destroy')->can('customer-delete');
+        Route::post('{customer:uuid}/create-user', 'createUser')->name('createUser')->can('customer-edit');
+    });
+});

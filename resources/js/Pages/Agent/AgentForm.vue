@@ -161,15 +161,11 @@
                         <AppSelect
                             id="status"
                             v-model="form.status"
+                            :options="statusOptions"
                             :class="{
                                 'input-error': errorsFields.includes('status')
                             }"
-                        >
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="suspended">Suspended</option>
-                            <option value="inactive">Inactive</option>
-                        </AppSelect>
+                        />
                     </div>
                 </div>
             </template>
@@ -1004,6 +1000,13 @@ const breadCrumb = [
     { label: 'Dashboard', href: route('dashboard.index') },
     { label: 'Agents', href: route('agent.index') },
     { label: isEdit.value ? 'Edit' : 'Create', last: true }
+]
+
+const statusOptions = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'suspended', label: 'Suspended' },
+    { value: 'inactive', label: 'Inactive' }
 ]
 
 const logoPreview = ref(null)
