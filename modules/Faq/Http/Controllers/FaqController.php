@@ -6,64 +6,108 @@ use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Modules\Faq\Http\Requests\FaqValidate;
 use Modules\Faq\Models\Faq;
+use Modules\Faq\Services\FaqCategoryService;
+use Modules\Faq\Services\FaqService;
 use Modules\Support\Http\Controllers\BackendController;
 
 class FaqController extends BackendController
 {
+    public function __construct(
+        public FaqService $service,
+        public FaqCategoryService $categoryService
+    ) {}
+
     public function index(): Response
     {
-        $faqs = Faq::orderBy('name')
-            ->search(request('searchContext'), request('searchTerm'))
-            ->paginate(request('rowsPerPage', 10))
-            ->withQueryString()
-            ->through(fn ($faq) => [
-                'id' => $faq->id,
-                'name' => $faq->name,
-                'created_at' => $faq->created_at->format('d/m/Y H:i').'h',
-            ]);
-
         return inertia('Faq/FaqIndex', [
-            'faqs' => $faqs,
+            'faqs' => $this->service->getAll(),
         ]);
     }
 
     public function create(): Response
     {
-        return inertia('Faq/FaqForm');
+        return inertia('Faq/FaqForm', [
+            'categories' => $this->categoryService->getOptions(),
+        ]);
     }
 
     public function store(FaqValidate $request): RedirectResponse
     {
-        Faq::create($request->validated());
+        $this->service->create($request->validated());
 
         return redirect()->route('faq.index')
-            ->with('success', 'Faq created.');
+            ->with('success', 'FAQ created.');
     }
 
-    public function edit(int $id): Response
+    public function show(Faq $faq): Response
     {
-        $faq = Faq::find($id);
+        $faq->load('category:id,name');
 
-        return inertia('Faq/FaqForm', [
+        return inertia('Faq/FaqShow', [
             'faq' => $faq,
         ]);
     }
 
-    public function update(FaqValidate $request, int $id): RedirectResponse
+    public function edit(Faq $faq): Response
     {
-        $faq = Faq::findOrFail($id);
-
-        $faq->update($request->validated());
-
-        return redirect()->route('faq.index')
-            ->with('success', 'Faq updated.');
+        return inertia('Faq/FaqForm', [
+            'faq' => $faq,
+            'categories' => $this->categoryService->getOptions(),
+        ]);
     }
 
-    public function destroy(int $id): RedirectResponse
+    public function update(FaqValidate $request, Faq $faq): RedirectResponse
     {
-        Faq::findOrFail($id)->delete();
+        $this->service->update($faq, $request->validated());
 
         return redirect()->route('faq.index')
-            ->with('success', 'Faq deleted.');
+            ->with('success', 'FAQ updated.');
+    }
+
+    public function destroy(Faq $faq): RedirectResponse
+    {
+        $this->service->delete($faq);
+
+        return redirect()->route('faq.index')
+            ->with('success', 'FAQ deleted.');
+    }
+
+    public function recycleBin(): Response
+    {
+        return inertia('Faq/FaqRecycleBin', [
+            'faqs' => $this->service->getRecycleBin(),
+        ]);
+    }
+
+    public function restore(string $uuid): RedirectResponse
+    {
+        $this->service->restore($uuid);
+
+        return redirect()->route('faq.recycleBin')
+            ->with('success', 'FAQ restored.');
+    }
+
+    public function destroyForce(string $uuid): RedirectResponse
+    {
+        $this->service->forceDelete($uuid);
+
+        return redirect()->route('faq.recycleBin')
+            ->with('success', 'FAQ permanently deleted.');
+    }
+
+    public function emptyRecycleBin(): RedirectResponse
+    {
+        $count = $this->service->emptyRecycleBin();
+
+        return redirect()->route('faq.recycleBin')
+            ->with('success', "{$count} FAQs permanently deleted.");
+    }
+
+    public function restoreRecycleBin(): RedirectResponse
+    {
+        $count = $this->service->restoreAll();
+
+        return redirect()->route('faq.recycleBin')
+            ->with('success', "{$count} FAQs restored.");
     }
 }
