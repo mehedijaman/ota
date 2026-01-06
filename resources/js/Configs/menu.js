@@ -9,33 +9,41 @@ export default {
         },
 
         {
-            label: 'Blog',
-            permission: 'blog',
-            icon: 'ri-book-2-line',
+            label: 'Customers',
+            permission: 'customer',
+            icon: 'ri-user-star-line',
             children: [
                 {
-                    label: 'Posts',
-                    permission: 'blog-post-list',
-                    icon: 'ri-draft-line',
-                    link: route('blogPost.index')
+                    label: 'Customer List',
+                    permission: 'customer-list',
+                    icon: 'ri-contacts-line',
+                    link: route('customer.index')
                 },
                 {
-                    label: 'Categories',
-                    permission: 'blog-category-list',
-                    icon: 'ri-folders-line',
-                    link: route('blogCategory.index')
+                    label: 'New Customer',
+                    permission: 'customer-create',
+                    icon: 'ri-user-add-line',
+                    link: route('customer.create')
+                }
+            ]
+        },
+
+        {
+            label: 'Agents',
+            permission: 'agent',
+            icon: 'ri-building-line',
+            children: [
+                {
+                    label: 'Agent List',
+                    permission: 'agent-list',
+                    icon: 'ri-building-2-line',
+                    link: route('agent.index')
                 },
                 {
-                    label: 'Tags',
-                    permission: 'blog-tag-list',
-                    icon: 'ri-price-tag-3-line',
-                    link: route('blogTag.index')
-                },
-                {
-                    label: 'Authors',
-                    permission: 'blog-author-list',
-                    icon: 'ri-team-line',
-                    link: route('blogAuthor.index')
+                    label: 'New Agent',
+                    permission: 'agent-create',
+                    icon: 'ri-add-circle-line',
+                    link: route('agent.create')
                 }
             ]
         },
@@ -79,41 +87,33 @@ export default {
         },
 
         {
-            label: 'Agents',
-            permission: 'agent',
-            icon: 'ri-building-line',
+            label: 'Blog',
+            permission: 'blog',
+            icon: 'ri-book-2-line',
             children: [
                 {
-                    label: 'Agent List',
-                    permission: 'agent-list',
-                    icon: 'ri-building-2-line',
-                    link: route('agent.index')
+                    label: 'Posts',
+                    permission: 'blog-post-list',
+                    icon: 'ri-draft-line',
+                    link: route('blogPost.index')
                 },
                 {
-                    label: 'New Agent',
-                    permission: 'agent-create',
-                    icon: 'ri-add-circle-line',
-                    link: route('agent.create')
-                }
-            ]
-        },
-
-        {
-            label: 'Customers',
-            permission: 'customer',
-            icon: 'ri-user-star-line',
-            children: [
-                {
-                    label: 'Customer List',
-                    permission: 'customer-list',
-                    icon: 'ri-contacts-line',
-                    link: route('customer.index')
+                    label: 'Categories',
+                    permission: 'blog-category-list',
+                    icon: 'ri-folders-line',
+                    link: route('blogCategory.index')
                 },
                 {
-                    label: 'New Customer',
-                    permission: 'customer-create',
-                    icon: 'ri-user-add-line',
-                    link: route('customer.create')
+                    label: 'Tags',
+                    permission: 'blog-tag-list',
+                    icon: 'ri-price-tag-3-line',
+                    link: route('blogTag.index')
+                },
+                {
+                    label: 'Authors',
+                    permission: 'blog-author-list',
+                    icon: 'ri-team-line',
+                    link: route('blogAuthor.index')
                 }
             ]
         },
@@ -145,7 +145,39 @@ export default {
         },
 
         {
-            label: 'Access Control List',
+            label: 'SMS',
+            permission: 'sms',
+            icon: 'ri-message-2-line',
+            children: [
+                {
+                    label: 'Send SMS',
+                    permission: 'sms-send',
+                    icon: 'ri-send-plane-line',
+                    link: route('sms.send.create')
+                },
+                {
+                    label: 'Campaigns',
+                    permission: 'sms-campaign-list',
+                    icon: 'ri-megaphone-line',
+                    link: route('sms.campaigns.index')
+                },
+                {
+                    label: 'Templates',
+                    permission: 'sms-template-list',
+                    icon: 'ri-file-text-line',
+                    link: route('sms.templates.index')
+                },
+                {
+                    label: 'Gateways',
+                    permission: 'sms-gateway-list',
+                    icon: 'ri-server-line',
+                    link: route('sms.gateways.index')
+                }
+            ]
+        },
+
+        {
+            label: 'User & ACL',
             permission: 'acl',
             icon: 'ri-shield-user-line',
             children: [

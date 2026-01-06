@@ -9,7 +9,6 @@ class SmsMessage extends BaseModel
     protected $table = 'sms_messages';
 
     protected $fillable = [
-        'tenant_id',
         'user_id',
         'type',
         'to_phone',

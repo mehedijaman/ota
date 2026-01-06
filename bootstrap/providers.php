@@ -23,4 +23,5 @@ return [
     Modules\Employee\EmployeeServiceProvider::class,
     Modules\Customer\CustomerServiceProvider::class,
     Modules\Agent\AgentServiceProvider::class,
+    Modules\Sms\SmsServiceProvider::class,
 ];

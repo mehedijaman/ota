@@ -1,226 +1,101 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Sms\Http\Controllers\SmsController;
-use Modules\Sms\Http\Controllers\SmsPurchasePaymentController;
-use Modules\Sms\Http\Controllers\SuperadminSmsPackageController;
-use Modules\Sms\Http\Controllers\SuperadminSmsPurchaseController;
-use Modules\Sms\Http\Controllers\SuperadminSmsSendController;
-use Modules\Sms\Http\Controllers\SuperadminSmsSettingsController;
-use Modules\Sms\Http\Controllers\SuperadminSmsTemplateController;
-use Modules\Sms\Http\Controllers\TenantSmsDueReminderController;
-use Modules\Sms\Http\Controllers\TenantSmsPurchaseController;
-use Modules\Sms\Http\Controllers\TenantSmsSettingsController;
-use Modules\Sms\Http\Controllers\TenantSmsWalletController;
+use Modules\Sms\Http\Controllers\SmsCampaignController;
+use Modules\Sms\Http\Controllers\SmsGatewayController;
+use Modules\Sms\Http\Controllers\SmsReportController;
+use Modules\Sms\Http\Controllers\SmsSendController;
+use Modules\Sms\Http\Controllers\SmsTemplateController;
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('sms', [
-        SmsController::class,
-        'index',
-    ])->name('sms.index');
+// SMS Gateway Settings Routes
+Route::get('sms/gateways', [SmsGatewayController::class, 'index'])
+    ->name('sms.gateways.index')
+    ->can('sms-gateway-list');
 
-    Route::get('sms/create', [
-        SmsController::class,
-        'create',
-    ])->name('sms.create');
+Route::get('sms/gateways/create', [SmsGatewayController::class, 'create'])
+    ->name('sms.gateways.create')
+    ->can('sms-gateway-create');
 
-    Route::post('sms', [
-        SmsController::class,
-        'store',
-    ])->name('sms.store');
+Route::post('sms/gateways', [SmsGatewayController::class, 'store'])
+    ->name('sms.gateways.store')
+    ->can('sms-gateway-create');
 
-    Route::get('sms/{id}/edit', [
-        SmsController::class,
-        'edit',
-    ])->name('sms.edit');
+Route::get('sms/gateways/{smsGateway}/edit', [SmsGatewayController::class, 'edit'])
+    ->name('sms.gateways.edit')
+    ->can('sms-gateway-edit');
 
-    Route::put('sms/{id}', [
-        SmsController::class,
-        'update',
-    ])->name('sms.update');
+Route::put('sms/gateways/{smsGateway}', [SmsGatewayController::class, 'update'])
+    ->name('sms.gateways.update')
+    ->can('sms-gateway-edit');
 
-    Route::delete('sms/{id}', [
-        SmsController::class,
-        'destroy',
-    ])->name('sms.destroy');
+Route::delete('sms/gateways/{smsGateway}', [SmsGatewayController::class, 'destroy'])
+    ->name('sms.gateways.destroy')
+    ->can('sms-gateway-delete');
 
-    // Tenant SMS wallet & sending
-    Route::get('tenant/sms/wallet', [
-        TenantSmsWalletController::class,
-        'index',
-    ])->name('tenant.sms.wallet');
+Route::post('sms/gateways/{smsGateway}/set-default', [SmsGatewayController::class, 'setDefault'])
+    ->name('sms.gateways.setDefault')
+    ->can('sms-gateway-edit');
 
-    Route::post('tenant/sms/purchases', [
-        TenantSmsPurchaseController::class,
-        'store',
-    ])->name('tenant.sms.purchases.store');
+Route::post('sms/gateways/{smsGateway}/test', [SmsGatewayController::class, 'test'])
+    ->name('sms.gateways.test')
+    ->can('sms-gateway-edit');
 
-    Route::get('tenant/sms/settings', [
-        TenantSmsSettingsController::class,
-        'edit',
-    ])->name('tenant.sms.settings.edit');
+// SMS Template Routes
+Route::get('sms/templates', [SmsTemplateController::class, 'index'])
+    ->name('sms.templates.index')
+    ->can('sms-template-list');
 
-    Route::put('tenant/sms/settings', [
-        TenantSmsSettingsController::class,
-        'update',
-    ])->name('tenant.sms.settings.update');
+Route::get('sms/templates/create', [SmsTemplateController::class, 'create'])
+    ->name('sms.templates.create')
+    ->can('sms-template-create');
 
-    Route::get('tenant/sms/due-reminder', [
-        TenantSmsDueReminderController::class,
-        'create',
-    ])->name('tenant.sms.due.create');
+Route::post('sms/templates', [SmsTemplateController::class, 'store'])
+    ->name('sms.templates.store')
+    ->can('sms-template-create');
 
-    Route::post('tenant/sms/due-reminder', [
-        TenantSmsDueReminderController::class,
-        'store',
-    ])->name('tenant.sms.due.store');
+Route::get('sms/templates/{smsTemplate}/edit', [SmsTemplateController::class, 'edit'])
+    ->name('sms.templates.edit')
+    ->can('sms-template-edit');
 
-    // SMS Reports
-    Route::get('sms/report', [
-        \Modules\Sms\Http\Controllers\SmsReportController::class,
-        'index',
-    ])->name('sms.report.index');
+Route::put('sms/templates/{smsTemplate}', [SmsTemplateController::class, 'update'])
+    ->name('sms.templates.update')
+    ->can('sms-template-edit');
 
-    Route::get('sms/report/generate', [
-        \Modules\Sms\Http\Controllers\SmsReportController::class,
-        'generate',
-    ])->name('sms.report.generate');
+Route::delete('sms/templates/{smsTemplate}', [SmsTemplateController::class, 'destroy'])
+    ->name('sms.templates.destroy')
+    ->can('sms-template-delete');
 
-    Route::get('sms/report/export', [
-        \Modules\Sms\Http\Controllers\SmsReportController::class,
-        'export',
-    ])->name('sms.report.export');
-});
+// SMS Campaign / Bulk Send Routes
+Route::get('sms/campaigns', [SmsCampaignController::class, 'index'])
+    ->name('sms.campaigns.index')
+    ->can('sms-campaign-list');
 
-// ====================================
-// PAYMENT GATEWAY CALLBACKS (No Auth Required)
-// ====================================
-Route::prefix('sms-purchase-payments')
-    ->name('sms.purchases.payments.')
-    ->controller(SmsPurchasePaymentController::class)
-    ->withoutMiddleware([
-        \Illuminate\Cookie\Middleware\EncryptCookies::class,
-        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-        \Illuminate\Session\Middleware\StartSession::class,
-        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
-        \App\Http\Middleware\SetLocaleFromSession::class,
-        \App\Http\Middleware\HandleInertiaRequests::class,
-        \App\Http\Middleware\TenantMiddleware::class,
-        \App\Http\Middleware\EnsureTenantContext::class,
-    ])
-    ->group(function () {
-        Route::match(['get', 'post'], '{transactionId}/success', 'success')->name('success');
-        Route::match(['get', 'post'], '{transactionId}/fail', 'fail')->name('fail');
-        Route::match(['get', 'post'], '{transactionId}/cancel', 'userCancel')->name('cancel');
-        Route::match(['get', 'post'], '{transactionId}/callback', 'callback')->name('callback');
-        Route::post('{transactionId}/ipn', 'ipn')->name('ipn');
-    });
+Route::get('sms/campaigns/create', [SmsCampaignController::class, 'create'])
+    ->name('sms.campaigns.create')
+    ->can('sms-campaign-create');
 
-Route::middleware(['auth', 'verified', 'superadmin'])
-    ->prefix('superadmin')
-    ->group(function () {
-        // Promotional SMS sending (superadmin only)
-        Route::get('sms/send', [
-            SuperadminSmsSendController::class,
-            'create',
-        ])->name('superadmin.sms.send.create');
+Route::post('sms/campaigns', [SmsCampaignController::class, 'store'])
+    ->name('sms.campaigns.store')
+    ->can('sms-campaign-create');
 
-        Route::post('sms/send', [
-            SuperadminSmsSendController::class,
-            'store',
-        ])->name('superadmin.sms.send.store');
+Route::get('sms/campaigns/{smsCampaign}', [SmsCampaignController::class, 'show'])
+    ->name('sms.campaigns.show')
+    ->can('sms-campaign-view');
 
-        // Templates
-        Route::get('sms/templates', [
-            SuperadminSmsTemplateController::class,
-            'index',
-        ])->name('superadmin.sms.templates.index');
+// SMS Send (Quick Send)
+Route::get('sms/send', [SmsSendController::class, 'create'])
+    ->name('sms.send.create')
+    ->can('sms-send');
 
-        Route::get('sms/templates/create', [
-            SuperadminSmsTemplateController::class,
-            'create',
-        ])->name('superadmin.sms.templates.create');
+Route::post('sms/send', [SmsSendController::class, 'store'])
+    ->name('sms.send.store')
+    ->can('sms-send');
 
-        Route::post('sms/templates', [
-            SuperadminSmsTemplateController::class,
-            'store',
-        ])->name('superadmin.sms.templates.store');
+// SMS Reports
+Route::get('sms/reports', [SmsReportController::class, 'index'])
+    ->name('sms.reports.index')
+    ->can('sms-report-list');
 
-        Route::get('sms/templates/{smsTemplate}/edit', [
-            SuperadminSmsTemplateController::class,
-            'edit',
-        ])->name('superadmin.sms.templates.edit');
-
-        Route::put('sms/templates/{smsTemplate}', [
-            SuperadminSmsTemplateController::class,
-            'update',
-        ])->name('superadmin.sms.templates.update');
-
-        Route::delete('sms/templates/{smsTemplate}', [
-            SuperadminSmsTemplateController::class,
-            'destroy',
-        ])->name('superadmin.sms.templates.destroy');
-
-        // Packages
-        Route::get('sms/packages', [
-            SuperadminSmsPackageController::class,
-            'index',
-        ])->name('superadmin.sms.packages.index');
-
-        Route::get('sms/packages/create', [
-            SuperadminSmsPackageController::class,
-            'create',
-        ])->name('superadmin.sms.packages.create');
-
-        Route::post('sms/packages', [
-            SuperadminSmsPackageController::class,
-            'store',
-        ])->name('superadmin.sms.packages.store');
-
-        Route::get('sms/packages/{smsPackage}/edit', [
-            SuperadminSmsPackageController::class,
-            'edit',
-        ])->name('superadmin.sms.packages.edit');
-
-        Route::put('sms/packages/{smsPackage}', [
-            SuperadminSmsPackageController::class,
-            'update',
-        ])->name('superadmin.sms.packages.update');
-
-        Route::delete('sms/packages/{smsPackage}', [
-            SuperadminSmsPackageController::class,
-            'destroy',
-        ])->name('superadmin.sms.packages.destroy');
-
-        // Purchase approvals
-        Route::get('sms/purchases', [
-            SuperadminSmsPurchaseController::class,
-            'index',
-        ])->name('superadmin.sms.purchases.index');
-
-        Route::post('sms/purchases/{id}/approve', [
-            SuperadminSmsPurchaseController::class,
-            'approve',
-        ])->name('superadmin.sms.purchases.approve');
-
-        Route::post('sms/purchases/{id}/reject', [
-            SuperadminSmsPurchaseController::class,
-            'reject',
-        ])->name('superadmin.sms.purchases.reject');
-
-        Route::get('sms/settings', [
-            SuperadminSmsSettingsController::class,
-            'edit',
-        ])->name('superadmin.sms.settings.edit');
-
-        Route::put('sms/settings', [
-            SuperadminSmsSettingsController::class,
-            'update',
-        ])->name('superadmin.sms.settings.update');
-
-        Route::post('sms/settings/test', [
-            SuperadminSmsSettingsController::class,
-            'test',
-        ])->name('superadmin.sms.settings.test');
-    });
+Route::get('sms/reports/export', [SmsReportController::class, 'export'])
+    ->name('sms.reports.export')
+    ->can('sms-report-list');
