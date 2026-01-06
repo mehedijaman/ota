@@ -203,10 +203,10 @@ class EmployeeService
 
     protected function deleteRelatedUser(Employee $employee): void
     {
-        $userQuery = User::query()->where('type', 'employee');
+        $userQuery = User::query()->where('profile_type', 'employee');
 
-        if (Schema::hasColumn('users', 'employee_id')) {
-            $userQuery->where('employee_id', $employee->id);
+        if (Schema::hasColumn('users', 'profile_id')) {
+            $userQuery->where('profile_id', $employee->id);
         } else {
             $userQuery->where('email', $employee->email);
         }

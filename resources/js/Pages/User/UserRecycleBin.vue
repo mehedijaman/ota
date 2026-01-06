@@ -9,18 +9,16 @@
                     @click="$inertia.visit(route('user.index'))"
                 >
                     <i class="ri-arrow-left-s-line mr-1"></i>
-                    {{ __('Back to List') }}
+                    Back to List
                 </AppButton>
 
                 <AppButton
                     v-if="users.data.length && can('acl-user-create')"
                     class="btn btn-primary"
-                    @click="
-                        confirmRestore(route('user.restoreRecycleBin'))
-                    "
+                    @click="confirmRestore(route('user.restoreRecycleBin'))"
                 >
                     <i class="ri-recycle-fill mr-1"></i>
-                    {{ __('Restore All') }}
+                    Restore Recycle Bin
                 </AppButton>
 
                 <AppButton
@@ -29,7 +27,7 @@
                     @click="confirmDelete(route('user.emptyRecycleBin'))"
                 >
                     <i class="ri-delete-bin-7-line mr-1"></i>
-                    {{ __('Empty Recycle Bin') }}
+                    Empty Recycle Bin
                 </AppButton>
             </div>
         </template>
@@ -104,17 +102,14 @@
                         <!-- Restore -->
                         <AppTooltip
                             v-if="can('acl-user-create')"
-                            :text="__('Restore')"
+                            text="Restore"
                             class="mr-2"
                         >
                             <AppButton
                                 class="btn btn-icon btn-primary"
                                 @click="
                                     confirmRestore(
-                                        route(
-                                            'user.restore',
-                                            item.uuid
-                                        )
+                                        route('user.restore', { uuid: item.uuid })
                                     )
                                 "
                             >
@@ -122,19 +117,16 @@
                             </AppButton>
                         </AppTooltip>
 
-                        <!-- Permanently Delete -->
+                        <!-- Delete -->
                         <AppTooltip
                             v-if="can('acl-user-delete')"
-                            :text="__('Delete Permanently')"
+                            text="Permanently Delete"
                         >
                             <AppButton
                                 class="btn btn-icon btn-destructive"
                                 @click="
                                     confirmDelete(
-                                        route(
-                                            'user.destroyForce',
-                                            item.uuid
-                                        )
+                                        route('user.destroyForce', { uuid: item.uuid })
                                     )
                                 "
                             >
@@ -150,32 +142,32 @@
     <AppPaginator
         v-if="users.data.length"
         :links="users.links"
-        :from="users.from || 0"
-        :to="users.to || 0"
-        :total="users.total || 0"
+        :from="users.from ?? 0"
+        :to="users.to ?? 0"
+        :total="users.total ?? 0"
         class="mt-4 justify-center"
     ></AppPaginator>
 
-    <AppEmptyState
-        v-if="!users.data.length"
-        class="mt-4"
-        :title="__('Recycle bin is empty')"
-        :description="__('Deleted users will appear here.')"
-    >
-    </AppEmptyState>
+    <AppEmptyState v-if="!users.data.length"></AppEmptyState>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
-    <AppConfirmDialog ref="confirmRestoreRef" action-type="restore"></AppConfirmDialog>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
-import useAuthCan from '@/Composables/useAuthCan'
 import useTitle from '@/Composables/useTitle'
+import useAuthCan from '@/Composables/useAuthCan'
+import AppEmptyState from '@/Components/Misc/AppEmptyState.vue'
 
 const { can } = useAuthCan()
-const { title } = useTitle('Recycle Bin')
+const { title } = useTitle('User Recycle Bin')
+
+const breadCrumb = [
+    { label: 'Dashboard', href: route('dashboard.index') },
+    { label: 'Users', href: route('user.index') },
+    { label: title, last: true }
+]
 
 const props = defineProps({
     users: {
@@ -184,22 +176,21 @@ const props = defineProps({
     }
 })
 
-const breadCrumb = [
-    { label: 'Dashboard', href: route('dashboard.index') },
-    { label: 'Users', href: route('user.index') },
-    { label: 'Recycle Bin', last: true }
+const headers = [
+    'SL',
+    'Name',
+    'Email',
+    'Type',
+    'Roles',
+    'Deleted At',
+    'Actions'
 ]
 
-const headers = ['ID', 'Name', 'Email', 'Type', 'Roles', 'Deleted At', 'Actions']
-
 const confirmDialogRef = ref(null)
-const confirmRestoreRef = ref(null)
-
 const confirmDelete = (deleteRoute) => {
     confirmDialogRef.value.openModal(deleteRoute)
 }
-
 const confirmRestore = (restoreRoute) => {
-    confirmRestoreRef.value.openModal(restoreRoute)
+    confirmDialogRef.value.confirmRestore(restoreRoute)
 }
 </script>

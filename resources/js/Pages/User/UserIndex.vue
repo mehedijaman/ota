@@ -2,14 +2,7 @@
     <AppSectionHeader :title="__('Users')" :bread-crumb="breadCrumb">
         <template #right>
             <div class="flex gap-2">
-                <AppButton
-                    v-if="can('acl-user-list')"
-                    class="btn btn-secondary"
-                    @click="$inertia.visit(route('user.recycleBin'))"
-                >
-                    <i class="ri-recycle-line mr-1"></i>
-                    {{ __('Recycle Bin') }}
-                </AppButton>
+                
                 <AppButton
                     v-if="can('acl-user-create')"
                     class="btn btn-primary"
@@ -17,6 +10,15 @@
                 >
                     <i class="ri-add-fill mr-1"></i>
                     {{ __('Create User') }}
+                </AppButton>
+
+                <AppButton
+                    v-if="can('acl-user-list')"
+                    class="btn btn-secondary"
+                    @click="$inertia.visit(route('user.recycleBin'))"
+                >
+                    <i class="ri-recycle-line mr-1"></i>
+                    {{ __('Recycle Bin') }}
                 </AppButton>
             </div>
         </template>
