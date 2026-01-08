@@ -10,13 +10,14 @@ class TestimonialValidate extends Request
     {
         return [
             'name' => 'required|string|max:255',
-            'designation' => 'required|string|max:255',
-            'company' => 'required|string|max:255',
-            'title' => 'required|string|max:255',
+            'designation' => 'nullable|string|max:255',
+            'company' => 'nullable|string|max:255',
+            'title' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|image|max:2048', // Max size 2MB
+            'image' => 'nullable|image|max:2048',
             'featured' => 'nullable|boolean',
-            'active' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
+            'remove_previous_image' => 'nullable|boolean',
         ];
     }
 }

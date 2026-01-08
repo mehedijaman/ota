@@ -10,10 +10,12 @@ use Modules\Support\Models\BaseModel;
 use Modules\Support\Traits\ActivityLog;
 use Modules\Support\Traits\Searchable;
 use Modules\Testimonial\Database\Factories\TestimonialFactory;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Testimonial extends BaseModel
+class Testimonial extends BaseModel implements HasMedia
 {
-    use ActivityLog, HasFactory, Searchable, SoftDeletes;
+    use ActivityLog, HasFactory, InteractsWithMedia, Searchable, SoftDeletes;
 
     protected $table = 'testimonials';
 
@@ -22,17 +24,18 @@ class Testimonial extends BaseModel
     protected $appends = ['image_url'];
 
     protected $casts = [
-        'active' => 'boolean',
+        'is_active' => 'boolean',
         'featured' => 'boolean',
     ];
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
+    }
+
     public function getImageUrlAttribute(): ?string
     {
-        if ($this->image) {
-            return asset("storage/testimonial/{$this->image}");
-        }
-
-        return null;
+        return $this->getFirstMediaUrl('image') ?: null;
     }
 
     protected static function newFactory(): Factory

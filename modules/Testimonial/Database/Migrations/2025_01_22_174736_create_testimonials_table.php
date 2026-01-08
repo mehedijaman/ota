@@ -19,9 +19,8 @@ return new class extends Migration
             $table->string('company')->nullable();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
-            $table->string('image')->nullable();
             $table->boolean('featured')->nullable()->default(0);
-            $table->boolean('active')->nullable()->default(1);
+            $table->boolean('is_active')->nullable()->default(1);
 
             $table->timestamps();
             $table->softDeletes();
