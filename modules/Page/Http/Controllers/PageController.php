@@ -8,9 +8,14 @@ use Modules\Page\Http\Requests\PageValidate;
 use Modules\Page\Models\Page;
 use Modules\Page\Services\PageService;
 use Modules\Support\Http\Controllers\BackendController;
+use Modules\Support\Traits\EditorImage;
 
 class PageController extends BackendController
 {
+    use EditorImage;
+
+    protected string $uploadImagePath = 'page-editor-files';
+
     public function __construct(
         protected PageService $pageService
     ) {}

@@ -186,7 +186,7 @@
                 <ul class="space-y-4">
                     <li>
                         <a
-                            href="{{ route('site.about') }}"
+                            href="/about"
                             class="transition-colors hover:text-blue-400"
                         >
                             About Us
@@ -232,7 +232,7 @@
                     </li>
                     <li>
                         <a
-                            href="{{ route('site.terms-and-conditions') }}"
+                            href="/terms-and-conditions"
                             class="transition-colors hover:text-blue-400"
                         >
                             Terms of Service
@@ -240,7 +240,7 @@
                     </li>
                     <li>
                         <a
-                            href="{{ route('site.privacy-policy') }}"
+                            href="/privacy-policy"
                             class="transition-colors hover:text-blue-400"
                         >
                             Privacy Policy

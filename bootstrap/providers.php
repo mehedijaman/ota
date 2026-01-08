@@ -9,7 +9,6 @@ return [
     Modules\Dashboard\DashboardServiceProvider::class,
     Modules\Acl\AclServiceProvider::class,
 
-    Modules\Index\IndexServiceProvider::class,
     Modules\Blog\BlogServiceProvider::class,
     Modules\Flight\FlightServiceProvider::class,
     Modules\Hotel\HotelServiceProvider::class,
@@ -27,4 +26,6 @@ return [
     Modules\Slider\SliderServiceProvider::class,
     Modules\Testimonial\TestimonialServiceProvider::class,
     Modules\Setting\SettingServiceProvider::class,
+
+    Modules\Index\IndexServiceProvider::class,
 ];

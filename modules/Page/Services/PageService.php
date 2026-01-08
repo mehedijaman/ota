@@ -133,6 +133,7 @@ class PageService
     {
         return [
             'title' => $data['title'] ?? null,
+            'slug' => $data['slug'] ?? null,
             'content' => $data['content'] ?? null,
             'meta_tag_title' => $data['meta_tag_title'] ?? null,
             'meta_tag_description' => $data['meta_tag_description'] ?? null,
