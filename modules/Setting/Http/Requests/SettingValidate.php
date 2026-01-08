@@ -43,12 +43,12 @@ class SettingValidate extends Request
             'google_map' => 'nullable|string',
 
             // Social Media Links
-            'facebook' => 'nullable|string|max:255|url',
-            'twitter' => 'nullable|string|max:255|url',
-            'instagram' => 'nullable|string|max:255|url',
-            'youtube' => 'nullable|string|max:255|url',
-            'linkedin' => 'nullable|string|max:255|url',
-            'pinterest' => 'nullable|string|max:255|url',
+            'facebook' => 'nullable|string|max:255',
+            'twitter' => 'nullable|string|max:255',
+            'instagram' => 'nullable|string|max:255',
+            'youtube' => 'nullable|string|max:255',
+            'linkedin' => 'nullable|string|max:255',
+            'pinterest' => 'nullable|string|max:255',
 
             // Theme Customization
             'navbar_background' => 'nullable|string|max:20',
@@ -58,18 +58,23 @@ class SettingValidate extends Request
             'footer_background' => 'nullable|string|max:20',
             'footer_text_color' => 'nullable|string|max:20',
 
-            // SMTP Settings
-            'smtp_settings' => 'nullable|array',
-            'smtp_settings.host' => 'nullable|string|max:255',
-            'smtp_settings.port' => 'nullable|numeric|min:1|max:65535',
-            'smtp_settings.username' => 'nullable|string|max:255',
-            'smtp_settings.password' => 'nullable|string|max:255',
-            'smtp_settings.encryption' => 'nullable|string|in:,tls,ssl',
-            'smtp_settings.from_address' => 'nullable|email|max:255',
-            'smtp_settings.from_name' => 'nullable|string|max:255',
+            // SMTP Settings (flat structure)
+            'smtp_host' => 'nullable|string|max:255',
+            'smtp_port' => 'nullable|numeric|min:1|max:65535',
+            'smtp_username' => 'nullable|string|max:255',
+            'smtp_password' => 'nullable|string|max:255',
+            'smtp_encryption' => 'nullable|string|in:,tls,ssl',
+            'mail_from_address' => 'nullable|email|max:255',
+            'mail_from_name' => 'nullable|string|max:255',
 
             // Advanced
             'custom_css' => 'nullable|string',
+
+            // reCAPTCHA
+            'recaptcha_enabled' => 'nullable|boolean',
+            'recaptcha_site_key' => 'nullable|string|max:255',
+            'recaptcha_secret_key' => 'nullable|string|max:255',
+            'recaptcha_version' => 'nullable|string|in:v2,v3',
         ];
     }
 }

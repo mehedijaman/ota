@@ -226,6 +226,8 @@ const props = defineProps({
     }
 })
 
+const theme = props.settings.theme ?? {}
+
 const defaultColors = {
     navbar_background: '#ffffff',
     navbar_text_color: '#1e293b',
@@ -236,18 +238,17 @@ const defaultColors = {
 }
 
 const form = useForm({
+    _method: 'PUT',
     navbar_background:
-        props.settings.navbar_background ?? defaultColors.navbar_background,
+        theme.navbar_background ?? defaultColors.navbar_background,
     navbar_text_color:
-        props.settings.navbar_text_color ?? defaultColors.navbar_text_color,
-    body_background:
-        props.settings.body_background ?? defaultColors.body_background,
-    body_text_color:
-        props.settings.body_text_color ?? defaultColors.body_text_color,
+        theme.navbar_text_color ?? defaultColors.navbar_text_color,
+    body_background: theme.body_background ?? defaultColors.body_background,
+    body_text_color: theme.body_text_color ?? defaultColors.body_text_color,
     footer_background:
-        props.settings.footer_background ?? defaultColors.footer_background,
+        theme.footer_background ?? defaultColors.footer_background,
     footer_text_color:
-        props.settings.footer_text_color ?? defaultColors.footer_text_color
+        theme.footer_text_color ?? defaultColors.footer_text_color
 })
 
 const resetToDefaults = () => {
@@ -255,7 +256,7 @@ const resetToDefaults = () => {
 }
 
 const submitForm = () => {
-    form.put(route('setting.update'), {
+    form.post(route('setting.update'), {
         preserveScroll: true
     })
 }

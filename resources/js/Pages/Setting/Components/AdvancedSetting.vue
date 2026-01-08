@@ -106,8 +106,11 @@ const props = defineProps({
     }
 })
 
+const advanced = props.settings.advanced ?? {}
+
 const form = useForm({
-    custom_css: props.settings.custom_css ?? ''
+    _method: 'PUT',
+    custom_css: advanced.custom_css ?? ''
 })
 
 const clearCss = () => {
@@ -117,7 +120,7 @@ const clearCss = () => {
 }
 
 const submitForm = () => {
-    form.put(route('setting.update'), {
+    form.post(route('setting.update'), {
         preserveScroll: true
     })
 }

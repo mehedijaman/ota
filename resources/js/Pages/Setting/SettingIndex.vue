@@ -35,6 +35,10 @@
             />
             <SmtpSetting v-show="activeTab === 'smtp'" :settings="settings" />
             <ThemeSetting v-show="activeTab === 'theme'" :settings="settings" />
+            <RecaptchaSetting
+                v-show="activeTab === 'recaptcha'"
+                :settings="settings"
+            />
             <AdvancedSetting
                 v-show="activeTab === 'advanced'"
                 :settings="settings"
@@ -53,6 +57,7 @@ import SiteIdentitySetting from './Components/SiteIdentitySetting.vue'
 import ContactSocialSetting from './Components/ContactSocialSetting.vue'
 import SmtpSetting from './Components/SmtpSetting.vue'
 import ThemeSetting from './Components/ThemeSetting.vue'
+import RecaptchaSetting from './Components/RecaptchaSetting.vue'
 import AdvancedSetting from './Components/AdvancedSetting.vue'
 
 const { title } = useTitle('Settings')
@@ -74,6 +79,7 @@ const tabs = [
     { id: 'contact', label: 'Contact & Social', icon: 'ri-contacts-line' },
     { id: 'smtp', label: 'Email / SMTP', icon: 'ri-mail-settings-line' },
     { id: 'theme', label: 'Theme', icon: 'ri-palette-line' },
+    { id: 'recaptcha', label: 'reCAPTCHA', icon: 'ri-shield-check-line' },
     { id: 'advanced', label: 'Advanced', icon: 'ri-code-s-slash-line' }
 ]
 

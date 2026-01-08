@@ -15,6 +15,12 @@ class MenuItem extends BaseModel
 
     protected $table = 'menu_items';
 
+    protected static function booted(): void
+    {
+        static::saved(fn () => Menu::clearMenuCache());
+        static::deleted(fn () => Menu::clearMenuCache());
+    }
+
     protected static function newFactory(): Factory
     {
         return MenuItemFactory::new();

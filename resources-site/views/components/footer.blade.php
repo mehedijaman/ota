@@ -45,16 +45,9 @@
                     @endif
                 </a>
 
-                @if ($siteSettings->show_slogan && $siteSettings->slogan)
-                    <p class="mb-6 max-w-sm leading-relaxed text-slate-400">
-                        {{ $siteSettings->slogan }}
-                    </p>
-                @else
-                    <p class="mb-6 max-w-sm leading-relaxed text-slate-400">
-                        Your trusted partner for all travel needs. We make
-                        exploring the world easy, affordable, and unforgettable.
-                    </p>
-                @endif
+                <p class="mb-6 max-w-sm leading-relaxed text-slate-400">
+                    {{ $siteSettings->description }}
+                </p>
 
                 {{-- Social Media Links --}}
                 <div class="flex gap-4">

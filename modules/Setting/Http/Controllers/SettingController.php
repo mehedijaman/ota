@@ -7,81 +7,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Response;
 use Modules\Setting\Http\Requests\SettingValidate;
-use Modules\Setting\Models\Setting;
+use Modules\Setting\Services\SettingService;
 use Modules\Support\Http\Controllers\BackendController;
 
 class SettingController extends BackendController
 {
+    public function __construct(protected SettingService $settingService) {}
+
     public function index(): Response
     {
-        $settings = Setting::firstOrCreate();
-
         return inertia('Setting/SettingIndex', [
-            'settings' => $settings,
+            'settings' => $this->settingService->getAllForAdmin(),
         ]);
     }
 
     public function update(SettingValidate $request): RedirectResponse
     {
-        $setting = Setting::firstOrCreate();
-
-        $settingData = $request->validated();
-
-        // Remove file-related keys from settingData as they're handled via media library
-        unset($settingData['logo'], $settingData['favicon'], $settingData['banner']);
-        unset($settingData['remove_previous_logo'], $settingData['remove_previous_favicon'], $settingData['remove_previous_banner']);
-
-        // Handle SMTP password - don't overwrite if empty
-        if (isset($settingData['smtp_settings']['password']) && empty($settingData['smtp_settings']['password'])) {
-            $existingSmtp = $setting->smtp_settings ?? [];
-            $settingData['smtp_settings']['password'] = $existingSmtp['password'] ?? '';
-        }
-
-        // Ensure port is cast to integer
-        if (isset($settingData['smtp_settings']['port'])) {
-            $settingData['smtp_settings']['port'] = (int) $settingData['smtp_settings']['port'];
-        }
-
-        // Handle logo upload via media library
-        if ($request->hasFile('logo')) {
-            $setting->clearMediaCollection('logo');
-            $setting->addMediaFromRequest('logo')->toMediaCollection('logo');
-        } elseif ($request->boolean('remove_previous_logo')) {
-            $setting->clearMediaCollection('logo');
-        }
-
-        // Handle favicon upload via media library
-        if ($request->hasFile('favicon')) {
-            $setting->clearMediaCollection('favicon');
-            $setting->addMediaFromRequest('favicon')->toMediaCollection('favicon');
-        } elseif ($request->boolean('remove_previous_favicon')) {
-            $setting->clearMediaCollection('favicon');
-        }
-
-        // Handle banner upload via media library
-        if ($request->hasFile('banner')) {
-            $setting->clearMediaCollection('banner');
-            $setting->addMediaFromRequest('banner')->toMediaCollection('banner');
-        } elseif ($request->boolean('remove_previous_banner')) {
-            $setting->clearMediaCollection('banner');
-        }
-
-        // Handle watermark (stays in public directory)
-        if ($request->hasFile('watermark')) {
-            $watermarkFile = $request->file('watermark');
-            $watermarkFile->move(public_path(), 'watermark.png');
-        } elseif ($request->boolean('remove_previous_watermark')) {
-            $watermarkPath = public_path('watermark.png');
-            if (file_exists($watermarkPath)) {
-                unlink($watermarkPath);
-            }
-        }
-        unset($settingData['watermark'], $settingData['remove_previous_watermark']);
-
-        $setting->update($settingData);
+        $this->settingService->updateFromRequest($request->validated(), $request);
 
         return redirect()->route('setting.index')
-            ->with('success', 'Setting updated.');
+            ->with('success', 'Settings updated successfully.');
     }
 
     public function testEmail(Request $request): RedirectResponse
@@ -90,8 +35,7 @@ class SettingController extends BackendController
             'email' => 'required|email',
         ]);
 
-        $setting = Setting::first();
-        $smtp = $setting->smtp_settings ?? [];
+        $smtp = $this->settingService->getSmtpConfig();
 
         if (empty($smtp['host'])) {
             return redirect()->back()

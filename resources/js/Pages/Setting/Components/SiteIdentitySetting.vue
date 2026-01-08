@@ -55,7 +55,7 @@
                         <AppInputFile
                             id="logo"
                             v-model="form.logo"
-                            :image-preview-url="settings.logo_url"
+                            :image-preview-url="logoUrl"
                             accept="image/*"
                             @remove-file="form.remove_previous_logo = true"
                         />
@@ -70,7 +70,7 @@
                         <AppInputFile
                             id="favicon"
                             v-model="form.favicon"
-                            :image-preview-url="settings.favicon_url"
+                            :image-preview-url="faviconUrl"
                             accept="image/*"
                             @remove-file="form.remove_previous_favicon = true"
                         />
@@ -85,7 +85,7 @@
                         <AppInputFile
                             id="banner"
                             v-model="form.banner"
-                            :image-preview-url="settings.banner_url"
+                            :image-preview-url="bannerUrl"
                             accept="image/*"
                             @remove-file="form.remove_previous_banner = true"
                         />
@@ -167,21 +167,28 @@ const props = defineProps({
     }
 })
 
+const site = props.settings.site ?? {}
+const media = props.settings.media ?? {}
+
 const form = useForm({
     _method: 'PUT',
-    site_name: props.settings.site_name ?? '',
-    description: props.settings.description ?? '',
-    slogan: props.settings.slogan ?? '',
+    site_name: site.site_name ?? '',
+    description: site.description ?? '',
+    slogan: site.slogan ?? '',
     logo: null,
     favicon: null,
     banner: null,
-    show_name: props.settings.show_name ?? true,
-    show_slogan: props.settings.show_slogan ?? true,
-    show_logo: props.settings.show_logo ?? true,
+    show_name: site.show_name ?? true,
+    show_slogan: site.show_slogan ?? true,
+    show_logo: site.show_logo ?? true,
     remove_previous_logo: false,
     remove_previous_favicon: false,
     remove_previous_banner: false
 })
+
+const logoUrl = media.logo_url ?? null
+const faviconUrl = media.favicon_url ?? null
+const bannerUrl = media.banner_url ?? null
 
 const submitForm = () => {
     form.post(route('setting.update'), {

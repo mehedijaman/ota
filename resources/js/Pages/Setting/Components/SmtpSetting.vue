@@ -20,7 +20,7 @@
                         </AppLabel>
                         <AppInputText
                             id="smtp_host"
-                            v-model="form.smtp_settings.host"
+                            v-model="form.smtp_host"
                             placeholder="smtp.example.com"
                         />
                     </div>
@@ -32,7 +32,7 @@
                         </AppLabel>
                         <AppInputText
                             id="smtp_port"
-                            v-model="form.smtp_settings.port"
+                            v-model="form.smtp_port"
                             type="number"
                             placeholder="587"
                         />
@@ -43,7 +43,7 @@
                         <AppLabel for="smtp_username"> Username </AppLabel>
                         <AppInputText
                             id="smtp_username"
-                            v-model="form.smtp_settings.username"
+                            v-model="form.smtp_username"
                             placeholder="your-email@example.com"
                             autocomplete="off"
                         />
@@ -54,7 +54,7 @@
                         <AppLabel for="smtp_password"> Password </AppLabel>
                         <AppInputText
                             id="smtp_password"
-                            v-model="form.smtp_settings.password"
+                            v-model="form.smtp_password"
                             type="password"
                             placeholder="••••••••"
                             autocomplete="new-password"
@@ -69,7 +69,7 @@
                         <AppLabel for="smtp_encryption"> Encryption </AppLabel>
                         <select
                             id="smtp_encryption"
-                            v-model="form.smtp_settings.encryption"
+                            v-model="form.smtp_encryption"
                             class="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                         >
                             <option value="">None</option>
@@ -80,22 +80,22 @@
 
                     <!-- From Name -->
                     <div>
-                        <AppLabel for="smtp_from_name"> From Name </AppLabel>
+                        <AppLabel for="mail_from_name"> From Name </AppLabel>
                         <AppInputText
-                            id="smtp_from_name"
-                            v-model="form.smtp_settings.from_name"
+                            id="mail_from_name"
+                            v-model="form.mail_from_name"
                             placeholder="Your Company Name"
                         />
                     </div>
 
                     <!-- From Email -->
                     <div class="lg:col-span-2">
-                        <AppLabel for="smtp_from_address">
+                        <AppLabel for="mail_from_address">
                             From Email Address
                         </AppLabel>
                         <AppInputText
-                            id="smtp_from_address"
-                            v-model="form.smtp_settings.from_address"
+                            id="mail_from_address"
+                            v-model="form.mail_from_address"
                             type="email"
                             placeholder="noreply@example.com"
                         />
@@ -162,23 +162,17 @@ const props = defineProps({
     }
 })
 
-const defaultSmtpSettings = {
-    host: '',
-    port: 587,
-    username: '',
-    password: '',
-    encryption: 'tls',
-    from_address: '',
-    from_name: ''
-}
+const mail = props.settings.mail ?? {}
 
 const form = useForm({
     _method: 'PUT',
-    smtp_settings: {
-        ...defaultSmtpSettings,
-        ...(props.settings.smtp_settings ?? {}),
-        password: '' // Always start with empty password field (masked)
-    }
+    smtp_host: mail.smtp_host ?? '',
+    smtp_port: mail.smtp_port ?? 587,
+    smtp_username: mail.smtp_username ?? '',
+    smtp_password: '', // Always start with empty password field (masked)
+    smtp_encryption: mail.smtp_encryption ?? 'tls',
+    mail_from_address: mail.mail_from_address ?? '',
+    mail_from_name: mail.mail_from_name ?? ''
 })
 
 const testEmail = ref('')
@@ -186,9 +180,7 @@ const sendingTest = ref(false)
 
 const submitForm = () => {
     // Ensure port is a number
-    form.smtp_settings.port = form.smtp_settings.port
-        ? Number(form.smtp_settings.port)
-        : 587
+    form.smtp_port = form.smtp_port ? Number(form.smtp_port) : 587
 
     form.post(route('setting.update'), {
         preserveScroll: true

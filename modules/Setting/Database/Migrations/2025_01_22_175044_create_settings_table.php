@@ -10,47 +10,40 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
 
-            // Site Identity
-            $table->string('site_name')->nullable();
+            // Logical grouping
+            $table->string('group', 100)->index();      // site, contact, social, theme, mail, security
+            $table->string('key', 150)->index();        // site_name, show_logo, smtp, etc.
+
+            // Value storage
+            $table->longText('value')->nullable();      // JSON / string / boolean / array
+
+            // Metadata
+            $table->string('type', 50)->default('string')->index();
+            // string | boolean | json | integer | color | css | html
+
+            $table->string('context', 50)->default('global')->index();
+            // global | web | mobile | admin | api
+
+            // Control
+            $table->boolean('is_encrypted')->default(false)->index();
+            $table->boolean('is_public')->default(false)->index(); // frontend-safe
+            $table->boolean('is_active')->default(true)->index();
+
+            // Optional description (Admin UI helper)
+            $table->string('label')->nullable();
             $table->text('description')->nullable();
-            $table->string('slogan')->nullable();
 
-            // Display Options
-            $table->boolean('show_name')->default(true);
-            $table->boolean('show_slogan')->default(true);
-            $table->boolean('show_logo')->default(true);
-
-            // Contact Information
-            $table->json('addresses')->nullable();
-            $table->json('phones')->nullable();
-            $table->json('emails')->nullable();
-            $table->string('whatsapp')->nullable();
-            $table->text('google_map')->nullable();
-
-            // Social Media Links
-            $table->string('facebook')->nullable();
-            $table->string('twitter')->nullable();
-            $table->string('instagram')->nullable();
-            $table->string('youtube')->nullable();
-            $table->string('linkedin')->nullable();
-            $table->string('pinterest')->nullable();
-
-            // Theme Customization
-            $table->string('navbar_background')->nullable();
-            $table->string('navbar_text_color')->nullable();
-            $table->string('body_background')->nullable();
-            $table->string('body_text_color')->nullable();
-            $table->string('footer_background')->nullable();
-            $table->string('footer_text_color')->nullable();
-
-            $table->json('smtp_settings')->nullable();
-
-            // Advanced
-            $table->longText('custom_css')->nullable();
+            // Audit
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
 
             $table->timestamps();
+
+            $table->unique(['group', 'key', 'context']);
         });
+
     }
 
     public function down(): void

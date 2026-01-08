@@ -277,18 +277,22 @@ const props = defineProps({
     }
 })
 
+const contact = props.settings.contact ?? {}
+const social = props.settings.social ?? {}
+
 const form = useForm({
-    addresses: props.settings.addresses ?? [{ label: '', address: '' }],
-    phones: props.settings.phones ?? [{ label: '', number: '' }],
-    emails: props.settings.emails ?? [{ label: '', email: '' }],
-    whatsapp: props.settings.whatsapp ?? '',
-    google_map: props.settings.google_map ?? '',
-    facebook: props.settings.facebook ?? '',
-    twitter: props.settings.twitter ?? '',
-    instagram: props.settings.instagram ?? '',
-    youtube: props.settings.youtube ?? '',
-    linkedin: props.settings.linkedin ?? '',
-    pinterest: props.settings.pinterest ?? ''
+    _method: 'PUT',
+    addresses: contact.addresses ?? [{ label: '', address: '' }],
+    phones: contact.phones ?? [{ label: '', number: '' }],
+    emails: contact.emails ?? [{ label: '', email: '' }],
+    whatsapp: contact.whatsapp ?? '',
+    google_map: contact.google_map ?? '',
+    facebook: social.facebook ?? '',
+    twitter: social.twitter ?? '',
+    instagram: social.instagram ?? '',
+    youtube: social.youtube ?? '',
+    linkedin: social.linkedin ?? '',
+    pinterest: social.pinterest ?? ''
 })
 
 const addAddress = () => {
@@ -322,7 +326,7 @@ const removeEmail = (index) => {
 }
 
 const submitForm = () => {
-    form.put(route('setting.update'), {
+    form.post(route('setting.update'), {
         preserveScroll: true
     })
 }
