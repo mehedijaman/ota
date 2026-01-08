@@ -45,7 +45,11 @@ class AppServiceProvider extends ServiceProvider
     protected function setMenus(array $positions): void
     {
         $menus = Menu::with(['items' => function ($query) {
-            $query->whereNull('parent_id')->orderBy('order');
+            $query->whereNull('parent_id')
+                ->with(['children' => function ($q) {
+                    $q->orderBy('order');
+                }])
+                ->orderBy('order');
         }])->whereIn('position', $positions)->get();
 
         foreach ($positions as $position) {
