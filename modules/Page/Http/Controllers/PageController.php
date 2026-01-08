@@ -2,40 +2,23 @@
 
 namespace Modules\Page\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Modules\Page\Http\Requests\PageValidate;
 use Modules\Page\Models\Page;
+use Modules\Page\Services\PageService;
 use Modules\Support\Http\Controllers\BackendController;
-use Modules\Support\Traits\EditorImage;
-use Modules\Support\Traits\UploadFile;
 
 class PageController extends BackendController
 {
-    use EditorImage, UploadFile;
-
-    protected string $uploadImagePath = 'page';
+    public function __construct(
+        protected PageService $pageService
+    ) {}
 
     public function index(): Response
     {
-        $pages = Page::orderBy('id', 'desc')
-            ->search(request('searchContext'), request('searchTerm'))
-            ->paginate(request('rowsPerPage', 10))
-            ->withQueryString()
-            ->through(fn ($page) => [
-                'id' => $page->id,
-                'slug' => $page->slug,
-                'title' => $page->title,
-                'content' => $page->content,
-                'image_url' => $page->image_url,
-                'title' => $page->title,
-                'status' => $page->status,
-                'published_at' => $page->published_at_formatted,
-            ]);
-
         return inertia('Page/PageIndex', [
-            'pages' => $pages,
+            'pages' => $this->pageService->getAll(),
         ]);
     }
 
@@ -46,21 +29,20 @@ class PageController extends BackendController
 
     public function store(PageValidate $request): RedirectResponse
     {
-        $validated = $request->validated();
+        try {
+            $page = $this->pageService->create($request->validated());
 
-        if ($request->hasFile('image')) {
-            $validated = array_merge($validated, $this->uploadFile('image', 'page', 'originalUUID', 'public'));
+            return redirect()->route('page.edit', $page)
+                ->with('success', 'Page created successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to create page: '.$e->getMessage());
         }
-
-        $page = Page::create($validated);
-
-        return redirect()->route('page.edit', $page)
-            ->with('success', 'page created.');
     }
 
     public function edit(int $id): Response
     {
-        $page = Page::with(['parent'])->find($id);
+        $page = Page::with(['parent'])->findOrFail($id);
 
         return inertia('Page/PageForm', [
             'page' => $page,
@@ -69,92 +51,88 @@ class PageController extends BackendController
 
     public function update(PageValidate $request, int $id): RedirectResponse
     {
-        $page = Page::findOrFail($id);
+        try {
+            $page = Page::findOrFail($id);
+            $this->pageService->update($page, $request->validated());
 
-        $validated = $request->validated();
-
-        if ($request->hasFile('image')) {
-            $validated = array_merge($validated, $this->uploadFile('image', 'page', 'originalUUID', 'public'));
-        } elseif ($request->input('remove_previous_image')) {
-            $validated['image'] = null;
-        } else {
-            unset($validated['image']);
+            return redirect()->route('page.index')
+                ->with('success', 'Page updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to update page: '.$e->getMessage());
         }
-
-        $page->update($validated);
-
-        return redirect()->route('page.index')
-            ->with('success', 'page updated.');
     }
 
     public function destroy(int $id): RedirectResponse
     {
-        Page::findOrFail($id)->delete();
+        try {
+            $page = Page::findOrFail($id);
+            $this->pageService->delete($page);
 
-        return redirect()->route('page.index')
-            ->with('success', 'page deleted.');
+            return redirect()->route('page.index')
+                ->with('success', 'Page deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to delete page: '.$e->getMessage());
+        }
     }
 
     public function recycleBin(): Response
     {
-        $pages = Page::onlyTrashed()
-            ->orderBy('id')
-            ->search(request('searchContext'), request('searchTerm'))
-            ->paginate(request('rowsPerPage', 10))
-            ->withQueryString()
-            ->through(fn ($page) => [
-                'id' => $page->id,
-                'slug' => $page->slug,
-                'title' => $page->title,
-                'content' => $page->content,
-                'image_url' => $page->image_url,
-                'title' => $page->title,
-                'status' => $page->status,
-                'published_at' => $page->published_at_formatted,
-                'deleted_at' => $page->deleted_at ? Carbon::parse($page->deleted_at)->format('d/m/Y') : null,
-                'deletedBy' => $page->deletedBy,
-            ]);
-
         return inertia('Page/PageRecycleBin', [
-            'pages' => $pages,
+            'pages' => $this->pageService->getRecycleBin(),
         ]);
     }
 
     public function restore(int $id): RedirectResponse
     {
-        Page::onlyTrashed()->findOrFail($id)->restore(); // Restore soft deleted record
+        try {
+            $this->pageService->restore($id);
 
-        return redirect()->route('page.recycleBin.index')
-            ->with('success', 'Page Restored.');
+            return redirect()->route('page.recycleBin.index')
+                ->with('success', 'Page restored successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to restore page: '.$e->getMessage());
+        }
     }
 
     public function destroyForce(int $id): RedirectResponse
     {
+        try {
+            $this->pageService->forceDelete($id);
 
-        $page = Page::onlyTrashed()->findOrFail($id);
-
-        $page->forceDelete();
-
-        return redirect()->route('page.recycleBin.index')->with('success', 'Page deleted.');
+            return redirect()->route('page.recycleBin.index')
+                ->with('success', 'Page permanently deleted.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to delete page: '.$e->getMessage());
+        }
     }
 
     public function emptyRecycleBin(): RedirectResponse
     {
-        $pages = Page::onlyTrashed()->get();
+        try {
+            $this->pageService->emptyRecycleBin();
 
-        foreach ($pages as $page) {
-            $page->forceDelete();
+            return redirect()->route('page.recycleBin.index')
+                ->with('success', 'Recycle bin emptied.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to empty recycle bin: '.$e->getMessage());
         }
-
-        return redirect()->route('page.recycleBin.index')
-            ->with('success', 'Recycle bin emptied.');
     }
 
     public function restoreRecycleBin(): RedirectResponse
     {
-        Page::onlyTrashed()->restore(); // Restore soft deleted records
+        try {
+            $this->pageService->restoreAll();
 
-        return redirect()->route('page.recycleBin.index')
-            ->with('success', 'Page Restored.');
+            return redirect()->route('page.recycleBin.index')
+                ->with('success', 'All pages restored.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to restore pages: '.$e->getMessage());
+        }
     }
 }

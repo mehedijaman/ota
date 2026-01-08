@@ -11,10 +11,12 @@ use Modules\Page\Database\Factories\PageFactory;
 use Modules\Support\Models\BaseModel;
 use Modules\Support\Traits\ActivityLog;
 use Modules\Support\Traits\Searchable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Page extends BaseModel
+class Page extends BaseModel implements HasMedia
 {
-    use ActivityLog, HasFactory, Searchable, Sluggable, SoftDeletes;
+    use ActivityLog, HasFactory, InteractsWithMedia, Searchable, Sluggable, SoftDeletes;
 
     protected $table = 'pages';
 
@@ -23,10 +25,16 @@ class Page extends BaseModel
     protected $appends = ['image_url'];
 
     protected $casts = [
-        'published_at' => 'date', // Ensures it's a Carbon instance
+        'published_at' => 'date',
+        'active' => 'boolean',
     ];
 
-    public function getPublishedAtFormattedAttribute()
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('featured_image')->singleFile();
+    }
+
+    public function getPublishedAtFormattedAttribute(): ?string
     {
         return $this->published_at ? $this->published_at->format('d/m/Y') : null;
     }
@@ -42,7 +50,7 @@ class Page extends BaseModel
 
     public function getStatusAttribute(): string
     {
-        if ($this->published_at and Carbon::now()->greaterThan($this->published_at)) {
+        if ($this->published_at && Carbon::now()->greaterThan($this->published_at)) {
             return 'Published';
         }
 
@@ -51,11 +59,7 @@ class Page extends BaseModel
 
     public function getImageUrlAttribute(): ?string
     {
-        if ($this->image) {
-            return asset("storage/page/{$this->image}");
-        }
-
-        return null;
+        return $this->getFirstMediaUrl('featured_image') ?: null;
     }
 
     protected static function newFactory(): Factory
