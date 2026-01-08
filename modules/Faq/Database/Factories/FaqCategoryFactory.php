@@ -12,16 +12,14 @@ class FaqCategoryFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->words(3, true);
+        $name = fake()->unique()->words(3, true);
 
         return [
             'name' => ucfirst($name),
             'slug' => Str::slug($name),
-            'description' => $this->faker->optional()->sentence(10),
-            'sort_order' => $this->faker->numberBetween(0, 100),
-            'is_active' => $this->faker->boolean(90),
-            'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'updated_at' => $this->faker->dateTimeBetween('-5 month', 'now'),
+            'description' => fake()->optional()->sentence(10),
+            'sort_order' => fake()->numberBetween(0, 100),
+            'is_active' => true,
         ];
     }
 

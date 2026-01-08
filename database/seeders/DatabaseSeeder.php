@@ -14,11 +14,16 @@ use Modules\Employee\Database\Seeders\DepartmentSeeder;
 use Modules\Employee\Database\Seeders\DesignationSeeder;
 use Modules\Employee\Database\Seeders\EmployeeAclSeeder;
 use Modules\Employee\Database\Seeders\EmployeeSeeder;
+use Modules\Faq\Database\Seeders\FaqAclSeeder;
+use Modules\Faq\Database\Seeders\FaqSeeder;
 use Modules\Menu\Database\Seeders\MenuAclSeeder;
 use Modules\Menu\Database\Seeders\MenuSeeder;
 use Modules\Page\Database\Seeders\PageAclSeeder;
+use Modules\Page\Database\Seeders\PageSeeder;
 use Modules\Slider\Database\Seeders\SliderAclSeeder;
+use Modules\Slider\Database\Seeders\SliderSeeder;
 use Modules\Testimonial\Database\Seeders\TestimonialAclSeeder;
+use Modules\Testimonial\Database\Seeders\TestimonialSeeder;
 use Modules\User\Database\Seeders\UserSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -31,11 +36,16 @@ class DatabaseSeeder extends Seeder
             AclPermissionSeeder::class,
             UserSeeder::class,
             AclModelHasRolesSeeder::class,
+
+            // Website
             MenuAclSeeder::class,
             SliderAclSeeder::class,
             TestimonialAclSeeder::class,
+            FaqAclSeeder::class,
             PageAclSeeder::class,
             BlogAclSeeder::class,
+
+            // Modules
             DashboardAclSeeder::class,
             EmployeeAclSeeder::class,
         ]);
@@ -43,7 +53,12 @@ class DatabaseSeeder extends Seeder
         // Data Seeders
         $this->call([
             MenuSeeder::class,
+            SliderSeeder::class,
+            TestimonialSeeder::class,
+            FaqSeeder::class,
+            PageSeeder::class,
             BlogSeeder::class,
+
             DesignationSeeder::class,
             DepartmentSeeder::class,
             AreaSeeder::class,

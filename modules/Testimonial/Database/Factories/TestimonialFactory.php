@@ -11,20 +11,35 @@ class TestimonialFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->sentence(4);
-
         return [
-            'name' => $this->faker->name,
-            'designation' => $this->faker->jobTitle,
-            'company' => $this->faker->company,
-            'title' => $this->faker->sentence(6), // Short title
-            'description' => $this->faker->paragraph(3), // Random text for the testimonial
-            'image' => $this->faker->imageUrl(200, 200, 'people', true, 'Testimonial'), // Generates a placeholder image
-            'active' => $this->faker->boolean(90), // 90% chance of being true
-            'featured' => $this->faker->boolean(30), // 30% chance of being true
-
-            'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'updated_at' => $this->faker->dateTimeBetween('-5 month', 'now'),
+            'name' => fake()->name(),
+            'designation' => fake()->jobTitle(),
+            'company' => fake()->company(),
+            'title' => fake()->sentence(6),
+            'description' => fake()->paragraph(3),
+            'is_active' => fake()->boolean(90),
+            'featured' => fake()->boolean(30),
         ];
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => true,
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
+    }
+
+    public function featured(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'featured' => true,
+        ]);
     }
 }

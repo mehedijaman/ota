@@ -12,20 +12,45 @@ class PageFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->sentence(4);
+        $title = fake()->unique()->sentence(4);
 
         return [
-            'title' => $name,
-            'slug' => Str::slug($name),
-            'content' => $this->faker->paragraphs(5, true),
-            'meta_tag_title' => Str::limit($name, 60, ''),
-            'meta_tag_description' => Str::limit($this->faker->sentence(10), 160, ''),
-            'image' => $this->faker->imageUrl(),
-
-            'published_at' => $this->faker->dateTimeBetween('-6 month', '+3 month'),
-
-            'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'updated_at' => $this->faker->dateTimeBetween('-5 month', 'now'),
+            'parent_id' => null,
+            'title' => $title,
+            'slug' => Str::slug($title),
+            'content' => fake()->paragraphs(5, true),
+            'meta_tag_title' => Str::limit($title, 60, ''),
+            'meta_tag_description' => Str::limit(fake()->sentence(10), 160, ''),
+            'published_at' => fake()->dateTimeBetween('-6 month', 'now'),
+            'active' => true,
         ];
+    }
+
+    public function draft(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'published_at' => null,
+        ]);
+    }
+
+    public function scheduled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'published_at' => fake()->dateTimeBetween('+1 week', '+3 month'),
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'active' => false,
+        ]);
+    }
+
+    public function withParent(Page $parent): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'parent_id' => $parent->id,
+        ]);
     }
 }

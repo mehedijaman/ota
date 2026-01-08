@@ -14,23 +14,42 @@ class FaqFactory extends Factory
     {
         return [
             'faq_category_id' => FaqCategory::factory(),
-            'question' => $this->faker->sentence(8).'?',
-            'answer' => $this->faker->paragraphs(3, true),
-            'status' => $this->faker->randomElement(['draft', 'published', 'archived']),
-            'sort_order' => $this->faker->numberBetween(0, 100),
-            'is_featured' => $this->faker->boolean(20),
-            'target_audience' => $this->faker->randomElement(['all', 'b2c', 'b2b']),
-            'meta_title' => $this->faker->optional()->sentence(6),
-            'meta_description' => $this->faker->optional()->sentence(15),
-            'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'updated_at' => $this->faker->dateTimeBetween('-5 month', 'now'),
+            'question' => fake()->sentence(8).'?',
+            'answer' => fake()->paragraphs(3, true),
+            'status' => 'published',
+            'sort_order' => fake()->numberBetween(0, 100),
+            'is_featured' => false,
+            'target_audience' => 'all',
+            'meta_title' => null,
+            'meta_description' => null,
         ];
+    }
+
+    public function forCategory(FaqCategory $category): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'faq_category_id' => $category->id,
+        ]);
     }
 
     public function published(): static
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'published',
+        ]);
+    }
+
+    public function draft(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'draft',
+        ]);
+    }
+
+    public function archived(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'archived',
         ]);
     }
 
@@ -41,10 +60,25 @@ class FaqFactory extends Factory
         ]);
     }
 
-    public function draft(): static
+    public function forB2C(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'draft',
+            'target_audience' => 'b2c',
+        ]);
+    }
+
+    public function forB2B(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'target_audience' => 'b2b',
+        ]);
+    }
+
+    public function withSeo(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'meta_title' => fake()->sentence(6),
+            'meta_description' => fake()->sentence(15),
         ]);
     }
 }
