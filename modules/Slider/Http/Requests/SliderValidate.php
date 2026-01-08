@@ -8,13 +8,19 @@ class SliderValidate extends Request
 {
     public function rules(): array
     {
+        $imageRule = $this->isMethod('POST')
+            ? 'required|image|max:2048'
+            : 'nullable|image|max:2048';
+
         return [
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'required|image|max:2048', // Max size 2MB
-            'url' => 'nullable|string',
-            'order' => 'nullable|integer',
-            'active' => 'nullable|boolean',
+            'image' => $imageRule,
+            'url' => 'nullable|string|url',
+            'button_text' => 'nullable|string|max:255',
+            'order' => 'nullable|integer|min:0',
+            'is_active' => 'nullable|boolean',
+            'remove_previous_image' => 'nullable|boolean',
         ];
     }
 }

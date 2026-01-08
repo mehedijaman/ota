@@ -2,7 +2,7 @@
     <Head :title="title"></Head>
     <AppSectionHeader :title="title" :bread-crumb="breadCrumb">
         <template #right>
-            <div class="flex flex-col gap-2 md:flex-row">
+            <div class="flex flex-col gap-2 sm:flex-row">
                 <AppButton
                     v-if="can('slider-list')"
                     class="btn btn-secondary"
@@ -15,25 +15,19 @@
                 <AppButton
                     v-if="can('slider-recycle-bin-restore')"
                     class="btn btn-primary"
-                    @click="
-                        $inertia.visit(
-                            route('slider.recycleBin.restoreAll')
-                        )
-                    "
+                    @click="$inertia.visit(route('slider.recycleBin.restoreAll'))"
                 >
                     <i class="ri-recycle-fill mr-1"></i>
-                    Restore Recycle Bin
+                    Restore All
                 </AppButton>
 
                 <AppButton
                     v-if="can('slider-recycle-bin-delete')"
                     class="btn btn-destructive"
-                    @click="
-                        confirmDelete(route('slider.recycleBin.empty'))
-                    "
+                    @click="confirmDelete(route('slider.recycleBin.empty'))"
                 >
                     <i class="ri-delete-bin-7-line mr-1"></i>
-                    Empty Recycle Bin
+                    Empty All
                 </AppButton>
             </div>
         </template>
@@ -42,10 +36,67 @@
     <AppDataSearch
         v-if="sliders.data.length || route().params.searchTerm"
         :url="route('slider.recycleBin.index')"
-        fields-to-search="name"
+        fields-to-search="title"
     ></AppDataSearch>
 
-    <AppDataTable v-if="sliders.data.length" :headers="headers">
+    <!-- Mobile Cards Layout -->
+    <div class="block sm:hidden space-y-4" v-if="sliders.data.length">
+        <template v-for="item in sliders.data" :key="item.id">
+            <div class="card bg-base-100 shadow-md">
+                <div class="card-body p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="h-16 w-16 shrink-0 overflow-hidden rounded bg-base-200">
+                            <img
+                                v-if="item.image_url"
+                                :src="item.image_url"
+                                :alt="item.title"
+                                class="h-full w-full object-cover"
+                            />
+                            <div v-else class="flex h-full w-full items-center justify-center">
+                                <i class="ri-image-line text-2xl text-base-content/20"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-medium truncate">{{ item.title || 'Untitled' }}</h3>
+                            <div class="mt-1 flex flex-wrap gap-2 text-xs text-base-content/60">
+                                <span>
+                                    <i class="ri-calendar-line mr-1"></i>{{ item.deleted_at }}
+                                </span>
+                                <span v-if="item.deletedBy">
+                                    <i class="ri-user-line mr-1"></i>{{ item.deletedBy.name }}
+                                </span>
+                            </div>
+                            <span
+                                class="badge badge-sm mt-2"
+                                :class="item.is_active ? 'badge-success' : 'badge-error'"
+                            >
+                                {{ item.is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-actions justify-end mt-3 pt-3 border-t border-base-200">
+                        <AppButton
+                            v-if="can('slider-recycle-bin-restore')"
+                            class="btn btn-sm btn-primary"
+                            @click="$inertia.visit(route('slider.recycleBin.restore', item.id))"
+                        >
+                            <i class="ri-recycle-fill mr-1"></i>Restore
+                        </AppButton>
+                        <AppButton
+                            v-if="can('slider-recycle-bin-delete')"
+                            class="btn btn-sm btn-destructive"
+                            @click="confirmDelete(route('slider.recycleBin.destroyForce', item.id))"
+                        >
+                            <i class="ri-delete-bin-line mr-1"></i>Delete
+                        </AppButton>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <!-- Desktop Table Layout -->
+    <AppDataTable v-if="sliders.data.length" :headers="headers" class="hidden sm:block">
         <template #TableBody>
             <tbody>
                 <AppDataTableRow
@@ -53,23 +104,30 @@
                     :key="item.id"
                 >
                     <AppDataTableData>
-                        {{
-                            (sliders.current_page - 1) *
-                                sliders.per_page +
-                            (index + 1)
-                        }}
+                        {{ (sliders.current_page - 1) * sliders.per_page + (index + 1) }}
                     </AppDataTableData>
 
                     <AppDataTableData>
-                        {{ item.name }}
+                        <div class="flex items-center gap-3">
+                            <div class="h-12 w-12 shrink-0 overflow-hidden rounded bg-base-200">
+                                <img
+                                    v-if="item.image_url"
+                                    :src="item.image_url"
+                                    :alt="item.title"
+                                    class="h-full w-full object-cover"
+                                />
+                                <div v-else class="flex h-full w-full items-center justify-center">
+                                    <i class="ri-image-line text-xl text-base-content/20"></i>
+                                </div>
+                            </div>
+                            <p class="font-medium">{{ item.title || 'Untitled' }}</p>
+                        </div>
                     </AppDataTableData>
 
                     <AppDataTableData>
-                        {{ item.designation }}
-                    </AppDataTableData>
-
-                    <AppDataTableData>
-                        {{ item.company }}
+                        <span class="badge badge-sm" :class="item.is_active ? 'badge-success' : 'badge-error'">
+                            {{ item.is_active ? 'Active' : 'Inactive' }}
+                        </span>
                     </AppDataTableData>
 
                     <AppDataTableData>
@@ -81,46 +139,25 @@
                     </AppDataTableData>
 
                     <AppDataTableData>
-                        <!-- Restore -->
-                        <AppTooltip
-                            v-if="can('slider-recycle-bin-restore')"
-                            text="Restore"
-                            class="mr-2"
-                        >
-                            <AppButton
-                                class="btn btn-icon btn-primary"
-                                @click="
-                                    $inertia.visit(
-                                        route(
-                                            'slider.recycleBin.restore',
-                                            item.id
-                                        )
-                                    )
-                                "
-                            >
-                                <i class="ri-recycle-fill"></i>
-                            </AppButton>
-                        </AppTooltip>
+                        <div class="flex gap-2">
+                            <AppTooltip v-if="can('slider-recycle-bin-restore')" text="Restore">
+                                <AppButton
+                                    class="btn btn-icon btn-primary"
+                                    @click="$inertia.visit(route('slider.recycleBin.restore', item.id))"
+                                >
+                                    <i class="ri-recycle-fill"></i>
+                                </AppButton>
+                            </AppTooltip>
 
-                        <!-- Delete -->
-                        <AppTooltip
-                            v-if="can('slider-recycle-bin-delete')"
-                            text="Permanently Delete"
-                        >
-                            <AppButton
-                                class="btn btn-icon btn-destructive"
-                                @click="
-                                    confirmDelete(
-                                        route(
-                                            'slider.recycleBin.destroyForce',
-                                            item.id
-                                        )
-                                    )
-                                "
-                            >
-                                <i class="ri-delete-bin-line"></i>
-                            </AppButton>
-                        </AppTooltip>
+                            <AppTooltip v-if="can('slider-recycle-bin-delete')" text="Permanently Delete">
+                                <AppButton
+                                    class="btn btn-icon btn-destructive"
+                                    @click="confirmDelete(route('slider.recycleBin.destroyForce', item.id))"
+                                >
+                                    <i class="ri-delete-bin-line"></i>
+                                </AppButton>
+                            </AppTooltip>
+                        </div>
                     </AppDataTableData>
                 </AppDataTableRow>
             </tbody>
@@ -132,12 +169,25 @@
         :from="sliders.from ?? 0"
         :to="sliders.to ?? 0"
         :total="sliders.total ?? 0"
-        class="mt-4 justify-center"
+        class="mt-6 justify-center"
     ></AppPaginator>
 
-    <AppAlert v-if="!sliders.data.length" class="mt-4">
-        No data found.
-    </AppAlert>
+    <!-- Empty State -->
+    <div v-if="!sliders.data.length" class="mt-8 flex flex-col items-center justify-center py-12">
+        <div class="rounded-full bg-base-200 p-6 mb-4">
+            <i class="ri-inbox-unarchive-line text-4xl text-base-content/40"></i>
+        </div>
+        <h3 class="text-lg font-medium text-base-content/70 mb-2">Recycle Bin is Empty</h3>
+        <p class="text-sm text-base-content/50 mb-4">Deleted sliders will appear here</p>
+        <AppButton
+            v-if="can('slider-list')"
+            class="btn btn-secondary btn-sm"
+            @click="$inertia.visit(route('slider.index'))"
+        >
+            <i class="ri-arrow-left-s-line mr-1"></i>
+            Back to Sliders
+        </AppButton>
+    </div>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>
@@ -151,7 +201,7 @@ import useAuthCan from '@/Composables/useAuthCan'
 const { can } = useAuthCan()
 const { title } = useTitle('Slider Recycle Bin')
 
-const props = defineProps({
+defineProps({
     sliders: {
         type: Object,
         default: () => {}
@@ -164,17 +214,12 @@ const breadCrumb = [
     { label: title, last: true }
 ]
 
-const headers = [
-    'SL',
-    'Title',
-    'Photo',
-    'Deleted At',
-    'Deleted By',
-    'Actions'
-]
+const headers = ['SL', 'Slider', 'Status', 'Deleted At', 'Deleted By', 'Actions']
 
 const confirmDialogRef = ref(null)
 const confirmDelete = (deleteRoute) => {
     confirmDialogRef.value.openModal(deleteRoute)
 }
 </script>
+
+

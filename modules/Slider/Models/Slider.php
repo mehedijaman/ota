@@ -10,10 +10,12 @@ use Modules\Slider\Database\Factories\SliderFactory;
 use Modules\Support\Models\BaseModel;
 use Modules\Support\Traits\ActivityLog;
 use Modules\Support\Traits\Searchable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Slider extends BaseModel
+class Slider extends BaseModel implements HasMedia
 {
-    use ActivityLog, HasFactory, Searchable, SoftDeletes;
+    use ActivityLog, HasFactory, InteractsWithMedia, Searchable, SoftDeletes;
 
     protected $table = 'sliders';
 
@@ -21,13 +23,20 @@ class Slider extends BaseModel
 
     protected $appends = ['image_url'];
 
+    /**
+     * Register the media collections for the slider.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
+    }
+
+    /**
+     * Get the URL of the slider image.
+     */
     public function getImageUrlAttribute(): ?string
     {
-        if ($this->image) {
-            return asset("storage/slider/{$this->image}");
-        }
-
-        return null;
+        return $this->getFirstMediaUrl('image') ?: null;
     }
 
     protected static function newFactory(): Factory

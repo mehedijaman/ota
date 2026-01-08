@@ -11,16 +11,15 @@ class SliderFactory extends Factory
 
     public function definition(): array
     {
-
         return [
-            'title' => $this->faker->sentence(3), // Generates a 3-word sentence
-            'description' => $this->faker->paragraph, // Generates a random paragraph
-            'image' => $this->faker->imageUrl(640, 480, 'sliders'), // Generates a fake image URL
-            'url' => $this->faker->url, // Generates a random URL
-            'order' => $this->faker->numberBetween(1, 10), // Generates a random number between 1 and 10
-            'active' => $this->faker->boolean(90), // 90% chance of being true
-            'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'), // Random date within the past year
-            'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now'), // Random date within the past year
+            'title' => $this->faker->sentence(3),
+            'description' => $this->faker->paragraph,
+            'url' => $this->faker->url,
+            'button_text' => $this->faker->randomElement(['Learn More', 'Get Started', 'Read More', 'Contact Us']),
+            'order' => $this->faker->numberBetween(1, 10),
+            'is_active' => $this->faker->boolean(90),
+            'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
+            'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
         ];
     }
 }

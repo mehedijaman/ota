@@ -22,14 +22,11 @@ class SliderAclSeeder extends Seeder
     private function getPermissions(): array
     {
         return [
-            'slider-list',
-            'slider-view',
-            'slider-create',
-            'slider-edit',
-            'slider-delete',
-            'slider-recycle-bin-list',
-            'slider-recycle-bin-delete',
-            'slider-recycle-bin-restore',
+            'website-slider-list',
+            'website-slider-view',
+            'website-slider-create',
+            'website-slider-edit',
+            'website-slider-delete',
         ];
     }
 }

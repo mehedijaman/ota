@@ -8,12 +8,12 @@
                     class="btn btn-secondary"
                     @click="$inertia.visit(route('page.index'))"
                 >
-                    <i class="ri-arrow-left-s-line mr-1"></i>
+                    <i class="ri-arrow-left-line mr-1"></i>
                     Back to List
                 </AppButton>
 
                 <AppButton
-                    v-if="can('page-recycle-bin-restore')"
+                    v-if="pages.data.length && can('page-recycle-bin-restore')"
                     class="btn btn-primary"
                     @click="$inertia.visit(route('page.recycleBin.restoreAll'))"
                 >
@@ -22,7 +22,7 @@
                 </AppButton>
 
                 <AppButton
-                    v-if="can('page-recycle-bin-delete')"
+                    v-if="pages.data.length && can('page-recycle-bin-delete')"
                     class="btn btn-destructive"
                     @click="confirmDelete(route('page.recycleBin.empty'))"
                 >
@@ -121,6 +121,7 @@
     </AppDataTable>
 
     <AppPaginator
+        v-if="pages.data.length"
         :links="pages.links"
         :from="pages.from ?? 0"
         :to="pages.to ?? 0"
@@ -128,7 +129,7 @@
         class="mt-4 justify-center"
     ></AppPaginator>
 
-    <AppAlert v-if="!pages.data.length" class="mt-4"> No data found. </AppAlert>
+    <AppEmptyState v-if="!pages.data.length"></AppEmptyState>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>
@@ -138,6 +139,7 @@ import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useAuthCan from '@/Composables/useAuthCan'
+import AppEmptyState from '@/Components/Misc/AppEmptyState.vue'
 
 const { can } = useAuthCan()
 const { title } = useTitle('Slider Recycle Bin')

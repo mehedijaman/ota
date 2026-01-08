@@ -15,10 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
-            $table->string('image');
             $table->string('url')->nullable();
+            $table->string('button_text')->nullable();
             $table->integer('order')->nullable();
-            $table->boolean('active')->nullable()->default(1);
+            $table->boolean('is_active')->nullable()->default(1);
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });

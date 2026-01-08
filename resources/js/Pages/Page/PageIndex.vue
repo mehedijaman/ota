@@ -103,6 +103,7 @@
     </AppDataTable>
 
     <AppPaginator
+        v-if="pages.data.length"
         :links="pages.links"
         :from="pages.from || 0"
         :to="pages.to || 0"
@@ -110,9 +111,7 @@
         class="mt-4 justify-center"
     ></AppPaginator>
 
-    <AppAlert v-if="!pages.data.length" class="mt-4">
-        No pages found.
-    </AppAlert>
+    <AppEmptyState v-if="!pages.data.length"></AppEmptyState>
 
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>
@@ -121,6 +120,7 @@
 import { ref } from 'vue'
 import useAuthCan from '@/Composables/useAuthCan'
 import AppImageNotAvailable from '@/Components/Modules/Blog/AppImageNotAvailable.vue'
+import AppEmptyState from '@/Components/Misc/AppEmptyState.vue'
 
 defineProps({
     pages: {

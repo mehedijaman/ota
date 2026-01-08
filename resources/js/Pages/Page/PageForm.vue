@@ -1,12 +1,25 @@
 <template>
     <AppSectionHeader title="Pages" :bread-crumb="breadCrumb">
+         <template #right>
+            <div class="flex gap-2">
+            <AppButton
+                v-if="can('page-list')"
+                class="btn btn-secondary"
+                @click="$inertia.visit(route('page.index'))"
+            >
+                <i class="ri-arrow-left-line mr-1"></i>
+                        Back to List
+                </AppButton>
+                
         <AppButton
             v-if="can(isCreate ? 'page-create' : 'page-edit')"
-            class="btn btn-primary mt-6"
+            class="btn btn-primary"
             @click="submitForm"
         >
             Save
         </AppButton>
+        </div>
+        </template>
     </AppSectionHeader>
 
     <AppCard class="w-full">
@@ -15,7 +28,7 @@
             <AppFormErrors class="mb-4" />
             <form class="pt-4">
                 <PageBody />
-                
+
                 <PageImage />
 
                 <PagePublishDate />

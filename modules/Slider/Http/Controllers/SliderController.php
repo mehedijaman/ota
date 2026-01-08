@@ -2,37 +2,23 @@
 
 namespace Modules\Slider\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Modules\Slider\Http\Requests\SliderValidate;
 use Modules\Slider\Models\Slider;
+use Modules\Slider\Services\SliderService;
 use Modules\Support\Http\Controllers\BackendController;
-use Modules\Support\Traits\UploadFile;
 
 class SliderController extends BackendController
 {
-    use UploadFile;
+    public function __construct(
+        protected SliderService $sliderService
+    ) {}
 
     public function index(): Response
     {
-        $sliders = Slider::latest()
-            ->search(request('searchContext'), request('searchTerm'))
-            ->paginate(request('rowsPerPage', 10))
-            ->withQueryString()
-            ->through(fn ($slider) => [
-                'id' => $slider->id,
-                'name' => $slider->name,
-                'designation' => $slider->designation,
-                'company' => $slider->company,
-                'title' => $slider->title,
-                'description' => $slider->description,
-                'image_url' => $slider->image_url,
-                'active' => $slider->active,
-            ]);
-
         return inertia('Slider/SliderIndex', [
-            'sliders' => $sliders,
+            'sliders' => $this->sliderService->getAll(),
         ]);
     }
 
@@ -43,21 +29,19 @@ class SliderController extends BackendController
 
     public function store(SliderValidate $request): RedirectResponse
     {
-        $validated = $request->validated();
+        try {
+            $this->sliderService->create($request->validated());
 
-        if ($request->hasFile('image')) {
-            $validated = array_merge($validated, $this->uploadFile('image', 'slider', 'originalUUID', 'public'));
+            return redirect()->route('slider.index')
+                ->with('success', 'Slider created.');
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
         }
-
-        Slider::create($validated);
-
-        return redirect()->route('slider.index')
-            ->with('success', 'Slider created.');
     }
 
     public function edit(int $id): Response
     {
-        $slider = Slider::find($id);
+        $slider = Slider::findOrFail($id);
 
         return inertia('Slider/SliderForm', [
             'slider' => $slider,
@@ -66,89 +50,82 @@ class SliderController extends BackendController
 
     public function update(SliderValidate $request, int $id): RedirectResponse
     {
-        $slider = Slider::findOrFail($id);
+        try {
+            $slider = Slider::findOrFail($id);
+            $this->sliderService->update($slider, $request->validated());
 
-        $validated = $request->validated();
-
-        if ($request->hasFile('image')) {
-            $validated = array_merge($validated, $this->uploadFile('image', 'slider', 'originalUUID', 'public'));
-        } elseif ($request->input('remove_previous_image')) {
-            $validated['image'] = null;
-        } else {
-            unset($validated['image']);
+            return redirect()->route('slider.index')
+                ->with('success', 'Slider updated.');
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
         }
-
-        $slider->update($validated);
-
-        return redirect()->route('slider.index')
-            ->with('success', 'Slider updated.');
     }
 
     public function destroy(int $id): RedirectResponse
     {
-        Slider::findOrFail($id)->delete();
+        try {
+            $slider = Slider::findOrFail($id);
+            $this->sliderService->delete($slider);
 
-        return redirect()->route('slider.index')
-            ->with('success', 'Slider deleted.');
+            return redirect()->route('slider.index')
+                ->with('success', 'Slider deleted.');
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
+        }
     }
 
     public function recycleBin(): Response
     {
-        $sliders = Slider::onlyTrashed()
-            ->orderBy('id')
-            ->search(request('searchContext'), request('searchTerm'))
-            ->paginate(request('rowsPerPage', 10))
-            ->withQueryString()
-            ->through(fn ($slider) => [
-                'id' => $slider->id,
-                'name' => $slider->name,
-                'designation' => $slider->designation,
-                'company' => $slider->company,
-                'deleted_at' => $slider->deleted_at ? Carbon::parse($slider->deleted_at)->format('d/m/Y') : null,
-                'deletedBy' => $slider->deletedBy,
-                'active' => $slider->active,
-            ]);
-
         return inertia('Slider/SliderRecycleBin', [
-            'sliders' => $sliders,
+            'sliders' => $this->sliderService->getRecycleBin(),
         ]);
     }
 
     public function restore(int $id): RedirectResponse
     {
-        Slider::onlyTrashed()->findOrFail($id)->restore(); // Restore soft deleted record
+        try {
+            $this->sliderService->restore($id);
 
-        return redirect()->route('slider.recycleBin.index')
-            ->with('success', 'Slider Restored.');
+            return redirect()->route('slider.recycleBin.index')
+                ->with('success', 'Slider restored.');
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
+        }
     }
 
     public function destroyForce(int $id): RedirectResponse
     {
+        try {
+            $this->sliderService->forceDelete($id);
 
-        $slider = Slider::onlyTrashed()->findOrFail($id);
-
-        $slider->forceDelete();
-
-        return redirect()->route('slider.recycleBin.index')->with('success', 'Slider deleted.');
+            return redirect()->route('slider.recycleBin.index')
+                ->with('success', 'Slider permanently deleted.');
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
+        }
     }
 
     public function emptyRecycleBin(): RedirectResponse
     {
-        $sliders = Slider::onlyTrashed()->get();
+        try {
+            $this->sliderService->emptyRecycleBin();
 
-        foreach ($sliders as $slider) {
-            $slider->forceDelete();
+            return redirect()->route('slider.recycleBin.index')
+                ->with('success', 'Recycle bin emptied.');
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
         }
-
-        return redirect()->route('slider.recycleBin.index')
-            ->with('success', 'Recycle bin emptied.');
     }
 
     public function restoreRecycleBin(): RedirectResponse
     {
-        Slider::onlyTrashed()->restore(); // Restore soft deleted records
+        try {
+            $this->sliderService->restoreAll();
 
-        return redirect()->route('slider.recycleBin.index')
-            ->with('success', 'Slider Restored.');
+            return redirect()->route('slider.recycleBin.index')
+                ->with('success', 'All sliders restored.');
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
+        }
     }
 }
