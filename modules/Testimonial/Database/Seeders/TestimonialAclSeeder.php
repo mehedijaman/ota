@@ -22,14 +22,11 @@ class TestimonialAclSeeder extends Seeder
     private function getPermissions(): array
     {
         return [
-            'testimonial-list',
-            'testimonial-view',
-            'testimonial-create',
-            'testimonial-edit',
-            'testimonial-delete',
-            'testimonial-recycle-bin-list',
-            'testimonial-recycle-bin-delete',
-            'testimonial-recycle-bin-restore',
+            'website-testimonial-list',
+            'website-testimonial-view',
+            'website-testimonial-create',
+            'website-testimonial-edit',
+            'website-testimonial-delete',
         ];
     }
 }

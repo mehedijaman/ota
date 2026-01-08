@@ -11,13 +11,35 @@ class MenuFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->sentence(4);
-
         return [
-            'name' => $name,
-
+            'name' => $this->faker->unique()->words(2, true),
+            'position' => $this->faker->randomElement(['primary', 'footer', 'sidebar']),
+            'active' => true,
             'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
             'updated_at' => $this->faker->dateTimeBetween('-5 month', 'now'),
         ];
+    }
+
+    public function primary(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Primary Menu',
+            'position' => 'primary',
+        ]);
+    }
+
+    public function footer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Footer Menu',
+            'position' => 'footer',
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'active' => false,
+        ]);
     }
 }

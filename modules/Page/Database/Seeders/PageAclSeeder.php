@@ -22,14 +22,11 @@ class PageAclSeeder extends Seeder
     private function getPermissions(): array
     {
         return [
-            'page-list',
-            'page-view',
-            'page-create',
-            'page-edit',
-            'page-delete',
-            'page-recycle-bin-list',
-            'page-recycle-bin-delete',
-            'page-recycle-bin-restore',
+            'website-page-list',
+            'website-page-view',
+            'website-page-create',
+            'website-page-edit',
+            'website-page-delete',
         ];
     }
 }
