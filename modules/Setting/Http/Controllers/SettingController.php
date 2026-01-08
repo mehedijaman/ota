@@ -7,12 +7,9 @@ use Inertia\Response;
 use Modules\Setting\Http\Requests\SettingValidate;
 use Modules\Setting\Models\Setting;
 use Modules\Support\Http\Controllers\BackendController;
-use Modules\Support\Traits\UploadFile;
 
 class SettingController extends BackendController
 {
-    use UploadFile;
-
     public function index(): Response
     {
         $settings = Setting::firstOrCreate();
@@ -26,84 +23,53 @@ class SettingController extends BackendController
     {
         $setting = Setting::firstOrCreate();
 
-        // dd($request->all());
         $settingData = $request->validated();
 
+        // Remove file-related keys from settingData as they're handled via media library
+        unset($settingData['logo'], $settingData['favicon'], $settingData['banner']);
+        unset($settingData['remove_previous_logo'], $settingData['remove_previous_favicon'], $settingData['remove_previous_banner']);
+
+        // Handle logo upload via media library
         if ($request->hasFile('logo')) {
-            $settingData = array_merge($settingData, $this->uploadFile('logo', 'site', 'originalUUID', 'public'));
-        } elseif ($request->input('remove_previous_logo')) {
-            $settingData['logo'] = null;
-        } else {
-            unset($settingData['logo']);
+            $setting->clearMediaCollection('logo');
+            $setting->addMediaFromRequest('logo')->toMediaCollection('logo');
+        } elseif ($request->boolean('remove_previous_logo')) {
+            $setting->clearMediaCollection('logo');
         }
 
+        // Handle favicon upload via media library
         if ($request->hasFile('favicon')) {
-            $settingData = array_merge($settingData, $this->uploadFile('favicon', 'site', 'originalUUID', 'public'));
-        } elseif ($request->input('remove_previous_favicon')) {
-            $settingData['favicon'] = null;
-        } else {
-            unset($settingData['favicon']);
+            $setting->clearMediaCollection('favicon');
+            $setting->addMediaFromRequest('favicon')->toMediaCollection('favicon');
+        } elseif ($request->boolean('remove_previous_favicon')) {
+            $setting->clearMediaCollection('favicon');
         }
 
-        //upload watermark
+        // Handle banner upload via media library
+        if ($request->hasFile('banner')) {
+            $setting->clearMediaCollection('banner');
+            $setting->addMediaFromRequest('banner')->toMediaCollection('banner');
+        } elseif ($request->boolean('remove_previous_banner')) {
+            $setting->clearMediaCollection('banner');
+        }
+
+        // Handle watermark (stays in public directory)
         if ($request->hasFile('watermark')) {
             $watermarkFile = $request->file('watermark');
-
-            // Define path and filename
-            $destinationPath = public_path(); // uploads to the public/ directory
-            $fileName = 'watermark.png';
-
-            // Move the file and overwrite existing watermark.png
-            $watermarkFile->move($destinationPath, $fileName);
-
-            // Optionally, you can store 'watermark.png' in DB if needed
-            $settingData['watermark'] = $fileName;
-        } elseif ($request->input('remove_previous_watermark')) {
+            $watermarkFile->move(public_path(), 'watermark.png');
+        } elseif ($request->boolean('remove_previous_watermark')) {
             $watermarkPath = public_path('watermark.png');
-
             if (file_exists($watermarkPath)) {
                 unlink($watermarkPath);
             }
-
-            $settingData['watermark'] = null;
-        } else {
-            unset($settingData['watermark']);
         }
-
+        unset($settingData['watermark'], $settingData['remove_previous_watermark']);
 
         $setting->update($settingData);
 
         return redirect()->route('setting.index')
             ->with('success', 'Setting updated.');
     }
-
-    // public function update(SettingValidate $request): RedirectResponse
-    // {
-    //     $setting = Setting::firstOrCreate();
-    //     $settingData = $request->validated();
-
-    //     if ($request->hasFile('logo')) {
-    //         $logoPath = $request->file('logo')->store('site', 'public');
-    //         $settingData['logo'] = $logoPath;
-    //     } elseif ($request->input('remove_previous_logo')) {
-    //         $settingData['logo'] = null;
-    //     } else {
-    //         unset($settingData['logo']);
-    //     }
-
-    //     if ($request->hasFile('favicon')) {
-    //         $faviconPath = $request->file('favicon')->store('site', 'public');
-    //         $settingData['favicon'] = $faviconPath;
-    //     } elseif ($request->input('remove_previous_favicon')) {
-    //         $settingData['favicon'] = null;
-    //     } else {
-    //         unset($settingData['favicon']);
-    //     }
-
-    //     $setting->update($settingData);
-
-    //     return redirect()->route('setting.index')->with('success', 'Setting updated.');
-    // }
 
     public function maintenance(): Response
     {

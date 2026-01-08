@@ -20,6 +20,7 @@ use Modules\Menu\Database\Seeders\MenuAclSeeder;
 use Modules\Menu\Database\Seeders\MenuSeeder;
 use Modules\Page\Database\Seeders\PageAclSeeder;
 use Modules\Page\Database\Seeders\PageSeeder;
+use Modules\Setting\Database\Seeders\SettingAclSeeder;
 use Modules\Slider\Database\Seeders\SliderAclSeeder;
 use Modules\Slider\Database\Seeders\SliderSeeder;
 use Modules\Testimonial\Database\Seeders\TestimonialAclSeeder;
@@ -44,6 +45,7 @@ class DatabaseSeeder extends Seeder
             FaqAclSeeder::class,
             PageAclSeeder::class,
             BlogAclSeeder::class,
+            SettingAclSeeder::class,
 
             // Modules
             DashboardAclSeeder::class,

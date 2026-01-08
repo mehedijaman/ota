@@ -11,13 +11,63 @@ class SettingFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->sentence(4);
-
         return [
-            'name' => $name,
+            // Site Identity
+            'site_name' => fake()->company(),
+            'slogan' => fake()->catchPhrase(),
+            'logo' => null,
+            'favicon' => null,
+            'banner' => null,
 
-            'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'updated_at' => $this->faker->dateTimeBetween('-5 month', 'now'),
+            // Display Options
+            'show_name' => true,
+            'show_slogan' => true,
+            'show_logo' => true,
+
+            // Contact Information
+            'addresses' => [
+                ['label' => 'Head Office', 'address' => fake()->address()],
+            ],
+            'phones' => [
+                ['label' => 'Main', 'number' => fake()->phoneNumber()],
+            ],
+            'emails' => [
+                ['label' => 'General', 'email' => fake()->companyEmail()],
+            ],
+            'whatsapp' => fake()->phoneNumber(),
+            'google_map' => null,
+
+            // Social Media
+            'facebook' => 'https://facebook.com/'.fake()->userName(),
+            'twitter' => 'https://twitter.com/'.fake()->userName(),
+            'instagram' => 'https://instagram.com/'.fake()->userName(),
+            'youtube' => null,
+            'linkedin' => null,
+            'pinterest' => null,
+
+            // Theme
+            'navbar_background' => '#ffffff',
+            'navbar_text_color' => '#1e293b',
+            'body_background' => '#f8fafc',
+            'body_text_color' => '#334155',
+            'footer_background' => '#1e293b',
+            'footer_text_color' => '#f1f5f9',
+
+            // Advanced
+            'custom_css' => null,
         ];
+    }
+
+    public function minimal(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'site_name' => 'My Site',
+            'addresses' => null,
+            'phones' => null,
+            'emails' => null,
+            'facebook' => null,
+            'twitter' => null,
+            'instagram' => null,
+        ]);
     }
 }

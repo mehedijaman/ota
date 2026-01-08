@@ -9,26 +9,39 @@
                 href="{{ route('site.index') }}"
                 class="group flex shrink-0 items-center gap-3"
             >
-                <div
-                    class="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl text-white shadow-lg shadow-blue-500/30 transition-transform duration-300 group-hover:scale-105"
-                >
+                @if ($siteSettings->show_logo && $siteSettings->logo_url)
+                    <img
+                        src="{{ $siteSettings->logo_url }}"
+                        alt="{{ $siteSettings->site_name ?? 'Logo' }}"
+                        class="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                    />
+                @else
                     <div
-                        class="bg-linear-to-tr absolute inset-0 from-blue-600 to-indigo-600 transition-colors group-hover:from-blue-500 group-hover:to-indigo-500"
-                    ></div>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="relative z-10 h-5 w-5 -rotate-45 transform"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
+                        class="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl text-white shadow-lg shadow-blue-500/30 transition-transform duration-300 group-hover:scale-105"
                     >
-                        <path
-                            d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z"
-                        />
-                    </svg>
-                </div>
-                <span class="text-2xl font-bold tracking-tight text-slate-800">
-                    {{ $siteSettings->site_name ?? 'TriptonicBD' }}
-                </span>
+                        <div
+                            class="bg-linear-to-tr absolute inset-0 from-blue-600 to-indigo-600 transition-colors group-hover:from-blue-500 group-hover:to-indigo-500"
+                        ></div>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="relative z-10 h-5 w-5 -rotate-45 transform"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z"
+                            />
+                        </svg>
+                    </div>
+                @endif
+
+                @if ($siteSettings->show_name)
+                    <span
+                        class="text-2xl font-bold tracking-tight text-slate-800"
+                    >
+                        {{ $siteSettings->site_name ?? 'TriptonicBD' }}
+                    </span>
+                @endif
             </a>
 
             <!-- Desktop Nav -->

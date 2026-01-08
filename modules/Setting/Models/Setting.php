@@ -2,63 +2,62 @@
 
 namespace Modules\Setting\Models;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Setting\Database\Factories\SettingFactory;
 use Modules\Support\Models\BaseModel;
 use Modules\Support\Traits\ActivityLog;
-use Modules\Support\Traits\Searchable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Setting extends BaseModel
+class Setting extends BaseModel implements HasMedia
 {
-    use ActivityLog, Searchable;
+    use ActivityLog, HasFactory, InteractsWithMedia;
 
     protected $table = 'settings';
 
-    protected $appends = ['logo_url', 'favicon_url', 'watermark_url'];
+    protected $appends = ['logo_url', 'favicon_url', 'banner_url', 'watermark_url'];
 
-    protected $casts = [
-        'show_topbar' => 'boolean',
-        'show_navbar' => 'boolean',
-        'show_slider' => 'boolean',
-        'show_top_categories' => 'boolean',
-        'show_latest_products' => 'boolean',
-        'show_featured_products' => 'boolean',
-        'show_brands' => 'boolean',
-        'show_testimonials' => 'boolean',
-        'show_latest_posts' => 'boolean',
-        'show_footer_menu' => 'boolean',
-        'show_floating_chat' => 'boolean',
+    protected function casts(): array
+    {
+        return [
+            // JSON fields
+            'addresses' => 'array',
+            'phones' => 'array',
+            'emails' => 'array',
 
-        'show_view_details_button' => 'boolean',
-        'show_add_to_cart_button' => 'boolean',
-        'show_add_to_wishlist_button' => 'boolean',
-        'show_product_compare_button' => 'boolean',
-        'show_product_rating' => 'boolean',
-        'show_product_review' => 'boolean',
-        'show_product_discount' => 'boolean',
-        'show_product_shipping' => 'boolean',
-        'show_product_stock' => 'boolean',
+            // Display options
+            'show_name' => 'boolean',
+            'show_slogan' => 'boolean',
+            'show_logo' => 'boolean',
+        ];
+    }
 
-        'show_name' => 'boolean',
-        'show_slogan' => 'boolean',
-        'show_logo' => 'boolean',
-        'show_favicon' => 'boolean',
-    ];
+    protected static function newFactory(): Factory
+    {
+        return SettingFactory::new();
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('logo')->singleFile();
+        $this->addMediaCollection('favicon')->singleFile();
+        $this->addMediaCollection('banner')->singleFile();
+    }
 
     public function getLogoUrlAttribute(): ?string
     {
-        if ($this->logo) {
-            return asset("storage/site/{$this->logo}");
-        }
-
-        return null;
+        return $this->getFirstMediaUrl('logo') ?: null;
     }
 
     public function getFaviconUrlAttribute(): ?string
     {
-        if ($this->favicon) {
-            return asset("storage/site/{$this->favicon}");
-        }
+        return $this->getFirstMediaUrl('favicon') ?: null;
+    }
 
-        return null;
+    public function getBannerUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl('banner') ?: null;
     }
 
     public function getWatermarkUrlAttribute(): ?string
