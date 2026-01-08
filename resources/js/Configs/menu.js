@@ -117,6 +117,13 @@ export default {
                     icon: 'ri-file-list-line',
                     link: route('testimonial.index')
                 },
+
+                {
+                    label: 'FAQs',
+                    permission: 'faq-list',
+                    icon: 'ri-questionnaire-line',
+                    link: route('faq.index')
+                },
                 
                 {
                     label: 'Settings',
@@ -159,31 +166,31 @@ export default {
             ]
         },
 
-        {
-            label: 'FAQ',
-            permission: 'faq',
-            icon: 'ri-question-answer-line',
-            children: [
-                {
-                    label: 'FAQs',
-                    permission: 'faq-list',
-                    icon: 'ri-questionnaire-line',
-                    link: route('faq.index')
-                },
-                {
-                    label: 'New FAQ',
-                    permission: 'faq-create',
-                    icon: 'ri-add-circle-line',
-                    link: route('faq.create')
-                },
-                {
-                    label: 'Categories',
-                    permission: 'faq-category-list',
-                    icon: 'ri-folders-line',
-                    link: route('faqCategory.index')
-                }
-            ]
-        },
+        // {
+        //     label: 'FAQ',
+        //     permission: 'faq',
+        //     icon: 'ri-question-answer-line',
+        //     children: [
+        //         {
+        //             label: 'FAQs',
+        //             permission: 'faq-list',
+        //             icon: 'ri-questionnaire-line',
+        //             link: route('faq.index')
+        //         },
+        //         {
+        //             label: 'New FAQ',
+        //             permission: 'faq-create',
+        //             icon: 'ri-add-circle-line',
+        //             link: route('faq.create')
+        //         },
+        //         {
+        //             label: 'Categories',
+        //             permission: 'faq-category-list',
+        //             icon: 'ri-folders-line',
+        //             link: route('faqCategory.index')
+        //         }
+        //     ]
+        // },
 
         {
             label: 'SMS',
