@@ -28,7 +28,7 @@ class SettingService
                 'phones' => ['type' => 'json', 'default' => [], 'is_public' => true, 'label' => 'Phone Numbers'],
                 'emails' => ['type' => 'json', 'default' => [], 'is_public' => true, 'label' => 'Email Addresses'],
                 'whatsapp' => ['type' => 'string', 'default' => '', 'is_public' => true, 'label' => 'WhatsApp Number'],
-                'google_map' => ['type' => 'string', 'default' => '', 'is_public' => true, 'label' => 'Google Map Embed'],
+                'telegram' => ['type' => 'string', 'default' => '', 'is_public' => true, 'label' => 'Telegram'],
             ],
             'social' => [
                 'facebook' => ['type' => 'string', 'default' => '', 'is_public' => true, 'label' => 'Facebook URL'],

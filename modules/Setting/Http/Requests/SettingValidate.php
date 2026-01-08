@@ -33,6 +33,7 @@ class SettingValidate extends Request
             'addresses' => 'nullable|array',
             'addresses.*.label' => 'nullable|string|max:255',
             'addresses.*.address' => 'nullable|string|max:500',
+            'addresses.*.google_map' => 'nullable|string',
             'phones' => 'nullable|array',
             'phones.*.label' => 'nullable|string|max:255',
             'phones.*.number' => 'nullable|string|max:50',
@@ -40,7 +41,7 @@ class SettingValidate extends Request
             'emails.*.label' => 'nullable|string|max:255',
             'emails.*.email' => 'nullable|email|max:255',
             'whatsapp' => 'nullable|string|max:50',
-            'google_map' => 'nullable|string',
+            'telegram' => 'nullable|string|max:100',
 
             // Social Media Links
             'facebook' => 'nullable|string|max:255',

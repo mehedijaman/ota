@@ -24,31 +24,51 @@
                             <i class="ri-add-line"></i> Add Address
                         </button>
                     </div>
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         <div
                             v-for="(addr, index) in form.addresses"
                             :key="index"
-                            class="flex gap-3"
+                            class="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
                         >
-                            <div class="w-1/3">
-                                <AppInputText
-                                    v-model="addr.label"
-                                    placeholder="Label (e.g., Head Office)"
-                                />
+                            <div class="mb-3 flex items-center justify-between">
+                                <span
+                                    class="text-sm font-medium text-gray-600 dark:text-gray-400"
+                                >
+                                    Address {{ index + 1 }}
+                                </span>
+                                <button
+                                    type="button"
+                                    class="text-red-500 hover:text-red-700"
+                                    @click="removeAddress(index)"
+                                >
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
                             </div>
-                            <div class="flex-1">
-                                <AppInputText
-                                    v-model="addr.address"
-                                    placeholder="Full address"
-                                />
+                            <div class="grid grid-cols-1 gap-3 lg:grid-cols-2">
+                                <div>
+                                    <AppInputText
+                                        v-model="addr.label"
+                                        placeholder="Label (e.g., Head Office)"
+                                    />
+                                </div>
+                                <div>
+                                    <AppInputText
+                                        v-model="addr.address"
+                                        placeholder="Full address"
+                                    />
+                                </div>
                             </div>
-                            <button
-                                type="button"
-                                class="text-red-500 hover:text-red-700"
-                                @click="removeAddress(index)"
-                            >
-                                <i class="ri-delete-bin-line"></i>
-                            </button>
+                            <div class="mt-3">
+                                <AppInputText
+                                    v-model="addr.google_map"
+                                    placeholder="Google Maps embed URL or link"
+                                />
+                                <p class="mt-1 text-xs text-gray-500">
+                                    <i class="ri-map-pin-line mr-1"></i>
+                                    Paste Google Maps embed URL for this
+                                    location
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -136,7 +156,7 @@
                     </div>
                 </div>
 
-                <!-- WhatsApp & Google Map -->
+                <!-- WhatsApp & Telegram -->
                 <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <div>
                         <AppLabel for="whatsapp">
@@ -150,14 +170,14 @@
                         />
                     </div>
                     <div>
-                        <AppLabel for="google_map">
-                            <i class="ri-map-pin-line mr-1 text-red-500"></i>
-                            Google Map Embed
+                        <AppLabel for="telegram">
+                            <i class="ri-telegram-line mr-1 text-blue-400"></i>
+                            Telegram
                         </AppLabel>
                         <AppInputText
-                            id="google_map"
-                            v-model="form.google_map"
-                            placeholder="Paste Google Maps embed URL"
+                            id="telegram"
+                            v-model="form.telegram"
+                            placeholder="@username or +880 1700-000000"
                         />
                     </div>
                 </div>
@@ -282,11 +302,13 @@ const social = props.settings.social ?? {}
 
 const form = useForm({
     _method: 'PUT',
-    addresses: contact.addresses ?? [{ label: '', address: '' }],
+    addresses: contact.addresses ?? [
+        { label: '', address: '', google_map: '' }
+    ],
     phones: contact.phones ?? [{ label: '', number: '' }],
     emails: contact.emails ?? [{ label: '', email: '' }],
     whatsapp: contact.whatsapp ?? '',
-    google_map: contact.google_map ?? '',
+    telegram: contact.telegram ?? '',
     facebook: social.facebook ?? '',
     twitter: social.twitter ?? '',
     instagram: social.instagram ?? '',
@@ -296,7 +318,7 @@ const form = useForm({
 })
 
 const addAddress = () => {
-    form.addresses.push({ label: '', address: '' })
+    form.addresses.push({ label: '', address: '', google_map: '' })
 }
 
 const removeAddress = (index) => {
