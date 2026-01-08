@@ -1,1 +1,0 @@
-import{_ as o,u as s,v as p,F as r}from"./_plugin-vue_export-helper-DsDDrT7h.js";const _=["type"],a={__name:"AppButton",props:{type:{type:String,default:"button"}},emits:["click"],setup(n){return(t,e)=>(p(),s("button",{type:n.type,onClick:e[0]||(e[0]=u=>t.$emit("click"))},[r(t.$slots,"default",{},void 0,!0)],8,_))}},i=o(a,[["__scopeId","data-v-e0aa19e3"]]);export{i as _};

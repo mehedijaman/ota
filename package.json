@@ -35,5 +35,8 @@
         "vite": "^7.0.7",
         "vue": "^3.4.21",
         "vue-eslint-parser": "^10.2.0"
+    },
+    "dependencies": {
+        "vuedraggable": "^2.24.3"
     }
 }

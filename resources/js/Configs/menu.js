@@ -87,6 +87,47 @@ export default {
         },
 
         {
+            label: 'Website',
+            permission: 'website',
+            icon: 'ri-global-line',
+            children: [
+                {
+                    label: 'Pages',
+                    permission: 'website-page-list',
+                    icon: 'ri-file-list-line',
+                    link: route('page.index')
+                },
+                {
+                    label: 'Menus',
+                    permission: 'website-menu-list',
+                    icon: 'ri-file-list-line',
+                    link: route('menu.index')
+                },
+                
+                {
+                    label: 'Sliders',
+                    permission: 'website-slider-list',
+                    icon: 'ri-file-list-line',
+                    link: route('slider.index')
+                },
+
+                {
+                    label: 'Testimonials',
+                    permission: 'website-testimonial-list',
+                    icon: 'ri-file-list-line',
+                    link: route('testimonial.index')
+                },
+                
+                {
+                    label: 'Settings',
+                    permission: 'website-setting-list',
+                    icon: 'ri-file-list-line',
+                    link: route('setting.index')
+                },
+            ]
+        },
+
+        {
             label: 'Blog',
             permission: 'blog',
             icon: 'ri-book-2-line',

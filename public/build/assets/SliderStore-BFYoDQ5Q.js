@@ -1,0 +1,1 @@
+import{d as r}from"./app-75h0gj58.js";const i=r("SliderStore",{state:()=>({slider:{title:"",description:"",image:null,url:null,order:null,active:!1,remove_previous_image:!1}}),actions:{setSlider(e){this.slider=e}},getters:{}});export{i as u};
