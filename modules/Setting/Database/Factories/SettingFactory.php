@@ -14,10 +14,8 @@ class SettingFactory extends Factory
         return [
             // Site Identity
             'site_name' => fake()->company(),
+            'description' => fake()->paragraph(3),
             'slogan' => fake()->catchPhrase(),
-            'logo' => null,
-            'favicon' => null,
-            'banner' => null,
 
             // Display Options
             'show_name' => true,
@@ -52,6 +50,17 @@ class SettingFactory extends Factory
             'body_text_color' => '#334155',
             'footer_background' => '#1e293b',
             'footer_text_color' => '#f1f5f9',
+
+            // SMTP Settings
+            'smtp_settings' => [
+                'host' => 'smtp.mailtrap.io',
+                'port' => 587,
+                'username' => '',
+                'password' => '',
+                'encryption' => 'tls',
+                'from_address' => fake()->companyEmail(),
+                'from_name' => fake()->company(),
+            ],
 
             // Advanced
             'custom_css' => null,

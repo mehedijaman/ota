@@ -18,7 +18,7 @@ class MessageController extends BackendController
             ->search(request('searchContext'), request('searchTerm'))
             ->paginate(request('rowsPerPage', 20))
             ->withQueryString()
-            ->through(fn($message) => [
+            ->through(fn ($message) => [
                 'id' => $message->id,
                 'name' => $message->name,
                 'phone' => $message->phone,
@@ -26,7 +26,7 @@ class MessageController extends BackendController
                 'subject' => $message->subject,
                 'message' => $message->message,
                 'read_at' => $message->read_at,
-                'created_at' => $message->created_at->format('d/m/Y H:i') . 'h',
+                'created_at' => $message->created_at->format('d/m/Y H:i').'h',
             ]);
 
         return inertia('Message/MessageIndex', [
@@ -86,7 +86,7 @@ class MessageController extends BackendController
             ->search(request('searchContext'), request('searchTerm'))
             ->paginate(request('rowsPerPage', 10))
             ->withQueryString()
-            ->through(fn($message) => [
+            ->through(fn ($message) => [
                 'id' => $message->id,
                 'name' => $message->name,
                 'deleted_at' => $message->deleted_at ? Carbon::parse($message->deleted_at)->format('d/m/Y') : null,

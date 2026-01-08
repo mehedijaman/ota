@@ -35,6 +35,20 @@
                         />
                     </div>
 
+                    <!-- Description -->
+                    <div class="lg:col-span-2">
+                        <AppLabel for="description">Site Description</AppLabel>
+                        <AppTextArea
+                            id="description"
+                            v-model="form.description"
+                            rows="3"
+                            placeholder="Brief description of your website for SEO and meta tags"
+                        />
+                        <p class="mt-1 text-xs text-gray-500">
+                            Used for SEO meta description and site overview
+                        </p>
+                    </div>
+
                     <!-- Logo -->
                     <div>
                         <AppLabel for="logo">Logo</AppLabel>
@@ -156,6 +170,7 @@ const props = defineProps({
 const form = useForm({
     _method: 'PUT',
     site_name: props.settings.site_name ?? '',
+    description: props.settings.description ?? '',
     slogan: props.settings.slogan ?? '',
     logo: null,
     favicon: null,

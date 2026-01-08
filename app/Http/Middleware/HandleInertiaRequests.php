@@ -43,8 +43,8 @@ class HandleInertiaRequests extends Middleware
             ],
             'impersonation' => [
                 'isImpersonating' => $user && app('impersonate')->isImpersonating(),
-                'impersonatorName' => $user && app('impersonate')->isImpersonating() 
-                    ? app('impersonate')->getImpersonator()?->name 
+                'impersonatorName' => $user && app('impersonate')->isImpersonating()
+                    ? app('impersonate')->getImpersonator()?->name
                     : null,
             ],
             'ziggy' => fn () => array_merge((new Ziggy)->toArray(), [

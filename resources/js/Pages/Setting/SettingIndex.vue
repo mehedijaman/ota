@@ -33,6 +33,7 @@
                 v-show="activeTab === 'contact'"
                 :settings="settings"
             />
+            <SmtpSetting v-show="activeTab === 'smtp'" :settings="settings" />
             <ThemeSetting v-show="activeTab === 'theme'" :settings="settings" />
             <AdvancedSetting
                 v-show="activeTab === 'advanced'"
@@ -50,6 +51,7 @@ import { Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import SiteIdentitySetting from './Components/SiteIdentitySetting.vue'
 import ContactSocialSetting from './Components/ContactSocialSetting.vue'
+import SmtpSetting from './Components/SmtpSetting.vue'
 import ThemeSetting from './Components/ThemeSetting.vue'
 import AdvancedSetting from './Components/AdvancedSetting.vue'
 
@@ -70,6 +72,7 @@ const breadCrumb = [
 const tabs = [
     { id: 'identity', label: 'Site Identity', icon: 'ri-global-line' },
     { id: 'contact', label: 'Contact & Social', icon: 'ri-contacts-line' },
+    { id: 'smtp', label: 'Email / SMTP', icon: 'ri-mail-settings-line' },
     { id: 'theme', label: 'Theme', icon: 'ri-palette-line' },
     { id: 'advanced', label: 'Advanced', icon: 'ri-code-s-slash-line' }
 ]

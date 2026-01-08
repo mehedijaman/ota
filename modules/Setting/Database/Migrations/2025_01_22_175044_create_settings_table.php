@@ -13,6 +13,7 @@ return new class extends Migration
 
             // Site Identity
             $table->string('site_name')->nullable();
+            $table->text('description')->nullable();
             $table->string('slogan')->nullable();
 
             // Display Options
@@ -42,6 +43,8 @@ return new class extends Migration
             $table->string('body_text_color')->nullable();
             $table->string('footer_background')->nullable();
             $table->string('footer_text_color')->nullable();
+
+            $table->json('smtp_settings')->nullable();
 
             // Advanced
             $table->longText('custom_css')->nullable();

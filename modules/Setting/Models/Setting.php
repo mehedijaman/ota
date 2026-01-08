@@ -25,6 +25,7 @@ class Setting extends BaseModel implements HasMedia
             'addresses' => 'array',
             'phones' => 'array',
             'emails' => 'array',
+            'smtp_settings' => 'array',
 
             // Display options
             'show_name' => 'boolean',

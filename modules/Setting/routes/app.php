@@ -13,6 +13,10 @@ Route::put('setting', [
     'update',
 ])->name('setting.update');
 
+Route::post('setting/test-email', [
+    SettingController::class,
+    'testEmail',
+])->name('setting.testEmail');
 
 Route::get('maintenance', [
     SettingController::class,

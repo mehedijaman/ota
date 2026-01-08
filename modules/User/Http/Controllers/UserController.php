@@ -81,22 +81,22 @@ class UserController extends BackendController
     public function store(UserValidate $request): RedirectResponse
     {
         $validated = $request->validated();
-        
+
         // Extract role_ids before processing
         $roleIds = $validated['role_ids'] ?? [];
         unset($validated['role_ids']);
-        
+
         // If employee_id is provided, set profile_type and profile_id
-        if (!empty($validated['employee_id'])) {
+        if (! empty($validated['employee_id'])) {
             $validated['profile_type'] = 'employee';
             $validated['profile_id'] = $validated['employee_id'];
         }
         unset($validated['employee_id']);
-        
+
         $user = User::create($validated);
 
         // Sync roles if provided
-        if (!empty($roleIds)) {
+        if (! empty($roleIds)) {
             $user->syncRoles(Role::whereIn('id', $roleIds)->pluck('name'));
         }
 
@@ -107,7 +107,7 @@ class UserController extends BackendController
     public function edit(string $uuid): Response
     {
         $user = User::where('uuid', $uuid)->firstOrFail();
-        
+
         // Get user's current role IDs
         $userData = [
             'id' => $user->id,
@@ -116,7 +116,7 @@ class UserController extends BackendController
             'email' => $user->email,
             'role_ids' => $user->roles->pluck('id')->toArray(),
         ];
-        
+
         // Get roles for dropdown
         $roles = Role::orderBy('name')
             ->get()
@@ -225,7 +225,7 @@ class UserController extends BackendController
     public function impersonate(string $uuid): \Inertia\Response|\Symfony\Component\HttpFoundation\Response
     {
         $user = User::where('uuid', $uuid)->firstOrFail();
-        
+
         auth()->user()->impersonate($user);
 
         // Use Inertia::location() to force a full page reload so shared props are refreshed

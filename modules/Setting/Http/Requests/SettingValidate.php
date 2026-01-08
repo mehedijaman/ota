@@ -9,52 +9,67 @@ class SettingValidate extends Request
     public function rules(): array
     {
         return [
-            /* Homepage Settings */
-            'show_topbar' => 'nullable|boolean',
-            'show_navbar' => 'nullable|boolean',
-            'show_slider' => 'nullable|boolean',
-            'show_top_categories' => 'nullable|boolean',
-            'show_latest_products' => 'nullable|boolean',
-            'show_featured_products' => 'nullable|boolean',
-            'show_brands' => 'nullable|boolean',
-            'show_testimonials' => 'nullable|boolean',
-            'show_latest_posts' => 'nullable|boolean',
-            'show_footer_menu' => 'nullable|boolean',
-            'show_floating_chat' => 'nullable|boolean',
-
-            /* Product Settings */
-            'show_view_details_button' => 'nullable|boolean',
-            'show_add_to_cart_button' => 'nullable|boolean',
-            'show_add_to_wishlist_button' => 'nullable|boolean',
-            'show_product_compare_button' => 'nullable|boolean',
-            'show_product_rating' => 'nullable|boolean',
-            'show_product_review' => 'nullable|boolean',
-            'show_product_discount' => 'nullable|boolean',
-            'show_product_shipping' => 'nullable|boolean',
-            'show_product_stock' => 'nullable|boolean',
-
-            /* Contact Settings */
-            'addresses' => 'nullable|json',
-            'google_map' => 'nullable|string',
-            'phones' => 'nullable|json',
-            'whatsapp' => 'nullable|string|max:255',
-            'emails' => 'nullable|json',
-            'facebook' => 'nullable|string|max:255',
-            'twitter' => 'nullable|string|max:255',
-            'instagram' => 'nullable|string|max:255',
-            'youtube' => 'nullable|string|max:255',
-
-            /* Site Settings */
+            // Site Identity
             'site_name' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:1000',
             'slogan' => 'nullable|string|max:255',
-            'logo' => 'nullable|image|max:2048', // Max size 2MB
-            'favicon' => 'nullable|image|max:2048', // Max size 2MB
-            'watermark' => 'nullable|image|max:2048', // Max size 2MB
+
+            // Display Options
             'show_name' => 'nullable|boolean',
             'show_slogan' => 'nullable|boolean',
             'show_logo' => 'nullable|boolean',
-            'show_favicon' => 'nullable|boolean',
-            'currency_symbol' => 'nullable|string|max:255',
+
+            // Media uploads
+            'logo' => 'nullable|image|max:2048',
+            'favicon' => 'nullable|image|max:2048',
+            'banner' => 'nullable|image|max:2048',
+            'watermark' => 'nullable|image|max:2048',
+            'remove_previous_logo' => 'nullable|boolean',
+            'remove_previous_favicon' => 'nullable|boolean',
+            'remove_previous_banner' => 'nullable|boolean',
+            'remove_previous_watermark' => 'nullable|boolean',
+
+            // Contact Information
+            'addresses' => 'nullable|array',
+            'addresses.*.label' => 'nullable|string|max:255',
+            'addresses.*.address' => 'nullable|string|max:500',
+            'phones' => 'nullable|array',
+            'phones.*.label' => 'nullable|string|max:255',
+            'phones.*.number' => 'nullable|string|max:50',
+            'emails' => 'nullable|array',
+            'emails.*.label' => 'nullable|string|max:255',
+            'emails.*.email' => 'nullable|email|max:255',
+            'whatsapp' => 'nullable|string|max:50',
+            'google_map' => 'nullable|string',
+
+            // Social Media Links
+            'facebook' => 'nullable|string|max:255|url',
+            'twitter' => 'nullable|string|max:255|url',
+            'instagram' => 'nullable|string|max:255|url',
+            'youtube' => 'nullable|string|max:255|url',
+            'linkedin' => 'nullable|string|max:255|url',
+            'pinterest' => 'nullable|string|max:255|url',
+
+            // Theme Customization
+            'navbar_background' => 'nullable|string|max:20',
+            'navbar_text_color' => 'nullable|string|max:20',
+            'body_background' => 'nullable|string|max:20',
+            'body_text_color' => 'nullable|string|max:20',
+            'footer_background' => 'nullable|string|max:20',
+            'footer_text_color' => 'nullable|string|max:20',
+
+            // SMTP Settings
+            'smtp_settings' => 'nullable|array',
+            'smtp_settings.host' => 'nullable|string|max:255',
+            'smtp_settings.port' => 'nullable|numeric|min:1|max:65535',
+            'smtp_settings.username' => 'nullable|string|max:255',
+            'smtp_settings.password' => 'nullable|string|max:255',
+            'smtp_settings.encryption' => 'nullable|string|in:,tls,ssl',
+            'smtp_settings.from_address' => 'nullable|email|max:255',
+            'smtp_settings.from_name' => 'nullable|string|max:255',
+
+            // Advanced
+            'custom_css' => 'nullable|string',
         ];
     }
 }
