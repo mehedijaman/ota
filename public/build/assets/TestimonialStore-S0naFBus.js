@@ -1,1 +1,0 @@
-import{d as t}from"./app-75h0gj58.js";const s=t("TestimonialStore",{state:()=>({testimonial:{name:"",designation:"",company:"",title:"",description:"",image:null,active:!0,featured:!1,remove_previous_image:!1}}),actions:{setTestimonial(e){this.testimonial=e}},getters:{}});export{s as u};

@@ -37,6 +37,6 @@
         "vue-eslint-parser": "^10.2.0"
     },
     "dependencies": {
-        "vuedraggable": "^2.24.3"
+        "vuedraggable": "^4.1.0"
     }
 }

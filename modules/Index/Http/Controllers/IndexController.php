@@ -2,13 +2,24 @@
 
 namespace Modules\Index\Http\Controllers;
 
+use Modules\Page\Models\Page;
 use Modules\Support\Http\Controllers\SiteController;
 
 class IndexController extends SiteController
 {
-    public function index()
+    public function index($slug = null)
     {
-        return view('index::index');
+        if (is_null($slug)) {
+            return view('index::index');
+        }
+
+        $page = Page::where('slug', $slug)->first();
+
+        if (is_null($page)) {
+            abort(404);
+        }
+
+        return view('index::page', compact('page'));
     }
 
     public function about()

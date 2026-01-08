@@ -59,5 +59,6 @@ Route::prefix('menu/{menu}')->name('menu.')->group(function () {
     Route::get('/items', [MenuItemController::class, 'index'])->name('items.index');
     Route::post('/items', [MenuItemController::class, 'store'])->name('items.store');
     Route::post('/items/order', [MenuItemController::class, 'updateOrder'])->name('items.updateOrder');
+    Route::put('/items/{menuItem}', [MenuItemController::class, 'update'])->name('items.update');
     Route::delete('/items/{menuItem}', [MenuItemController::class, 'destroy'])->name('items.destroy');
 });
