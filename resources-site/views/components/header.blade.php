@@ -153,7 +153,7 @@
                                 </a>
                                 <div class="my-1 border-t border-gray-100"></div>
                                 <a
-                                    href="{{ route('adminAuth.logout') }}"
+                                    href="{{ route('auth.logout') }}"
                                     class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,7 +166,7 @@
                     </div>
                 @else
                     <a
-                        href="{{ route('adminAuth.loginForm') }}"
+                        href="{{ route('auth.loginForm') }}"
                         class="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition-all hover:scale-105 hover:bg-blue-700 active:scale-95"
                     >
                         Login

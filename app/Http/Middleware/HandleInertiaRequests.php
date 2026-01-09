@@ -47,6 +47,9 @@ class HandleInertiaRequests extends Middleware
                     ? app('impersonate')->getImpersonator()?->name
                     : null,
             ],
+            'siteSettings' => fn () => \Illuminate\Support\Facades\Cache::remember('settings', 3600, function () {
+                return app(\Modules\Setting\Services\SettingService::class)->getPublicSettingsObject();
+            }),
             'ziggy' => fn () => array_merge((new Ziggy)->toArray(), [
                 'location' => $request->url(),
             ]),

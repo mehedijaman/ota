@@ -21,7 +21,7 @@ class RegisterController extends SiteController
      */
     public function registerForm()
     {
-        return Inertia::render('AdminAuth/RegisterForm');
+        return Inertia::render('Auth/RegisterForm');
     }
 
     /**
@@ -35,7 +35,7 @@ class RegisterController extends SiteController
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -58,8 +58,10 @@ class RegisterController extends SiteController
 
         event(new Registered($user));
 
+        // Log the user in so they can access the verification page
         Auth::guard('user')->login($user);
 
-        return redirect()->intended(route('customerDashboard.index'));
+        return redirect()->route('verification.notice')
+            ->with('status', 'Registration successful! Please check your email to verify your account.');
     }
 }

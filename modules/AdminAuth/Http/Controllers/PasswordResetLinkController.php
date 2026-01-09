@@ -11,11 +11,11 @@ class PasswordResetLinkController extends AppController
     /**
      * Display the password reset link request view.
      *
-     * @return \Illuminate\View\View
+     * @return \Inertia\Response
      */
     public function forgotPasswordForm()
     {
-        return inertia('AdminAuth/ForgotPassword');
+        return inertia('Auth/ForgotPassword');
     }
 
     /**

@@ -15,11 +15,11 @@ class NewPasswordController extends AppController
     /**
      * Display the password reset view.
      *
-     * @return \Illuminate\View\View
+     * @return \Inertia\Response
      */
     public function resetPasswordForm(Request $request)
     {
-        return inertia('AdminAuth/ResetPassword', [
+        return inertia('Auth/ResetPassword', [
             'email' => $request->email,
             'token' => $request->route('token'),
         ]);
@@ -59,7 +59,7 @@ class NewPasswordController extends AppController
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.
         return $status == Password::broker('usersModule')::PASSWORD_RESET
-            ? redirect()->route('adminAuth.loginForm')->with('success', 'Password updated')
+            ? redirect()->route('auth.loginForm')->with('success', 'Password updated')
             : back()->withInput($request->only('email'))
                 ->withErrors(['email' => __($status)]);
     }

@@ -17,13 +17,13 @@ class AuthenticatedSessionController extends AppController
      */
     public function loginForm()
     {
-        return inertia('AdminAuth/LoginForm');
+        return inertia('Auth/LoginForm');
     }
 
     /**
      * Handle an incoming authentication request.
      *
-     * @param  \App\Http\Requests\Auth\LoginRequest  $request
+     * @param  \Modules\AdminAuth\Http\Requests\LoginRequest  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function login(LoginRequest $request)
@@ -36,7 +36,7 @@ class AuthenticatedSessionController extends AppController
 
         return match ($user->profile_type) {
             'agent' => redirect()->intended(route('agentDashboard.index')),
-            'customer' => redirect()->intended(route('customerDashboard.index')),
+            'customer' => redirect()->intended(route('site.index')),
             default => redirect()->intended(route(config('modular.default-logged-route'))),
         };
     }
@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends AppController
     /**
      * Destroy an authenticated session.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function logout(Request $request)
     {

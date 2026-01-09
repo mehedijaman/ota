@@ -16,11 +16,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.admin' => \Modules\AdminAuth\Http\Middleware\AdminAuth::class,
             'auth.agent' => \Modules\AdminAuth\Http\Middleware\AgentAuth::class,
             'auth.customer' => \Modules\AdminAuth\Http\Middleware\CustomerAuth::class,
+            'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         ]);
 
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
+
+        // Configure authentication redirects
+        $middleware->redirectGuestsTo(fn () => route('auth.loginForm'));
+        $middleware->redirectUsersTo(fn () => route('site.index'));
 
         //
     })

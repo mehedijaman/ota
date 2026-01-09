@@ -1,9 +1,21 @@
 <template>
     <a
-        :href="route('adminAuth.loginForm')"
+        :href="route('site.index')"
         class="group flex items-center gap-3 transition-all duration-200"
     >
+        <!-- Logo Image or Icon -->
         <div
+            v-if="siteSettings?.site_logo"
+            class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl shadow-lg transition-transform duration-200 group-hover:scale-105"
+        >
+            <img
+                :src="siteSettings.site_logo"
+                :alt="siteSettings?.site_name || 'Logo'"
+                class="h-full w-full object-contain"
+            />
+        </div>
+        <div
+            v-else
             class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-9 shadow-lg shadow-primary-9/25 transition-transform duration-200 group-hover:scale-105"
         >
             <svg
@@ -20,8 +32,18 @@
                 />
             </svg>
         </div>
+        
+        <!-- Site Name -->
         <span class="text-xl font-bold tracking-tight text-neutral-12">
-            Admin
+            {{ siteSettings?.site_name || 'App' }}
         </span>
     </a>
 </template>
+
+<script setup>
+import { usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
+
+const page = usePage()
+const siteSettings = computed(() => page.props.siteSettings)
+</script>

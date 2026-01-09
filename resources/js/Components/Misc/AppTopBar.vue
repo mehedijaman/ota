@@ -32,7 +32,7 @@
 
             <AppButton
                 class="btn btn-icon hover:bg-neutral-4"
-                @click="$inertia.visit(route('adminAuth.logout'))"
+                @click="$inertia.visit(route('auth.logout'))"
             >
                 <i class="ri-logout-circle-r-line"></i>
             </AppButton>
