@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\AdminAuth\Http\Controllers\AuthenticatedSessionController;
 use Modules\AdminAuth\Http\Controllers\NewPasswordController;
 use Modules\AdminAuth\Http\Controllers\PasswordResetLinkController;
+use Modules\AdminAuth\Http\Controllers\RegisterController;
 
 Route::get(config('modular.login-url'), [
     AuthenticatedSessionController::class, 'loginForm',
@@ -12,6 +13,15 @@ Route::get(config('modular.login-url'), [
 Route::post('/admin-auth/login', [
     AuthenticatedSessionController::class, 'login',
 ])->name('adminAuth.login');
+
+// Customer Registration
+Route::get('/register', [
+    RegisterController::class, 'registerForm',
+])->name('adminAuth.registerForm');
+
+Route::post('/register', [
+    RegisterController::class, 'register',
+])->name('adminAuth.register');
 
 Route::get('/admin-auth/logout', [
     AuthenticatedSessionController::class, 'logout',

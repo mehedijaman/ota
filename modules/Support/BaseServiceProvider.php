@@ -35,7 +35,7 @@ class BaseServiceProvider extends ServiceProvider
     protected function mapAppRoutes()
     {
         Route::prefix('admin')
-            ->middleware(['web', 'auth.user'])
+            ->middleware(['web', 'auth.admin'])
             ->group(function ($router) {
                 $routesPath = $this->getCurrentDir().'/routes/app.php';
 

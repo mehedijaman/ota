@@ -1,1 +1,0 @@
-import{u as a}from"./useFormContext-J-hy6DI2.js";import{i as o,b as n}from"./_plugin-vue_export-helper-BGo4GR_V.js";function f(i){const e=o("translate"),{isCreate:r,isEdit:s}=a();return{title:n(()=>{let t="";return r.value&&(t="Create"),s.value&&(t="Edit"),t=e(t),t+" "+e(i)})}}export{f as u};

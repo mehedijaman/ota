@@ -7,6 +7,8 @@ return [
     Modules\AdminAuth\AdminAuthServiceProvider::class,
     Modules\User\UserServiceProvider::class,
     Modules\Dashboard\DashboardServiceProvider::class,
+    Modules\AgentDashboard\Providers\AgentDashboardServiceProvider::class,
+    Modules\CustomerDashboard\Providers\CustomerDashboardServiceProvider::class,
     Modules\Acl\AclServiceProvider::class,
 
     Modules\Blog\BlogServiceProvider::class,

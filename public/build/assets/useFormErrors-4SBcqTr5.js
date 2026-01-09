@@ -1,0 +1,1 @@
+import{b as e}from"./app-CY2I2dT4.js";import{b as o}from"./_plugin-vue_export-helper-5RSKAyFF.js";function m(){const r=o(()=>e().props.errors),s=o(()=>Object.keys(r.value));return{errors:r,errorsFields:s}}export{m as u};

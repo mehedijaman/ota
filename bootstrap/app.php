@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'auth.user' => \Modules\AdminAuth\Http\Middleware\UserAuth::class,
+            'auth.admin' => \Modules\AdminAuth\Http\Middleware\AdminAuth::class,
+            'auth.agent' => \Modules\AdminAuth\Http\Middleware\AgentAuth::class,
+            'auth.customer' => \Modules\AdminAuth\Http\Middleware\CustomerAuth::class,
         ]);
 
         $middleware->web(append: [

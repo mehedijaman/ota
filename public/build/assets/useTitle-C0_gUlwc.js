@@ -1,0 +1,1 @@
+import{u as a}from"./useFormContext-CT4ZUUgj.js";import{i as o,b as n}from"./_plugin-vue_export-helper-5RSKAyFF.js";function f(i){const e=o("translate"),{isCreate:r,isEdit:s}=a();return{title:n(()=>{let t="";return r.value&&(t="Create"),s.value&&(t="Edit"),t=e(t),t+" "+e(i)})}}export{f as u};

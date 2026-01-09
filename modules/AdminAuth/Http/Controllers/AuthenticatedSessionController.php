@@ -32,7 +32,13 @@ class AuthenticatedSessionController extends AppController
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route(config('modular.default-logged-route')));
+        $user = auth()->user();
+
+        return match ($user->profile_type) {
+            'agent' => redirect()->intended(route('agentDashboard.index')),
+            'customer' => redirect()->intended(route('customerDashboard.index')),
+            default => redirect()->intended(route(config('modular.default-logged-route'))),
+        };
     }
 
     /**
