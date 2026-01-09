@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-    <x-hero></x-hero>
+    {{-- <x-hero></x-hero> --}}
 
     {{-- <x-exclusive-offers></x-exclusive-offers> --}}
 
@@ -21,7 +21,11 @@
 
     {{-- <x-best-hotels></x-best-hotels> --}}
 
-    <x-tour-packages></x-tour-packages>
+    {{-- <x-tour-packages></x-tour-packages> --}}
+
+    <x-top-testimonials :testimonials="$topTestimonials"></x-top-testimonials>
+
+    {{-- <x-latest-blogs></x-latest-blogs> --}}
 
     {{-- <x-business-cta></x-business-cta> --}}
 

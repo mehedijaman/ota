@@ -166,4 +166,30 @@ class TestimonialService
             $testimonial->clearMediaCollection('image');
         }
     }
+
+    /**
+     * Get all active testimonials with pagination for public display.
+     */
+    public static function getAllActive(int $perPage = 9)
+    {
+        return Testimonial::query()
+            ->with('media')
+            ->where('is_active', true)
+            ->latest()
+            ->paginate($perPage);
+    }
+
+    /**
+     * Get top featured and active testimonials for display.
+     */
+    public static function getTopTestimonials(int $limit = 3)
+    {
+        return Testimonial::query()
+            ->with('media')
+            ->where('is_active', true)
+            ->where('featured', true)
+            ->latest()
+            ->limit($limit)
+            ->get();
+    }
 }

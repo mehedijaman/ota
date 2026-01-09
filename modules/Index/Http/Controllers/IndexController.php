@@ -4,13 +4,18 @@ namespace Modules\Index\Http\Controllers;
 
 use Modules\Page\Models\Page;
 use Modules\Support\Http\Controllers\SiteController;
+use Modules\Testimonial\Services\TestimonialService;
 
 class IndexController extends SiteController
 {
     public function index($slug = null)
     {
         if (is_null($slug)) {
-            return view('index::index');
+            $topTestimonials = TestimonialService::getTopTestimonials(3);
+
+            return view('index::index', [
+                'topTestimonials' => $topTestimonials,
+            ]);
         }
 
         $page = Page::where('slug', $slug)->first();
