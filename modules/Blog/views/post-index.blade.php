@@ -9,71 +9,225 @@
 @endsection
 
 @section('content')
-    <blog-toolbar :archive-options="{{ json_encode($archiveOptions) }}" :tags="{{ json_encode($tags) }}"></blog-toolbar>
+    <!-- Page Header -->
+    <div
+        class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-20"
+    >
+        <div class="absolute inset-0 opacity-20">
+            <div
+                class="absolute left-1/4 top-0 h-64 w-64 rounded-full bg-blue-500 blur-3xl"
+            ></div>
+            <div
+                class="absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-indigo-500 blur-3xl"
+            ></div>
+        </div>
+        <div
+            class="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8"
+        >
+            <h1
+                class="text-4xl font-bold tracking-tight text-white sm:text-5xl"
+            >
+                @if (isset($fromArchive))
+                    Blog Archive
+                @elseif (isset($fromTag))
+                    Tagged Posts
+                @elseif (isset($fromSearch))
+                    Search Results
+                @else
+                        Our Blog
+                @endif
+            </h1>
+            <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-300">
+                @if (isset($fromArchive))
+                    Posts from
+                    <span class="font-semibold text-blue-400">
+                        {{ $fromArchive }}
+                    </span>
+                @elseif (isset($fromTag))
+                    Posts tagged with
+                    <span class="font-semibold text-blue-400">
+                        {{ $fromTag }}
+                    </span>
+                @elseif (isset($fromSearch))
+                    Results for
+                    <span class="font-semibold text-blue-400">
+                        "{{ $fromSearch }}"
+                    </span>
+                @else
+                        Tips, guides, and inspiration for your next adventure
+                @endif
+            </p>
+        </div>
+    </div>
 
-    <div class="bg-slate-50 min-h-screen py-16 sm:py-24">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <!-- Section Header -->
+    <blog-toolbar
+        :archive-options="{{ json_encode($archiveOptions) }}"
+        :tags="{{ json_encode($tags) }}"
+    ></blog-toolbar>
+
+    <div class="relative mx-auto -mt-10 mb-16 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="rounded-2xl bg-white p-8 shadow-xl">
+            <!-- Header -->
             <div class="mb-12 text-center">
-                <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-                    Blog
-                </h1>
-                <p class="mt-3 text-lg text-slate-600">
-                    @if (isset($fromArchive))
-                        Posts from archive: <span class="font-semibold text-blue-600">{{ $fromArchive }}</span>
-                    @elseif (isset($fromTag))
-                        Posts tagged with: <span class="font-semibold text-blue-600">{{ $fromTag }}</span>
-                    @elseif (isset($fromSearch))
-                        Search results for: <span class="font-semibold text-blue-600">{{ $fromSearch }}</span>
-                    @else
-                        Here you will find the latest news and updates about us.
-                    @endif
+                <span
+                    class="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600"
+                >
+                    <svg
+                        class="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                        />
+                    </svg>
+                    Latest Articles
+                </span>
+                <h2 class="text-3xl font-bold text-slate-800 sm:text-4xl">
+                    Travel Stories & Tips
+                </h2>
+                <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-500">
+                    Discover insights, guides, and inspiration from our travel
+                    experts
                 </p>
             </div>
 
             @if ($posts->count())
                 <!-- Posts Grid -->
-                <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <div
+                    class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
+                >
                     @foreach ($posts as $post)
-                        <article class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
+                        <article
+                            class="group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-100 hover:shadow-xl"
+                        >
                             <!-- Image -->
-                            <div class="relative overflow-hidden">
+                            <a
+                                href="{{ route('site.blog.show', $post->slug) }}"
+                                class="relative block aspect-[16/10] overflow-hidden"
+                            >
                                 @if ($post->image_url)
-                                    <img src="{{ $post->image_url }}" alt="{{ $post->title }}"
-                                        class="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-105">
+                                    <img
+                                        src="{{ $post->image_url }}"
+                                        alt="{{ $post->title }}"
+                                        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
                                 @else
-                                    <div class="aspect-video w-full bg-linear-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-                                        <svg class="h-12 w-12 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    <div
+                                        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600"
+                                    >
+                                        <svg
+                                            class="h-16 w-16 text-white/50"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="1.5"
+                                                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                                            />
                                         </svg>
                                     </div>
                                 @endif
-                            </div>
+                                <!-- Date Badge -->
+                                <div
+                                    class="absolute left-4 top-4 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm backdrop-blur-sm"
+                                >
+                                    {{ $post->published_at->format('M d, Y') }}
+                                </div>
+                            </a>
 
                             <!-- Content -->
                             <div class="flex flex-1 flex-col p-6">
-                                <!-- Date -->
-                                <time datetime="{{ $post->published_at }}" class="text-sm font-semibold text-blue-600">
-                                    {{ $post->published_at->format('F d, Y') }}
-                                </time>
+                                <!-- Tags -->
+                                @if ($post->tags && $post->tags->count() > 0)
+                                    <div class="mb-3 flex flex-wrap gap-2">
+                                        @foreach ($post->tags->take(2) as $tag)
+                                            <a
+                                                href="{{ route('site.blog.tag', $tag->slug) }}"
+                                                class="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100"
+                                            >
+                                                {{ $tag->name }}
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
 
                                 <!-- Title -->
-                                <h3 class="mt-3 text-lg font-bold leading-snug text-slate-900 line-clamp-2">
-                                    {{ $post->title }}
+                                <h3
+                                    class="mb-3 text-xl font-bold text-slate-800"
+                                >
+                                    <a
+                                        href="{{ route('site.blog.show', $post->slug) }}"
+                                        class="transition-colors hover:text-blue-600"
+                                    >
+                                        {{ Str::limit($post->title, 60) }}
+                                    </a>
                                 </h3>
 
                                 <!-- Summary -->
-                                <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-500 line-clamp-3">
-                                    {!! strip_tags($post->summary) !!}
+                                <p
+                                    class="mb-4 flex-1 text-sm leading-relaxed text-slate-500"
+                                >
+                                    {{ Str::limit(strip_tags($post->summary), 120) }}
                                 </p>
 
-                                <!-- Read More Button -->
-                                <div class="mt-6">
-                                    <a href="/blog/{{ $post->slug }}"
-                                        class="inline-flex items-center gap-2 rounded-full border border-blue-600 px-5 py-2.5 text-sm font-semibold text-blue-600 transition-all hover:bg-blue-600 hover:text-white">
+                                <!-- Footer -->
+                                <div
+                                    class="mt-auto flex items-center justify-between border-t border-slate-100 pt-4"
+                                >
+                                    <!-- Author -->
+                                    @if ($post->author)
+                                        <div class="flex items-center gap-2">
+                                            @if ($post->author->image_url)
+                                                <img
+                                                    src="{{ $post->author->image_url }}"
+                                                    alt="{{ $post->author->name }}"
+                                                    class="h-8 w-8 rounded-full object-cover ring-2 ring-slate-100"
+                                                />
+                                            @else
+                                                <div
+                                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-xs font-bold text-white ring-2 ring-slate-100"
+                                                >
+                                                    {{ strtoupper(substr($post->author->name, 0, 1)) }}
+                                                </div>
+                                            @endif
+                                            <span
+                                                class="text-sm font-medium text-slate-600"
+                                            >
+                                                {{ $post->author->name }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <div class="text-sm text-slate-400">
+                                            TriptonicBD
+                                        </div>
+                                    @endif
+
+                                    <!-- Read More -->
+                                    <a
+                                        href="{{ route('site.blog.show', $post->slug) }}"
+                                        class="group/link inline-flex items-center gap-1 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700"
+                                    >
                                         Read More
-                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                        <svg
+                                            class="h-4 w-4 transition-transform group-hover/link:translate-x-0.5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M9 5l7 7-7 7"
+                                            />
                                         </svg>
                                     </a>
                                 </div>
@@ -81,20 +235,35 @@
                         </article>
                     @endforeach
                 </div>
+
+                <!-- Pagination -->
+                <div class="mt-12">
+                    {{ $posts->links('pagination.tailwind') }}
+                </div>
             @else
-                <div class="rounded-xl bg-white p-12 text-center shadow-sm">
-                    <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                <!-- Empty State -->
+                <div class="py-16 text-center">
+                    <svg
+                        class="mx-auto h-16 w-16 text-slate-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                        />
                     </svg>
-                    <h3 class="mt-4 text-lg font-semibold text-slate-900">No posts found</h3>
-                    <p class="mt-2 text-slate-500">Try adjusting your search or filter criteria.</p>
+                    <h3 class="mt-4 text-lg font-medium text-slate-600">
+                        No posts found
+                    </h3>
+                    <p class="mt-2 text-slate-500">
+                        Try adjusting your search or filter criteria.
+                    </p>
                 </div>
             @endif
-
-            <!-- Pagination -->
-            <div class="mt-12 flex justify-center">
-                {{ $posts->links('pagination.tailwind') }}
-            </div>
         </div>
     </div>
 @endsection

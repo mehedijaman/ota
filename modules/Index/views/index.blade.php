@@ -25,7 +25,7 @@
 
     <x-top-testimonials :testimonials="$topTestimonials"></x-top-testimonials>
 
-    {{-- <x-latest-blogs></x-latest-blogs> --}}
+    <x-latest-posts :posts="$latestPosts"></x-latest-posts>
 
     {{-- <x-business-cta></x-business-cta> --}}
 
