@@ -3,15 +3,59 @@
 namespace Modules\Tour\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 use Modules\Tour\Models\Tour;
-use Modules\Tour\Models\TourCategory;
-use Modules\Tour\Models\TourDestination;
+use Modules\Tour\Models\TourDepartureDate;
+use Modules\Tour\Models\TourFaq;
+use Modules\Tour\Models\TourHighlight;
 use Modules\Tour\Models\TourInclusion;
 use Modules\Tour\Models\TourItinerary;
 
 class TourSeeder extends Seeder
 {
+    protected array $inclusions = [
+        'Round-trip AC transport from Dhaka',
+        'Hotel/Resort accommodation',
+        'Daily breakfast',
+        'All meals included',
+        'Professional tour guide',
+        'Sightseeing as per itinerary',
+        'Boat rides & transfers',
+        'Entry tickets to attractions',
+        'Welcome drink on arrival',
+        'First aid kit',
+    ];
+
+    protected array $exclusions = [
+        'Personal expenses',
+        'Travel insurance',
+        'Tips & gratuities',
+        'Room service charges',
+        'Extra activities not mentioned',
+        'Camera/Video fees at monuments',
+        'Laundry services',
+        'Alcoholic beverages',
+    ];
+
+    protected array $faqs = [
+        ['q' => 'What should I pack for this tour?', 'a' => 'Comfortable clothing, walking shoes, sunscreen, sunglasses, hat, camera, personal medications, and light rain gear depending on season.'],
+        ['q' => 'Is this tour suitable for children?', 'a' => 'Yes, most of our tours are family-friendly. Please check the difficulty level and age restrictions for specific tours.'],
+        ['q' => 'What is the cancellation policy?', 'a' => 'Free cancellation up to the specified days before departure. After that, cancellation fees may apply.'],
+        ['q' => 'Are meals included?', 'a' => 'Meal inclusions vary by tour. Please check the inclusions section for specific details.'],
+        ['q' => 'What happens if weather is bad?', 'a' => 'We monitor weather conditions and may adjust itinerary or reschedule certain activities for your safety.'],
+        ['q' => 'Can I customize this tour?', 'a' => 'Yes, we offer private customized tours. Contact us for personalized packages.'],
+    ];
+
+    protected array $highlights = [
+        'Professional experienced guides',
+        'Small group sizes for personalized experience',
+        'Handpicked quality accommodations',
+        'Authentic local cuisine experiences',
+        'Flexible itinerary options',
+        'Photo opportunities at iconic spots',
+        'Cultural immersion activities',
+        '24/7 customer support',
+    ];
+
     public function run(): void
     {
         $this->call([
@@ -19,71 +63,116 @@ class TourSeeder extends Seeder
             TourDestinationSeeder::class,
         ]);
 
-        $coxsBazar = TourDestination::where('name', "Cox's Bazar")->first();
-        $beachCategory = TourCategory::where('name', 'Beach & Island')->first();
+        $this->command->info('Creating 50 Tour Packages...');
 
-        if ($coxsBazar && $beachCategory) {
-            $tour = Tour::firstOrCreate(
-                ['code' => 'CBX-001'],
-                [
-                    'category_id' => $beachCategory->id,
-                    'destination_id' => $coxsBazar->id,
-                    'name' => "Cox's Bazar Beach Getaway",
-                    'slug' => Str::slug("Cox's Bazar Beach Getaway"),
-                    'excerpt' => 'Experience the longest sea beach in the world with our curated 3-day tour package.',
-                    'description' => '<p>Experience the world\'s longest natural sea beach with our carefully curated 3-day tour package. Enjoy stunning sunsets, fresh seafood, and the warm hospitality of Cox\'s Bazar.</p><p>This package includes comfortable accommodation, all meals, transportation from Dhaka, and guided tours to Himchori, Inani Beach, and the famous Marine Drive.</p>',
-                    'duration_days' => 3,
-                    'duration_nights' => 2,
-                    'min_group_size' => 1,
-                    'max_group_size' => 20,
-                    'difficulty_level' => 'easy',
-                    'tour_type' => 'group',
-                    'base_price' => 5500,
-                    'child_price' => 3500,
-                    'infant_price' => 0,
-                    'deposit_amount' => 2000,
-                    'deposit_type' => 'fixed',
-                    'cancellation_days' => 2,
-                    'is_featured' => true,
-                    'is_bestseller' => true,
-                    'is_active' => true,
-                    'start_location' => 'Dhaka',
-                    'end_location' => 'Dhaka',
-                    'languages' => ['Bengali', 'English'],
-                ]
-            );
+        // Create 50 tours using factory
+        $tours = Tour::factory()->count(50)->create();
 
-            // Add itineraries
-            $itineraries = [
-                ['day' => 1, 'title' => 'Arrival & Beach Exploration', 'desc' => 'Arrive in Cox\'s Bazar, check into hotel. Evening beach walk and sunset viewing. Dinner at seaside restaurant.'],
-                ['day' => 2, 'title' => 'Full Day Sightseeing', 'desc' => 'Visit Himchori Waterfall, Inani Beach, and Marine Drive. Lunch at local restaurant. Evening free for shopping.'],
-                ['day' => 3, 'title' => 'Departure', 'desc' => 'Breakfast at hotel, free time for last-minute beach visits. Check out and departure to Dhaka.'],
-            ];
+        $this->command->getOutput()->progressStart($tours->count());
 
-            foreach ($itineraries as $itin) {
-                TourItinerary::firstOrCreate(
-                    ['tour_id' => $tour->id, 'day_number' => $itin['day']],
-                    ['title' => $itin['title'], 'description' => $itin['desc'], 'meals_included' => ['breakfast', 'lunch', 'dinner']]
-                );
-            }
+        foreach ($tours as $tour) {
+            $this->createItineraries($tour);
+            $this->createInclusions($tour);
+            $this->createExclusions($tour);
+            $this->createHighlights($tour);
+            $this->createFaqs($tour);
+            $this->createDepartureDates($tour);
 
-            // Add inclusions
-            $inclusions = ['Round-trip transport', 'Hotel accommodation', 'All meals', 'Sightseeing tours', 'Professional guide'];
-            foreach ($inclusions as $i => $inc) {
-                TourInclusion::firstOrCreate(
-                    ['tour_id' => $tour->id, 'type' => 'inclusion', 'title' => $inc],
-                    ['sort_order' => $i]
-                );
-            }
+            $this->command->getOutput()->progressAdvance();
+        }
 
-            // Add exclusions
-            $exclusions = ['Personal expenses', 'Travel insurance', 'Tips & gratuities'];
-            foreach ($exclusions as $i => $exc) {
-                TourInclusion::firstOrCreate(
-                    ['tour_id' => $tour->id, 'type' => 'exclusion', 'title' => $exc],
-                    ['sort_order' => $i]
-                );
-            }
+        $this->command->getOutput()->progressFinish();
+        $this->command->info('Tours created successfully!');
+    }
+
+    protected function createItineraries(Tour $tour): void
+    {
+        for ($day = 1; $day <= $tour->duration_days; $day++) {
+            $title = match ($day) {
+                1 => 'Arrival & Welcome',
+                $tour->duration_days => 'Departure Day',
+                default => 'Day '.$day.' - Exploration',
+            };
+
+            TourItinerary::create([
+                'tour_id' => $tour->id,
+                'day_number' => $day,
+                'title' => $title,
+                'description' => fake()->paragraph(2),
+                'accommodation' => $day < $tour->duration_days ? fake()->randomElement(['Hotel', 'Resort', 'Cottage', 'Guest House']) : null,
+                'meals_included' => $day === 1 ? ['lunch', 'dinner'] : ($day === $tour->duration_days ? ['breakfast'] : ['breakfast', 'lunch', 'dinner']),
+            ]);
+        }
+    }
+
+    protected function createInclusions(Tour $tour): void
+    {
+        $selected = fake()->randomElements($this->inclusions, fake()->numberBetween(5, 8));
+        foreach ($selected as $i => $inclusion) {
+            TourInclusion::create([
+                'tour_id' => $tour->id,
+                'type' => 'inclusion',
+                'title' => $inclusion,
+                'sort_order' => $i,
+            ]);
+        }
+    }
+
+    protected function createExclusions(Tour $tour): void
+    {
+        $selected = fake()->randomElements($this->exclusions, fake()->numberBetween(3, 5));
+        foreach ($selected as $i => $exclusion) {
+            TourInclusion::create([
+                'tour_id' => $tour->id,
+                'type' => 'exclusion',
+                'title' => $exclusion,
+                'sort_order' => $i,
+            ]);
+        }
+    }
+
+    protected function createHighlights(Tour $tour): void
+    {
+        $selected = fake()->randomElements($this->highlights, fake()->numberBetween(4, 6));
+        foreach ($selected as $i => $highlight) {
+            TourHighlight::create([
+                'tour_id' => $tour->id,
+                'title' => $highlight,
+                'sort_order' => $i,
+            ]);
+        }
+    }
+
+    protected function createFaqs(Tour $tour): void
+    {
+        $selected = fake()->randomElements($this->faqs, fake()->numberBetween(3, 5));
+        foreach ($selected as $i => $faq) {
+            TourFaq::create([
+                'tour_id' => $tour->id,
+                'question' => $faq['q'],
+                'answer' => $faq['a'],
+                'sort_order' => $i,
+            ]);
+        }
+    }
+
+    protected function createDepartureDates(Tour $tour): void
+    {
+        // Create 5-10 upcoming departure dates
+        $count = fake()->numberBetween(5, 10);
+
+        for ($i = 0; $i < $count; $i++) {
+            $departureDate = now()->addDays(fake()->numberBetween(7 + ($i * 15), 14 + ($i * 15)));
+            $slots = fake()->numberBetween(10, 30);
+
+            TourDepartureDate::create([
+                'tour_id' => $tour->id,
+                'departure_date' => $departureDate,
+                'return_date' => $departureDate->copy()->addDays($tour->duration_days - 1),
+                'available_slots' => $slots,
+                'booked_slots' => fake()->numberBetween(0, (int) ($slots * 0.5)),
+                'status' => 'available',
+            ]);
         }
     }
 }
