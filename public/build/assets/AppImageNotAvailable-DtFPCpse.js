@@ -1,0 +1,1 @@
+import{_ as t,A as s,x as r,B as n}from"./_plugin-vue_export-helper-qTKvau-w.js";const a={},o={class:"from-neutral-3 to-neutral-6 flex h-10 w-10 items-center justify-center rounded bg-gradient-to-bl"};function c(l,e){return r(),s("div",o,[...e[0]||(e[0]=[n("span",{class:"text-neutral-9 text-xs"},"N/A",-1)])])}const _=t(a,[["render",c]]);export{_ as A};

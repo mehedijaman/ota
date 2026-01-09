@@ -12,11 +12,13 @@ use Modules\AdminAuth\Notifications\ResetPassword;
 use Modules\Support\Traits\Searchable;
 // use Modules\Support\Traits\ActivityLog;
 use Modules\User\Database\Factories\UserFactory;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, HasMedia
 {
-    use HasFactory, HasRoles, Impersonate, Notifiable, Searchable, SoftDeletes;
+    use HasFactory, HasRoles, Impersonate, InteractsWithMedia, Notifiable, Searchable, SoftDeletes;
 
     protected static function newFactory()
     {
