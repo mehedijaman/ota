@@ -21,7 +21,7 @@
 
     {{-- <x-best-hotels></x-best-hotels> --}}
 
-    {{-- <x-tour-packages></x-tour-packages> --}}
+    <x-tour-packages></x-tour-packages>
 
     <x-top-testimonials :testimonials="$topTestimonials"></x-top-testimonials>
 

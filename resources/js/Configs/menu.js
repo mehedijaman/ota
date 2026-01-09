@@ -9,6 +9,51 @@ export default {
         },
 
         {
+            label: 'Tours',
+            permission: 'tour',
+            icon: 'ri-compass-3-line',
+            children: [
+                {
+                    label: 'Tour List',
+                    permission: 'tour-list',
+                    icon: 'ri-map-pin-line',
+                    link: route('tour.index')
+                },
+                {
+                    label: 'New Tour',
+                    permission: 'tour-create',
+                    icon: 'ri-add-circle-line',
+                    link: route('tour.create')
+                },
+                {
+                    label: 'Categories',
+                    permission: 'tour-category-list',
+                    icon: 'ri-folders-line',
+                    link: route('tourCategory.index')
+                },
+                {
+                    label: 'Destinations',
+                    permission: 'tour-destination-list',
+                    icon: 'ri-road-map-line',
+                    link: route('tourDestination.index')
+                },
+                {
+                    label: 'Bookings',
+                    permission: 'tour-booking-list',
+                    icon: 'ri-calendar-check-line',
+                    link: route('tourBooking.index')
+                },
+                {
+                    label: 'Reviews',
+                    permission: 'tour-review-list',
+                    icon: 'ri-star-line',
+                    link: route('tourReview.index')
+                }
+            ]
+        },
+
+
+        {
             label: 'Customers',
             permission: 'customer',
             icon: 'ri-user-star-line',
@@ -48,6 +93,7 @@ export default {
             ]
         },
 
+        
         {
             label: 'Employee',
             permission: 'employee',

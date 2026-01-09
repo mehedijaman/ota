@@ -5,47 +5,62 @@ namespace Modules\Tour\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Modules\Support\Http\Controllers\BackendController;
+use Modules\Support\Traits\EditorImage;
 use Modules\Tour\Http\Requests\TourValidate;
 use Modules\Tour\Models\Tour;
+use Modules\Tour\Services\GetTourCategoryOptions;
+use Modules\Tour\Services\GetTourDestinationOptions;
+use Modules\Tour\Services\TourService;
 
 class TourController extends BackendController
 {
+    use EditorImage;
+
+    public function __construct(
+        protected TourService $tourService
+    ) {}
+
     public function index(): Response
     {
-        $tours = Tour::orderBy('name')
-            ->search(request('searchContext'), request('searchTerm'))
-            ->paginate(request('rowsPerPage', 10))
-            ->withQueryString()
-            ->through(fn ($tour) => [
-                'id' => $tour->id,
-                'name' => $tour->name,
-                'created_at' => $tour->created_at->format('d/m/Y H:i').'h',
-            ]);
-
         return inertia('Tour/TourIndex', [
-            'tours' => $tours,
+            'tours' => $this->tourService->getAll(),
         ]);
     }
 
-    public function create(): Response
-    {
-        return inertia('Tour/TourForm');
+    public function create(
+        GetTourCategoryOptions $categoryOptions,
+        GetTourDestinationOptions $destinationOptions
+    ): Response {
+        return inertia('Tour/TourForm', [
+            'categories' => $categoryOptions->get(),
+            'destinations' => $destinationOptions->get(),
+        ]);
     }
 
     public function store(TourValidate $request): RedirectResponse
     {
-        Tour::create($request->validated());
+        $this->tourService->create($request->validated());
 
         return redirect()->route('tour.index')
-            ->with('success', 'Tour created.');
+            ->with('success', 'Tour created successfully.');
     }
 
-    public function edit(int $id): Response
+    public function show(int $id): Response
     {
-        $tour = Tour::find($id);
+        return inertia('Tour/TourShow', [
+            'tour' => $this->tourService->getById($id),
+        ]);
+    }
 
+    public function edit(
+        GetTourCategoryOptions $categoryOptions,
+        GetTourDestinationOptions $destinationOptions,
+        int $id
+    ): Response {
         return inertia('Tour/TourForm', [
-            'tour' => $tour,
+            'tour' => $this->tourService->getForEdit($id),
+            'categories' => $categoryOptions->get(),
+            'destinations' => $destinationOptions->get(),
         ]);
     }
 
@@ -53,17 +68,22 @@ class TourController extends BackendController
     {
         $tour = Tour::findOrFail($id);
 
-        $tour->update($request->validated());
+        $this->tourService->update($tour, $request->validated());
 
         return redirect()->route('tour.index')
-            ->with('success', 'Tour updated.');
+            ->with('success', 'Tour updated successfully.');
     }
 
     public function destroy(int $id): RedirectResponse
     {
-        Tour::findOrFail($id)->delete();
+        $tour = Tour::findOrFail($id);
+
+        if (! $this->tourService->delete($tour)) {
+            return redirect()->route('tour.index')
+                ->with('error', 'Cannot delete tour with existing bookings.');
+        }
 
         return redirect()->route('tour.index')
-            ->with('success', 'Tour deleted.');
+            ->with('success', 'Tour deleted successfully.');
     }
 }

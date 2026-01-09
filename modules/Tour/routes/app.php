@@ -1,28 +1,65 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Tour\Http\Controllers\TourBookingController;
+use Modules\Tour\Http\Controllers\TourCategoryController;
 use Modules\Tour\Http\Controllers\TourController;
+use Modules\Tour\Http\Controllers\TourDestinationController;
+use Modules\Tour\Http\Controllers\TourReviewController;
 
-Route::get('tour', [
-    TourController::class, 'index',
-])->name('tour.index');
+Route::middleware(['auth', 'verified'])->group(function () {
 
-Route::get('tour/create', [
-    TourController::class, 'create',
-])->name('tour.create');
+    // Tour Categories
+    Route::prefix('tour-categories')->controller(TourCategoryController::class)->name('tourCategory.')->group(function () {
+        Route::get('/', 'index')->name('index')->can('tour-category-list');
+        Route::get('create', 'create')->name('create')->can('tour-category-create');
+        Route::post('/', 'store')->name('store')->can('tour-category-create');
+        Route::get('{id}/edit', 'edit')->name('edit')->can('tour-category-edit');
+        Route::put('{id}', 'update')->name('update')->can('tour-category-edit');
+        Route::delete('{id}', 'destroy')->name('destroy')->can('tour-category-delete');
+    });
 
-Route::post('tour', [
-    TourController::class, 'store',
-])->name('tour.store');
+    // Tour Destinations
+    Route::prefix('tour-destinations')->controller(TourDestinationController::class)->name('tourDestination.')->group(function () {
+        Route::get('/', 'index')->name('index')->can('tour-destination-list');
+        Route::get('create', 'create')->name('create')->can('tour-destination-create');
+        Route::post('/', 'store')->name('store')->can('tour-destination-create');
+        Route::get('{id}/edit', 'edit')->name('edit')->can('tour-destination-edit');
+        Route::put('{id}', 'update')->name('update')->can('tour-destination-edit');
+        Route::delete('{id}', 'destroy')->name('destroy')->can('tour-destination-delete');
+    });
 
-Route::get('tour/{id}/edit', [
-    TourController::class, 'edit',
-])->name('tour.edit');
+    // Tours
+    Route::prefix('tours')->controller(TourController::class)->name('tour.')->group(function () {
+        Route::get('/', 'index')->name('index')->can('tour-list');
+        Route::get('create', 'create')->name('create')->can('tour-create');
+        Route::post('/', 'store')->name('store')->can('tour-create');
+        Route::get('{id}', 'show')->name('show')->can('tour-view');
+        Route::get('{id}/edit', 'edit')->name('edit')->can('tour-edit');
+        Route::put('{id}', 'update')->name('update')->can('tour-edit');
+        Route::delete('{id}', 'destroy')->name('destroy')->can('tour-delete');
+    });
 
-Route::put('tour/{id}', [
-    TourController::class, 'update',
-])->name('tour.update');
+    // Tour Bookings
+    Route::prefix('tour-bookings')->controller(TourBookingController::class)->name('tourBooking.')->group(function () {
+        Route::get('/', 'index')->name('index')->can('tour-booking-list');
+        Route::get('create', 'create')->name('create')->can('tour-booking-create');
+        Route::post('/', 'store')->name('store')->can('tour-booking-create');
+        Route::get('{id}', 'show')->name('show')->can('tour-booking-view');
+        Route::get('{id}/edit', 'edit')->name('edit')->can('tour-booking-edit');
+        Route::put('{id}', 'update')->name('update')->can('tour-booking-edit');
+        Route::patch('{id}/status/{status}', 'updateStatus')->name('updateStatus')->can('tour-booking-edit');
+        Route::delete('{id}', 'destroy')->name('destroy')->can('tour-booking-delete');
+    });
 
-Route::delete('tour/{id}', [
-    TourController::class, 'destroy',
-])->name('tour.destroy');
+    // Tour Reviews
+    Route::prefix('tour-reviews')->controller(TourReviewController::class)->name('tourReview.')->group(function () {
+        Route::get('/', 'index')->name('index')->can('tour-review-list');
+        Route::get('{id}', 'show')->name('show')->can('tour-review-view');
+        Route::patch('{id}/approve', 'approve')->name('approve')->can('tour-review-edit');
+        Route::patch('{id}/reject', 'reject')->name('reject')->can('tour-review-edit');
+        Route::patch('{id}/toggle-featured', 'toggleFeatured')->name('toggleFeatured')->can('tour-review-edit');
+        Route::delete('{id}', 'destroy')->name('destroy')->can('tour-review-delete');
+    });
+
+});

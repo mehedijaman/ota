@@ -1,159 +1,149 @@
 @extends('site-layout')
 
-@section('meta-title', 'Tour Search Results | TriptonicBD')
-@section('meta-description', 'Browse and compare tour packages to amazing destinations.')
+@section('meta-title', 'Search Tours | ' . config('app.name'))
 
-@section('bodyEndScripts')
-    @vite('resources-site/js/index-app.js')
-@endsection
+@section('meta-description', 'Find your perfect tour package. Filter by destination, category, and duration.')
 
 @section('content')
-    <!-- Header -->
-    <div class="bg-linear-to-r from-orange-600 to-amber-600 pt-24 pb-6">
+    <!-- Search Header -->
+    <div class="bg-slate-900 pt-28 pb-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="text-white">
-                    <h1 class="text-2xl md:text-3xl font-bold">Tour Packages</h1>
-                    <p class="text-orange-100 mt-1">Explore 45+ amazing destinations</p>
-                </div>
-                <button class="self-start bg-white/20 hover:bg-white/30 text-white px-5 py-2.5 rounded-xl font-semibold transition-all">
-                    Modify Search
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="bg-slate-50 min-h-screen py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col lg:flex-row gap-8">
-                
-                <!-- Filters Sidebar -->
-                <aside class="w-full lg:w-72 shrink-0">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-24">
-                        <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-lg font-bold text-slate-800">Filters</h2>
-                            <button class="text-sm text-orange-600 font-medium">Reset</button>
-                        </div>
-
-                        <!-- Duration -->
-                        <div class="border-b border-slate-100 pb-5 mb-5">
-                            <h3 class="text-sm font-semibold text-slate-700 mb-3">Duration</h3>
-                            <div class="space-y-2">
-                                @foreach(['1-3 Days', '4-7 Days', '7-14 Days', '14+ Days'] as $d)
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" class="w-4 h-4 rounded text-orange-600">
-                                    <span class="text-sm text-slate-600">{{ $d }}</span>
-                                </label>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <!-- Price Range -->
-                        <div class="border-b border-slate-100 pb-5 mb-5">
-                            <h3 class="text-sm font-semibold text-slate-700 mb-3">Price Range</h3>
-                            <input type="range" min="2000" max="50000" class="w-full accent-orange-600">
-                            <div class="flex justify-between text-xs text-slate-500 mt-2">
-                                <span>৳2,000</span><span>৳50,000</span>
-                            </div>
-                        </div>
-
-                        <!-- Tour Type -->
-                        <div class="border-b border-slate-100 pb-5 mb-5">
-                            <h3 class="text-sm font-semibold text-slate-700 mb-3">Tour Type</h3>
-                            <div class="space-y-2">
-                                @foreach(['Adventure', 'Beach', 'Cultural', 'Nature', 'Wildlife'] as $t)
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" class="w-4 h-4 rounded text-orange-600">
-                                    <span class="text-sm text-slate-600">{{ $t }}</span>
-                                </label>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <!-- Rating -->
-                        <div>
-                            <h3 class="text-sm font-semibold text-slate-700 mb-3">Rating</h3>
-                            <div class="space-y-2">
-                                @foreach(['4.5+ Excellent', '4.0+ Very Good', '3.5+ Good'] as $r)
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="radio" name="rating" class="w-4 h-4 text-orange-600">
-                                    <span class="text-sm text-slate-600">{{ $r }}</span>
-                                </label>
-                                @endforeach
-                            </div>
-                        </div>
+            <h1 class="text-3xl font-bold text-white mb-6">Search Tours</h1>
+            
+            <!-- Filters -->
+            <form action="{{ route('site.tour.search') }}" method="GET" class="bg-white rounded-xl p-6 shadow-lg">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Search</label>
+                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Tour name or keyword..." class="w-full border border-slate-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
                     </div>
-                </aside>
-
-                <!-- Results -->
-                <main class="flex-1">
-                    <div class="bg-white rounded-xl p-4 mb-6 flex items-center justify-between">
-                        <p class="text-slate-600"><span class="font-semibold">45 tours</span> found</p>
-                        <select class="border border-slate-200 rounded-lg px-3 py-2 text-sm">
-                            <option>Recommended</option>
-                            <option>Price (Low to High)</option>
-                            <option>Rating</option>
-                            <option>Duration</option>
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Category</label>
+                        <select name="category" class="w-full border border-slate-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                            @endforeach
                         </select>
                     </div>
-
-                    <div class="grid gap-6">
-                        @foreach([
-                            ['name' => "Cox's Bazar Beach Tour", 'days' => '3 Days', 'rating' => '4.8', 'reviews' => '120', 'price' => '5,500', 'oldPrice' => '7,000', 'img' => 'photo-1548013146-72479768bada', 'badge' => 'BEST SELLER'],
-                            ['name' => 'Sylhet Tea Garden Tour', 'days' => '2 Days', 'rating' => '4.9', 'reviews' => '85', 'price' => '4,200', 'oldPrice' => null, 'img' => 'photo-1596436889106-be35e843f974', 'badge' => null],
-                            ['name' => 'Sajek Valley Adventure', 'days' => '3 Days', 'rating' => '4.7', 'reviews' => '200', 'price' => '6,500', 'oldPrice' => null, 'img' => 'photo-1566863473556-2e8c14771d2b', 'badge' => 'POPULAR'],
-                            ['name' => 'Sundarbans Wildlife Safari', 'days' => '4 Days', 'rating' => '4.6', 'reviews' => '95', 'price' => '8,000', 'oldPrice' => '10,000', 'img' => 'photo-1578559115206-a83d69c6f2a7', 'badge' => null],
-                            ['name' => 'Bandarban Hill Track', 'days' => '3 Days', 'rating' => '4.8', 'reviews' => '150', 'price' => '5,800', 'oldPrice' => null, 'img' => 'photo-1469854523086-cc02fe5d8800', 'badge' => null],
-                            ['name' => 'Saint Martin Island Escape', 'days' => '4 Days', 'rating' => '4.9', 'reviews' => '180', 'price' => '9,500', 'oldPrice' => '12,000', 'img' => 'photo-1507525428034-b723cf961d3e', 'badge' => 'HOT DEAL'],
-                        ] as $idx => $tour)
-                        <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-lg transition-shadow">
-                            <div class="flex flex-col md:flex-row">
-                                <div class="md:w-72 h-56 md:h-auto relative shrink-0">
-                                    <img src="https://images.unsplash.com/{{ $tour['img'] }}?w=600&q=80" alt="{{ $tour['name'] }}" class="w-full h-full object-cover">
-                                    @if($tour['badge'])
-                                    <div class="absolute top-3 left-3 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">{{ $tour['badge'] }}</div>
-                                    @endif
-                                    <button class="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
-                                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                                    </button>
-                                </div>
-                                <div class="flex-1 p-5">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="text-orange-500">★</span>
-                                        <span class="text-sm font-medium">{{ $tour['rating'] }}</span>
-                                        <span class="text-sm text-slate-400">({{ $tour['reviews'] }} reviews)</span>
-                                        <span class="text-xs bg-slate-100 px-2 py-1 rounded ml-auto">{{ $tour['days'] }}</span>
-                                    </div>
-                                    <h3 class="text-xl font-bold text-slate-800 mb-2">
-                                        <a href="{{ route('site.tour.show', $idx + 1) }}" class="hover:text-orange-600">{{ $tour['name'] }}</a>
-                                    </h3>
-                                    <div class="flex flex-wrap gap-2 mb-4">
-                                        <span class="text-xs bg-slate-100 px-2 py-1 rounded">Transport</span>
-                                        <span class="text-xs bg-slate-100 px-2 py-1 rounded">Meals</span>
-                                        <span class="text-xs bg-slate-100 px-2 py-1 rounded">Guide</span>
-                                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Free Cancellation</span>
-                                    </div>
-                                    <div class="flex items-end justify-between pt-4 border-t border-slate-100">
-                                        <div>
-                                            <p class="text-xs text-slate-500">Starting from</p>
-                                            @if($tour['oldPrice'])<span class="text-sm text-slate-400 line-through mr-2">৳{{ $tour['oldPrice'] }}</span>@endif
-                                            <span class="text-2xl font-bold text-orange-600">৳{{ $tour['price'] }}</span>
-                                            <span class="text-xs text-slate-500">/person</span>
-                                        </div>
-                                        <a href="{{ route('site.tour.show', $idx + 1) }}" class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm">View Details</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Destination</label>
+                        <select name="destination" class="w-full border border-slate-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+                            <option value="">All Destinations</option>
+                            @foreach($destinations as $destination)
+                                <option value="{{ $destination->id }}" {{ request('destination') == $destination->id ? 'selected' : '' }}>{{ $destination->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
-
-                    <div class="text-center mt-8">
-                        <button class="bg-white border border-slate-200 px-8 py-3 rounded-xl font-semibold text-slate-700 hover:bg-slate-50">Load More Tours</button>
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Duration</label>
+                        <select name="duration" class="w-full border border-slate-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+                            <option value="">Any Duration</option>
+                            <option value="1-3" {{ request('duration') == '1-3' ? 'selected' : '' }}>1-3 Days</option>
+                            <option value="4-7" {{ request('duration') == '4-7' ? 'selected' : '' }}>4-7 Days</option>
+                            <option value="7+" {{ request('duration') == '7+' ? 'selected' : '' }}>7+ Days</option>
+                        </select>
                     </div>
-                </main>
-            </div>
+                </div>
+                <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm text-slate-600">Sort by:</label>
+                        <select name="sort" onchange="this.form.submit()" class="border border-slate-200 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+                            <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Latest</option>
+                            <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                            <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                            <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Most Popular</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white py-2 px-6 rounded-lg font-medium transition-colors flex items-center gap-2">
+                        <i class="ri-search-line"></i>
+                        Search
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+
+    <!-- Results -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="flex items-center justify-between mb-6">
+            <p class="text-slate-600">
+                <span class="font-bold text-slate-800">{{ $tours->total() }}</span> tours found
+            </p>
+        </div>
+
+        @if($tours->count())
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($tours as $tour)
+            <a href="{{ route('site.tour.show', $tour->slug) }}" class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 overflow-hidden">
+                <div class="h-56 overflow-hidden relative">
+                    <img src="{{ $tour->thumbnail_url ?: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800' }}" alt="{{ $tour->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-lg text-sm font-bold text-slate-800 shadow-sm">
+                        {{ $tour->duration }}
+                    </div>
+                    @if($tour->is_featured)
+                    <div class="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-sm">
+                        Featured
+                    </div>
+                    @endif
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center gap-2 mb-2">
+                        @if($tour->category)
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-lg">{{ $tour->category->name }}</span>
+                        @endif
+                        @if($tour->destination)
+                        <span class="text-xs bg-orange-50 text-orange-600 px-2 py-1 rounded-lg">{{ $tour->destination->name }}</span>
+                        @endif
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-800 mb-1 group-hover:text-orange-600 transition-colors">{{ $tour->name }}</h3>
+                    <p class="text-slate-500 text-sm mb-4 line-clamp-2">{{ $tour->excerpt ?: Str::limit(strip_tags($tour->description), 100) }}</p>
+                    
+                    <div class="flex items-center gap-4 text-sm text-slate-500 mb-4">
+                        <span class="flex items-center gap-1">
+                            <i class="ri-time-line"></i>
+                            {{ $tour->duration }}
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <i class="ri-group-line"></i>
+                            Max {{ $tour->max_group_size ?? 20 }}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-slate-100 pt-4">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-slate-400 font-medium uppercase">From</span>
+                            @if($tour->discount_price && $tour->discount_price < $tour->base_price)
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg font-bold text-orange-600">৳ {{ number_format($tour->discount_price) }}</span>
+                                    <span class="text-sm text-slate-400 line-through">৳ {{ number_format($tour->base_price) }}</span>
+                                </div>
+                            @else
+                                <span class="text-lg font-bold text-orange-600">৳ {{ number_format($tour->base_price) }}</span>
+                            @endif
+                        </div>
+                        <span class="bg-orange-50 text-orange-600 py-2 px-4 rounded-lg font-medium group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                            View Details
+                        </span>
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+
+        <div class="mt-10">
+            {{ $tours->links() }}
+        </div>
+        @else
+        <div class="text-center py-16 bg-slate-50 rounded-2xl">
+            <i class="ri-compass-3-line text-6xl text-slate-300 mb-4"></i>
+            <h3 class="text-xl font-bold text-slate-700 mb-2">No tours found</h3>
+            <p class="text-slate-500 mb-6">Try adjusting your search filters</p>
+            <a href="{{ route('site.tour.search') }}" class="inline-flex items-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-700 transition-colors">
+                <i class="ri-refresh-line"></i>
+                Clear Filters
+            </a>
+        </div>
+        @endif
+    </section>
 @endsection
