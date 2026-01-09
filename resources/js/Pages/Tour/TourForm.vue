@@ -383,6 +383,110 @@
                 </div>
             </div>
 
+            <!-- Media Tab -->
+            <div v-show="activeTab === 'media'" class="space-y-6">
+                <!-- Thumbnail -->
+                <div>
+                    <AppLabel>Featured Image (Thumbnail)</AppLabel>
+                    <div class="mt-2">
+                        <div v-if="thumbnailPreview || props.tour?.thumbnail_url" class="relative inline-block mb-4">
+                            <img
+                                :src="thumbnailPreview || props.tour?.thumbnail_url"
+                                class="h-48 w-64 rounded-xl object-cover border-2 border-slate-200"
+                                alt="Thumbnail preview"
+                            />
+                            <button
+                                type="button"
+                                @click="removeThumbnail"
+                                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                            >
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="cursor-pointer">
+                                <span class="btn btn-secondary">
+                                    <i class="ri-image-add-line mr-2"></i>
+                                    {{ thumbnailPreview || props.tour?.thumbnail_url ? 'Change Image' : 'Upload Image' }}
+                                </span>
+                                <input
+                                    type="file"
+                                    class="hidden"
+                                    accept="image/*"
+                                    @change="handleThumbnailChange"
+                                />
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">Recommended: 800x600 pixels, JPG or PNG</p>
+                    </div>
+                </div>
+
+                <!-- Gallery -->
+                <div>
+                    <AppLabel>Gallery Images</AppLabel>
+                    <div class="mt-2">
+                        <div v-if="galleryPreviews.length > 0 || (props.tour?.gallery && props.tour.gallery.length > 0)" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
+                            <!-- Existing gallery images -->
+                            <div
+                                v-for="image in props.tour?.gallery || []"
+                                :key="'existing-' + image.id"
+                                class="relative group"
+                                v-show="!removedGalleryIds.includes(image.id)"
+                            >
+                                <img
+                                    :src="image.url"
+                                    class="h-32 w-full rounded-xl object-cover border-2 border-slate-200"
+                                    :alt="image.name"
+                                />
+                                <button
+                                    type="button"
+                                    @click="removeExistingGalleryImage(image.id)"
+                                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <i class="ri-close-line"></i>
+                                </button>
+                            </div>
+                            <!-- New gallery previews -->
+                            <div
+                                v-for="(preview, index) in galleryPreviews"
+                                :key="'new-' + index"
+                                class="relative group"
+                            >
+                                <img
+                                    :src="preview"
+                                    class="h-32 w-full rounded-xl object-cover border-2 border-emerald-300"
+                                    alt="New gallery image"
+                                />
+                                <button
+                                    type="button"
+                                    @click="removeNewGalleryImage(index)"
+                                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <i class="ri-close-line"></i>
+                                </button>
+                                <span class="absolute bottom-2 left-2 bg-emerald-500 text-white text-xs px-2 py-0.5 rounded">New</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="cursor-pointer">
+                                <span class="btn btn-secondary">
+                                    <i class="ri-image-add-line mr-2"></i>
+                                    Add Gallery Images
+                                </span>
+                                <input
+                                    type="file"
+                                    class="hidden"
+                                    accept="image/*"
+                                    multiple
+                                    @change="handleGalleryChange"
+                                />
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">You can select multiple images at once</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- SEO Tab -->
             <div v-show="activeTab === 'seo'" class="space-y-4">
                 <div>
@@ -452,6 +556,7 @@ const tabs = [
     { id: 'pricing', label: 'Pricing' },
     { id: 'itinerary', label: 'Itinerary' },
     { id: 'inclusions', label: 'Inclusions' },
+    { id: 'media', label: 'Media' },
     { id: 'seo', label: 'SEO' }
 ]
 
@@ -505,7 +610,11 @@ const form = useForm({
     meta_keywords: props.tour?.meta_keywords || '',
     itineraries: props.tour?.itineraries || [],
     inclusions: props.tour?.inclusions || [''],
-    exclusions: props.tour?.exclusions || ['']
+    exclusions: props.tour?.exclusions || [''],
+    thumbnail: null,
+    gallery: [],
+    remove_thumbnail: false,
+    remove_gallery_ids: []
 })
 
 const { isCreate, isEdit } = useFormContext()
@@ -543,12 +652,58 @@ const submitForm = () => {
     form.exclusions = form.exclusions.filter(e => e.trim())
 
     if (isCreate.value) {
-        form.post(route('tour.store'))
+        form.post(route('tour.store'), {
+            forceFormData: true
+        })
     }
     if (isEdit.value) {
-        form.put(route('tour.update', props.tour.id))
+        form.transform(data => ({
+            ...data,
+            _method: 'PUT'
+        })).post(route('tour.update', props.tour.id), {
+            forceFormData: true
+        })
     }
 }
 
 const { errorsFields } = useFormErrors()
+
+// Media handling
+const thumbnailPreview = ref(null)
+const galleryPreviews = ref([])
+const galleryFiles = ref([])
+const removedGalleryIds = ref([])
+
+const handleThumbnailChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        form.thumbnail = file
+        form.remove_thumbnail = false
+        thumbnailPreview.value = URL.createObjectURL(file)
+    }
+}
+
+const removeThumbnail = () => {
+    form.thumbnail = null
+    form.remove_thumbnail = true
+    thumbnailPreview.value = null
+}
+
+const handleGalleryChange = (event) => {
+    const files = Array.from(event.target.files)
+    files.forEach(file => {
+        form.gallery.push(file)
+        galleryPreviews.value.push(URL.createObjectURL(file))
+    })
+}
+
+const removeNewGalleryImage = (index) => {
+    form.gallery.splice(index, 1)
+    galleryPreviews.value.splice(index, 1)
+}
+
+const removeExistingGalleryImage = (id) => {
+    removedGalleryIds.value.push(id)
+    form.remove_gallery_ids.push(id)
+}
 </script>

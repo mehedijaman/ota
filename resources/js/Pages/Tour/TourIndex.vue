@@ -30,6 +30,20 @@
                     </AppDataTableData>
 
                     <AppDataTableData>
+                        <div class="h-12 w-16 overflow-hidden rounded-lg bg-slate-100">
+                            <img
+                                v-if="item.thumbnail_url"
+                                :src="item.thumbnail_url"
+                                :alt="item.name"
+                                class="h-full w-full object-cover"
+                            />
+                            <div v-else class="flex h-full w-full items-center justify-center text-slate-400">
+                                <i class="ri-image-line text-xl"></i>
+                            </div>
+                        </div>
+                    </AppDataTableData>
+
+                    <AppDataTableData>
                         <div class="flex flex-col">
                             <span class="font-medium text-slate-900">{{ item.name }}</span>
                             <span class="text-xs text-slate-500">{{ item.code }}</span>
@@ -135,7 +149,7 @@ const breadCrumb = [
     { label: 'Tours', last: true }
 ]
 
-const headers = ['ID', 'Tour', 'Category', 'Destination', 'Duration', 'Price', 'Status', 'Actions']
+const headers = ['ID', 'Image', 'Tour', 'Category', 'Destination', 'Duration', 'Price', 'Status', 'Actions']
 
 const formatNumber = (num) => {
     return new Intl.NumberFormat('en-BD').format(num)

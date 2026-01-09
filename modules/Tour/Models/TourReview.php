@@ -6,10 +6,11 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Support\Models\BaseModel;
+use Modules\Support\Traits\Searchable;
 
 class TourReview extends BaseModel
 {
-    use SoftDeletes;
+    use Searchable, SoftDeletes;
 
     protected $table = 'tour_reviews';
 

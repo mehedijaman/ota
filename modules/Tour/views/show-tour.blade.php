@@ -48,6 +48,26 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Main Content -->
             <div class="lg:col-span-2 space-y-8">
+                <!-- Photo Gallery -->
+                @php
+                    $gallery = $tour->getMedia('gallery');
+                @endphp
+                @if($gallery->count())
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Photo Gallery</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        @foreach($gallery as $index => $image)
+                        <a href="{{ $image->getUrl() }}" target="_blank" class="group relative aspect-4/3 rounded-xl overflow-hidden">
+                            <img src="{{ $image->getUrl() }}" alt="{{ $tour->name }} - Photo {{ $index + 1 }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <i class="ri-zoom-in-line text-3xl text-white"></i>
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <!-- Overview Card -->
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <h2 class="text-2xl font-bold text-slate-800 mb-4">Overview</h2>

@@ -68,6 +68,42 @@
                     />
                 </div>
 
+                <!-- Image Upload -->
+                <div class="border-t pt-4">
+                    <h4 class="font-medium mb-2">Category Image</h4>
+                    <div>
+                        <div v-if="imagePreview || props.category?.image_url" class="relative inline-block mb-4">
+                            <img
+                                :src="imagePreview || props.category?.image_url"
+                                class="h-40 w-56 rounded-xl object-cover border-2 border-slate-200"
+                                alt="Category image"
+                            />
+                            <button
+                                type="button"
+                                @click="removeImage"
+                                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                            >
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="cursor-pointer">
+                                <span class="btn btn-secondary">
+                                    <i class="ri-image-add-line mr-2"></i>
+                                    {{ imagePreview || props.category?.image_url ? 'Change Image' : 'Upload Image' }}
+                                </span>
+                                <input
+                                    type="file"
+                                    class="hidden"
+                                    accept="image/*"
+                                    @change="handleImageChange"
+                                />
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">Recommended: 800x600 pixels, JPG or PNG</p>
+                    </div>
+                </div>
+
                 <div class="border-t pt-4">
                     <h4 class="font-medium mb-2">SEO Settings</h4>
                     <div class="space-y-4">
@@ -133,6 +169,8 @@ const form = useForm({
     sort_order: props.category?.sort_order || 0,
     meta_title: props.category?.meta_title || '',
     meta_description: props.category?.meta_description || '',
+    image: null,
+    remove_image: false,
 })
 
 const { isCreate, isEdit } = useFormContext()
@@ -147,12 +185,38 @@ const generateSlug = () => {
 
 const submitForm = () => {
     if (isCreate.value) {
-        form.post(route('tourCategory.store'))
+        form.post(route('tourCategory.store'), {
+            forceFormData: true
+        })
     }
     if (isEdit.value) {
-        form.put(route('tourCategory.update', props.category.id))
+        form.transform(data => ({
+            ...data,
+            _method: 'PUT'
+        })).post(route('tourCategory.update', props.category.id), {
+            forceFormData: true
+        })
     }
 }
 
 const { errorsFields } = useFormErrors()
+
+// Image handling
+import { ref } from 'vue'
+const imagePreview = ref(null)
+
+const handleImageChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        form.image = file
+        form.remove_image = false
+        imagePreview.value = URL.createObjectURL(file)
+    }
+}
+
+const removeImage = () => {
+    form.image = null
+    form.remove_image = true
+    imagePreview.value = null
+}
 </script>

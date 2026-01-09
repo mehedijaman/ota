@@ -30,6 +30,20 @@
                     </AppDataTableData>
 
                     <AppDataTableData>
+                        <div class="h-10 w-14 overflow-hidden rounded-lg bg-slate-100">
+                            <img
+                                v-if="item.image_url"
+                                :src="item.image_url"
+                                :alt="item.name"
+                                class="h-full w-full object-cover"
+                            />
+                            <div v-else class="flex h-full w-full items-center justify-center text-slate-400">
+                                <i class="ri-image-line"></i>
+                            </div>
+                        </div>
+                    </AppDataTableData>
+
+                    <AppDataTableData>
                         <span class="font-medium">{{ item.name }}</span>
                     </AppDataTableData>
 
@@ -119,7 +133,7 @@ const breadCrumb = [
     { label: 'Tour Destinations', last: true }
 ]
 
-const headers = ['ID', 'Name', 'Country', 'City', 'Tours', 'Status', 'Actions']
+const headers = ['ID', 'Image', 'Name', 'Country', 'City', 'Tours', 'Status', 'Actions']
 
 const confirmDialogRef = ref(null)
 const confirmDelete = (deleteRoute) => {

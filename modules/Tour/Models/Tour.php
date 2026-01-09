@@ -236,6 +236,14 @@ class Tour extends BaseModel implements HasMedia
     }
 
     /**
+     * Get thumbnail URL attribute.
+     */
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl('thumbnail') ?: null;
+    }
+
+    /**
      * Register media collections.
      */
     public function registerMediaCollections(): void
