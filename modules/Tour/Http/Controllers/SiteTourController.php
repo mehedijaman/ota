@@ -120,9 +120,6 @@ class SiteTourController extends SiteController
             ])
             ->firstOrFail();
 
-        // Increment view count
-        $tour->increment('view_count');
-
         // Related tours
         $relatedTours = Tour::query()
             ->active()

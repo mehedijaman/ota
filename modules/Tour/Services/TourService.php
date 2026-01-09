@@ -34,18 +34,101 @@ class TourService
             ]);
     }
 
-    public function getById(int $id): Tour
+    public function getById(int $id): array
     {
-        return Tour::with([
+        $tour = Tour::with([
             'category',
             'destination',
             'itineraries',
             'inclusions',
             'exclusions',
             'highlights',
+            'faqs',
             'pricings',
+            'extras',
             'departureDates' => fn ($q) => $q->upcoming()->limit(10),
+            'reviews' => fn ($q) => $q->approved()->latest()->limit(5),
         ])->findOrFail($id);
+
+        return [
+            'id' => $tour->id,
+            'name' => $tour->name,
+            'code' => $tour->code,
+            'slug' => $tour->slug,
+            'excerpt' => $tour->excerpt,
+            'description' => $tour->description,
+            'duration_days' => $tour->duration_days,
+            'duration_nights' => $tour->duration_nights,
+            'duration' => $tour->duration,
+            'difficulty_level' => $tour->difficulty_level,
+            'tour_type' => $tour->tour_type,
+            'min_group_size' => $tour->min_group_size,
+            'max_group_size' => $tour->max_group_size,
+            'base_price' => $tour->base_price,
+            'discount_price' => $tour->discount_price,
+            'child_price' => $tour->child_price,
+            'infant_price' => $tour->infant_price,
+            'deposit_amount' => $tour->deposit_amount,
+            'deposit_type' => $tour->deposit_type,
+            'cancellation_days' => $tour->cancellation_days,
+            'start_location' => $tour->start_location,
+            'end_location' => $tour->end_location,
+            'languages' => $tour->languages,
+            'is_featured' => $tour->is_featured,
+            'is_bestseller' => $tour->is_bestseller,
+            'is_active' => $tour->is_active,
+            'average_rating' => $tour->average_rating,
+            'reviews_count' => $tour->reviews_count,
+            'meta_title' => $tour->meta_title,
+            'meta_description' => $tour->meta_description,
+            'created_at' => $tour->created_at?->format('M d, Y H:i'),
+            'updated_at' => $tour->updated_at?->format('M d, Y H:i'),
+            'category' => $tour->category ? [
+                'id' => $tour->category->id,
+                'name' => $tour->category->name,
+            ] : null,
+            'destination' => $tour->destination ? [
+                'id' => $tour->destination->id,
+                'name' => $tour->destination->name,
+            ] : null,
+            'thumbnail_url' => $tour->getFirstMediaUrl('thumbnail'),
+            'gallery' => $tour->getMedia('gallery')->map(fn ($m) => [
+                'id' => $m->id,
+                'url' => $m->getUrl(),
+                'name' => $m->file_name,
+            ])->toArray(),
+            'itineraries' => $tour->itineraries->map(fn ($i) => [
+                'day_number' => $i->day_number,
+                'title' => $i->title,
+                'description' => $i->description,
+                'meals_included' => $i->meals_included,
+                'accommodation' => $i->accommodation,
+            ])->toArray(),
+            'inclusions' => $tour->inclusions->pluck('title')->toArray(),
+            'exclusions' => $tour->exclusions->pluck('title')->toArray(),
+            'highlights' => $tour->highlights->pluck('title')->toArray(),
+            'faqs' => $tour->faqs->map(fn ($f) => [
+                'question' => $f->question,
+                'answer' => $f->answer,
+            ])->toArray(),
+            'extras' => $tour->extras->map(fn ($e) => [
+                'id' => $e->id,
+                'name' => $e->name,
+                'price' => $e->price,
+            ])->toArray(),
+            'departure_dates' => $tour->departureDates->map(fn ($d) => [
+                'id' => $d->id,
+                'date' => $d->departure_date->format('M d, Y'),
+                'available' => $d->available_slots - $d->booked_slots,
+                'status' => $d->status,
+            ])->toArray(),
+            'reviews' => $tour->reviews->map(fn ($r) => [
+                'rating' => $r->rating,
+                'reviewer_name' => $r->reviewer_name,
+                'comment' => $r->comment,
+                'created_at' => $r->created_at->format('M d, Y'),
+            ])->toArray(),
+        ];
     }
 
     public function getForEdit(int $id): array
