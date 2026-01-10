@@ -1,13 +1,13 @@
 <?php
 
-use Modules\Tour\Models\Tour;
-use Modules\Tour\Models\TourPricing;
-use Modules\Tour\Models\TourExtra;
-use Modules\Tour\Models\TourBooking;
-use Tests\TestCase;
-use Modules\Customer\Models\Customer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Customer\Models\Customer;
+use Modules\Tour\Models\Tour;
+use Modules\Tour\Models\TourBooking;
+use Modules\Tour\Models\TourExtra;
+use Modules\Tour\Models\TourPricing;
+use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
@@ -17,13 +17,13 @@ beforeEach(function () {
         'profile_type' => 'customer',
         'profile_id' => $this->customer->id,
     ]);
-    
+
     $this->tour = Tour::factory()->create([
         'name' => 'Sundarbans Adventure',
         'slug' => 'sundarbans-adventure',
         'is_active' => true,
     ]);
-    
+
     $this->pricing = TourPricing::factory()->create([
         'tour_id' => $this->tour->id,
         'name' => 'Standard Package',
@@ -31,7 +31,7 @@ beforeEach(function () {
         'child_price' => 3000,
         'infant_price' => 1000,
     ]);
-    
+
     $this->extra = TourExtra::factory()->create([
         'tour_id' => $this->tour->id,
         'name' => 'Airport Transfer',
@@ -142,9 +142,9 @@ describe('Tour Booking Flow', function () {
             ->post(route('site.tour.submitBooking', $this->tour->slug), $bookingData);
 
         $booking = TourBooking::where('customer_id', $this->customer->id)->first();
-        
+
         // 2 adults * 5000 + 1 child * 3000 + 1 infant * 1000 = 14000
-        expect((float)$booking->total_amount)->toBe(14000.0);
+        expect((float) $booking->total_amount)->toBe(14000.0);
     });
 
     it('includes extras in total calculation', function () {
@@ -171,9 +171,9 @@ describe('Tour Booking Flow', function () {
             ->post(route('site.tour.submitBooking', $this->tour->slug), $bookingData);
 
         $booking = TourBooking::where('customer_id', $this->customer->id)->first();
-        
+
         // 1 adult * 5000 + 2 extras * 1000 = 7000
-        expect((float)$booking->total_amount)->toBe(7000.0)
+        expect((float) $booking->total_amount)->toBe(7000.0)
             ->and($booking->extras)->toHaveCount(1)
             ->and($booking->extras->first()->quantity)->toBe(2);
     });
@@ -298,8 +298,8 @@ describe('Payment Flow', function () {
     it('prevents access to other users bookings', function () {
         $otherCustomer = Customer::factory()->create();
         $otherUser = User::factory()->create([
-             'profile_type' => 'customer',
-             'profile_id' => $otherCustomer->id, 
+            'profile_type' => 'customer',
+            'profile_id' => $otherCustomer->id,
         ]);
 
         $booking = TourBooking::factory()->create([
@@ -319,12 +319,15 @@ describe('Payment Flow', function () {
             'tour_id' => $this->tour->id,
             'pricing_id' => $this->pricing->id,
             'customer_id' => $this->customer->id,
+            'created_by' => $this->user->id,
             'payment_status' => 'unpaid',
         ]);
 
         $response = $this->actingAs($this->user)
             ->post(route('site.tour.processPayment', $booking->booking_number), [
                 'payment_gateway' => 'manual',
+                'transaction_number' => 'BANK-TXN-123456',
+                'notes' => 'Paid via bank transfer',
             ]);
 
         $response->assertRedirect(route('site.tour.bookingConfirmation', [
@@ -333,7 +336,107 @@ describe('Payment Flow', function () {
         ]));
 
         $booking->refresh();
-        expect($booking->payment_method)->toBe('manual');
+        expect($booking->status)->toBe('processing')
+            ->and($booking->payments)->toHaveCount(1)
+            ->and($booking->payments->first()->gateway_transaction_id)->toBe('BANK-TXN-123456')
+            ->and($booking->payments->first()->status)->toBe('pending');
+    });
+
+    it('validates payment gateway selection', function () {
+        $booking = TourBooking::factory()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+            'created_by' => $this->user->id,
+            'payment_status' => 'unpaid',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('site.tour.processPayment', $booking->booking_number), [
+                'payment_gateway' => 'invalid_gateway',
+            ]);
+
+        $response->assertSessionHasErrors('payment_gateway');
+    });
+
+    it('requires transaction number for manual payment', function () {
+        $booking = TourBooking::factory()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+            'created_by' => $this->user->id,
+            'payment_status' => 'unpaid',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('site.tour.processPayment', $booking->booking_number), [
+                'payment_gateway' => 'manual',
+            ]);
+
+        $response->assertSessionHasErrors('transaction_number');
+    });
+
+    it('handles bkash callback with success status', function () {
+        $booking = TourBooking::factory()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+            'created_by' => $this->user->id,
+            'payment_status' => 'unpaid',
+            'total_amount' => 5000,
+        ]);
+
+        // Mock the bKash service
+        $mockBkash = $this->mock(\Ihasan\Bkash\Bkash::class);
+        $mockBkash->shouldReceive('executePayment')
+            ->once()
+            ->with('BKASH_PAYMENT_123')
+            ->andReturn([
+                'trxID' => 'TRX123456789',
+                'transactionStatus' => 'Completed',
+                'amount' => '5000',
+                'currency' => 'BDT',
+                'statusCode' => '0000',
+                'statusMessage' => 'Successful',
+            ]);
+
+        $response = $this->get(route('site.tour.payment.bkash.callback', [
+            'booking' => $booking->booking_number,
+            'paymentID' => 'BKASH_PAYMENT_123',
+            'status' => 'success',
+        ]));
+
+        $response->assertRedirect(route('site.tour.bookingConfirmation', [
+            'slug' => $this->tour->slug,
+            'booking' => $booking->booking_number,
+        ]));
+
+        $booking->refresh();
+        expect($booking->payment_status)->toBe('paid')
+            ->and($booking->status)->toBe('confirmed')
+            ->and($booking->payments)->toHaveCount(1)
+            ->and($booking->payments->first()->gateway_transaction_id)->toBe('TRX123456789');
+    });
+
+    it('handles bkash callback with failed status', function () {
+        $booking = TourBooking::factory()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+            'created_by' => $this->user->id,
+            'payment_status' => 'unpaid',
+        ]);
+
+        $response = $this->get(route('site.tour.payment.bkash.callback', [
+            'booking' => $booking->booking_number,
+            'paymentID' => 'BKASH_PAYMENT_123',
+            'status' => 'cancel',
+        ]));
+
+        $response->assertRedirect(route('site.tour.payment', $booking->booking_number));
+
+        $booking->refresh();
+        expect($booking->payment_status)->toBe('unpaid');
     });
 });
 
@@ -359,8 +462,8 @@ describe('Booking Confirmation', function () {
     it('prevents access to other users booking confirmations', function () {
         $otherCustomer = Customer::factory()->create();
         $otherUser = User::factory()->create([
-             'profile_type' => 'customer',
-             'profile_id' => $otherCustomer->id, 
+            'profile_type' => 'customer',
+            'profile_id' => $otherCustomer->id,
         ]);
 
         $booking = TourBooking::factory()->create([

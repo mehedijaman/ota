@@ -23,6 +23,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
 
+        // Exclude SSLCommerz callback routes from CSRF verification
+        $middleware->validateCsrfTokens(except: [
+            'tours/payment/*/success',
+            'tours/payment/*/fail',
+            'tours/payment/*/cancel',
+            'tours/payment/*/ipn',
+        ]);
+
         // Configure authentication redirects
         $middleware->redirectGuestsTo(fn () => route('auth.loginForm'));
         $middleware->redirectUsersTo(fn () => route('site.index'));

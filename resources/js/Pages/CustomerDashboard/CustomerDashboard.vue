@@ -1,5 +1,4 @@
 <template>
-    <CustomerLayout>
         <div
             class="border-neutral-4 bg-neutral-2 mt-6 flex flex-col justify-between rounded-md border px-4 py-2 shadow-2xs md:flex-row"
         >
@@ -50,7 +49,6 @@
                 </div>
             </div>
         </div>
-    </CustomerLayout>
 </template>
 <script setup>
 import { Head } from '@inertiajs/vue3'

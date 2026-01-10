@@ -7,11 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Modules\Support\Http\Controllers\SiteController;
 use Modules\Tour\Models\Tour;
+use Modules\Tour\Models\TourBooking;
+use Modules\Tour\Models\TourBookingPayment;
 use Modules\Tour\Models\TourCategory;
 use Modules\Tour\Models\TourDestination;
 use Modules\Tour\Services\TourBookingService;
-use Raziul\Sslcommerz\Sslcommerz;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Raziul\Sslcommerz\Facades\Sslcommerz;
 
 class SiteTourController extends SiteController
 {
@@ -222,7 +223,7 @@ class SiteTourController extends SiteController
             + ($infantsCount * ($pricing->infant_price ?? 0));
 
         $extrasTotal = 0;
-        if (!empty($validated['extras'])) {
+        if (! empty($validated['extras'])) {
             foreach ($validated['extras'] as $extraData) {
                 $extra = $tour->extras()->findOrFail($extraData['extra_id']);
                 $extrasTotal += $extra->price * $extraData['quantity'];
@@ -273,7 +274,7 @@ class SiteTourController extends SiteController
         }
 
         // Create extras
-        if (!empty($validated['extras'])) {
+        if (! empty($validated['extras'])) {
             foreach ($validated['extras'] as $extraData) {
                 $extra = $tour->extras()->findOrFail($extraData['extra_id']);
                 $booking->extras()->create([
@@ -292,7 +293,7 @@ class SiteTourController extends SiteController
             if (auth()->user()->profile_type === 'customer' && auth()->user()->profile_id) {
                 $customer = \Modules\Customer\Models\Customer::find(auth()->user()->profile_id);
             }
-            
+
             // Send confirmation to customer
             if ($customer) {
                 $customer->notify(new \Modules\Tour\Notifications\BookingConfirmationNotification($booking));
@@ -309,7 +310,7 @@ class SiteTourController extends SiteController
                     ->notify(new \Modules\Tour\Notifications\AdminBookingNotification($booking));
             }
         } catch (\Exception $e) {
-            \Log::error('Booking notification failed: ' . $e->getMessage());
+            \Log::error('Booking notification failed: '.$e->getMessage());
         }
 
         // Store booking ID in session
@@ -339,7 +340,7 @@ class SiteTourController extends SiteController
             ->firstOrFail();
 
         // Verify user owns this booking
-        if ($bookingRecord->created_by !== auth()->id() && 
+        if ($bookingRecord->created_by !== auth()->id() &&
             ($bookingRecord->customer_id !== auth()->user()->profile_id || auth()->user()->profile_type !== 'customer')) {
             abort(403, 'Unauthorized access to this booking');
         }
@@ -392,7 +393,7 @@ class SiteTourController extends SiteController
             ->firstOrFail();
 
         // Verify user owns this booking
-        if ($bookingRecord->created_by !== auth()->id() && 
+        if ($bookingRecord->created_by !== auth()->id() &&
             ($bookingRecord->customer_id !== auth()->user()->profile_id || auth()->user()->profile_type !== 'customer')) {
             abort(403, 'Unauthorized access to this booking');
         }
@@ -417,7 +418,7 @@ class SiteTourController extends SiteController
             ->firstOrFail();
 
         // Verify user owns this booking
-        if ($bookingRecord->created_by !== auth()->id() && 
+        if ($bookingRecord->created_by !== auth()->id() &&
             ($bookingRecord->customer_id !== auth()->user()->profile_id || auth()->user()->profile_type !== 'customer')) {
             abort(403, 'Unauthorized access to this booking');
         }
@@ -452,176 +453,270 @@ class SiteTourController extends SiteController
         }
     }
 
-    protected function initiateSslcommerzPayment($booking)
+    protected function initiateSslcommerzPayment(TourBooking $booking): RedirectResponse
     {
         try {
-            $sslcommerz = app(\Raziul\Sslcommerz\SslcommerzClient::class);
+            $config = config('sslcommerz');
 
-            $sslcommerz->setAmount($booking->total_amount);
-            $sslcommerz->setTransactionId($booking->booking_number);
-            $sslcommerz->setProductName('Tour Booking - ' . $booking->tour->name);
-            $sslcommerz->setProductCategory('Tour');
-            $sslcommerz->setCustomerName($booking->contact_name);
-            $sslcommerz->setCustomerEmail($booking->contact_email);
-            $sslcommerz->setCustomerPhone($booking->contact_phone);
-            $sslcommerz->setCustomerAddress($booking->contact_address ?? 'N/A');
-            $sslcommerz->setCustomerCity('Dhaka');
-            $sslcommerz->setCustomerCountry('Bangladesh');
+            if (empty($config['store']['id']) || empty($config['store']['password'])) {
+                \Log::error('SSLCommerz credentials not configured');
 
-            // Set callback URLs
-            $sslcommerz->setSuccessUrl(route('site.tour.payment.success', ['booking' => $booking->booking_number]));
-            $sslcommerz->setFailUrl(route('site.tour.payment.fail', ['booking' => $booking->booking_number]));
-            $sslcommerz->setCancelUrl(route('site.tour.payment.cancel', ['booking' => $booking->booking_number]));
-
-            $response = $sslcommerz->initiate();
-
-            if ($response->isSuccessful()) {
-                return redirect($response->getRedirectUrl());
+                return back()->with('error', 'Payment gateway is not configured. Please contact support.');
             }
 
-            return back()->with('error', 'Failed to initiate payment. Please try again.');
+            // Use the Facade as per documentation
+            $response = Sslcommerz::setOrder(
+                $booking->total_amount,
+                $booking->booking_number,
+                'Tour Booking - '.$booking->tour->name
+            )
+                ->setCustomer(
+                    $booking->contact_name,
+                    $booking->contact_email,
+                    $booking->contact_phone ?? '01700000000'
+                )
+                ->setShippingInfo(
+                    $booking->total_travelers,
+                    $booking->contact_address ?? 'N/A'
+                )
+                ->setProductProfile('general')
+                ->setCallbackUrls(
+                    successUrl: route('site.tour.payment.success', ['booking' => $booking->booking_number]),
+                    failedUrl: route('site.tour.payment.fail', ['booking' => $booking->booking_number]),
+                    cancelUrl: route('site.tour.payment.cancel', ['booking' => $booking->booking_number]),
+                    ipnUrl: route('site.tour.payment.ipn', ['booking' => $booking->booking_number])
+                )
+                ->makePayment();
+
+            if ($response->success() && $response->gatewayPageURL()) {
+                return redirect($response->gatewayPageURL());
+            }
+
+            \Log::error('SSLCommerz initiation failed', [
+                'booking' => $booking->booking_number,
+                'response' => $response->toArray(),
+            ]);
+
+            return back()->with('error', 'Failed to initiate payment. '.($response->failedReason() ?? 'Please try again.'));
         } catch (\Exception $e) {
-            \Log::error('SSLCommerz payment error: ' . $e->getMessage());
+            \Log::error('SSLCommerz payment error: '.$e->getMessage(), [
+                'booking' => $booking->booking_number,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             return back()->with('error', 'Payment gateway error. Please try again or contact support.');
         }
     }
 
-    protected function initiateBkashPayment($booking)
+    protected function initiateBkashPayment(TourBooking $booking): RedirectResponse
     {
         try {
             $bkash = app(\Ihasan\Bkash\Bkash::class);
 
+            // Create payment with bKash
             $response = $bkash->createPayment([
                 'amount' => $booking->total_amount,
-                'invoice' => $booking->booking_number,
+                'merchant_invoice_number' => $booking->booking_number,
+                'payer_reference' => $booking->contact_phone ?? $booking->contact_email,
+                'callback_url' => route('site.tour.payment.bkash.callback', ['booking' => $booking->booking_number]),
                 'intent' => 'sale',
             ]);
 
+            // bKash returns bkashURL for redirect
             if (isset($response['bkashURL'])) {
                 return redirect($response['bkashURL']);
             }
 
-            return back()->with('error', 'Failed to initiate bKash payment. Please try again.');
+            \Log::error('bKash payment creation failed', [
+                'booking' => $booking->booking_number,
+                'response' => $response,
+            ]);
+
+            return back()->with('error', 'Failed to initiate bKash payment. '.($response['statusMessage'] ?? 'Please try again.'));
         } catch (\Exception $e) {
-            \Log::error('bKash payment error: ' . $e->getMessage());
+            \Log::error('bKash payment error: '.$e->getMessage(), [
+                'booking' => $booking->booking_number,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             return back()->with('error', 'Payment gateway error. Please try again or contact support.');
         }
     }
 
-    protected function handleManualPayment($booking)
+    protected function handleManualPayment(TourBooking $booking): RedirectResponse
     {
         $transactionNumber = request('transaction_number');
         $notes = request('notes');
 
-        // Update booking with manual payment instructions and transaction details
+        // Update booking with manual payment pending status
+        // payment_status remains 'unpaid' until admin verifies the manual payment
         $booking->update([
-            'payment_method' => 'manual',
-            'status' => 'pending', // Explicitly set status to pending
-            'payment_status' => 'pending', // Payment is pending verification
-            'notes' => ($booking->notes ?? '') . "\n\nManual Payment Request:" . 
-                       "\nTransaction ID: " . $transactionNumber . 
-                       "\nNotes: " . $notes . 
-                       "\nRequested at: " . now()->format('Y-m-d H:i:s'),
+            'status' => 'processing',
+            'internal_notes' => ($booking->internal_notes ?? '')."\n\nManual Payment Request:".
+                       "\nTransaction ID: ".$transactionNumber.
+                       "\nNotes: ".$notes.
+                       "\nRequested at: ".now()->format('Y-m-d H:i:s'),
         ]);
 
         // Create a payment record for the manual transaction
         $booking->payments()->create([
+            'transaction_id' => TourBookingPayment::generateTransactionId(),
             'amount' => $booking->total_amount,
             'payment_method' => 'manual',
-            'transaction_id' => $transactionNumber,
+            'payment_gateway' => 'manual',
+            'gateway_transaction_id' => $transactionNumber,
             'status' => 'pending',
-            'payment_details' => [
+            'type' => 'full',
+            'gateway_response' => [
                 'notes' => $notes,
                 'user_ip' => request()->ip(),
+                'submitted_at' => now()->toIso8601String(),
             ],
+            'notes' => $notes,
         ]);
 
         return redirect()->route('site.tour.bookingConfirmation', [
             'slug' => $booking->tour->slug,
             'booking' => $booking->booking_number,
-        ])->with('success', 'Manual payment submitted! We will verify your transaction (' . $transactionNumber . ') and confirm your booking shortly.');
+        ])->with('success', 'Manual payment submitted! We will verify your transaction ('.$transactionNumber.') and confirm your booking shortly.');
     }
 
-    public function paymentSuccess(Request $request, string $booking)
+    public function paymentSuccess(Request $request, string $booking): RedirectResponse
     {
-        $bookingRecord = \Modules\Tour\Models\TourBooking::where('booking_number', $booking)
+        $bookingRecord = TourBooking::where('booking_number', $booking)
             ->with(['tour'])
             ->firstOrFail();
+
+        // Prevent duplicate processing
+        if ($bookingRecord->payment_status === 'paid') {
+            return redirect()->route('site.tour.bookingConfirmation', [
+                'slug' => $bookingRecord->tour->slug,
+                'booking' => $booking,
+            ])->with('info', 'This booking has already been paid.');
+        }
 
         // Verify payment with gateway
         try {
             // For SSLCommerz
-            if ($request->has('tran_id')) {
-                $sslcommerz = new \Raziul\Sslcommerz\SslcommerzClient();
-                $validation = $sslcommerz->validate($request->all());
+            if ($request->has('tran_id') && $request->has('val_id')) {
+                // First verify the hash to ensure the response is authentic
+                if (! Sslcommerz::verifyHash($request->all())) {
+                    \Log::warning('SSLCommerz hash verification failed', [
+                        'booking' => $booking,
+                        'data' => $request->all(),
+                    ]);
 
-                if ($validation->isSuccessful()) {
+                    return redirect()->route('site.tour.payment', $booking)
+                        ->with('error', 'Payment verification failed. Please try again.');
+                }
+
+                // Validate the payment with SSLCommerz server
+                $isValid = Sslcommerz::validatePayment(
+                    $request->all(),
+                    $bookingRecord->booking_number,
+                    $bookingRecord->total_amount
+                );
+
+                if ($isValid) {
                     $bookingRecord->update([
                         'payment_status' => 'paid',
-                        'payment_method' => 'sslcommerz',
-                        'paid_amount' => $bookingRecord->total_amount,
+                        'status' => 'confirmed',
+                        'amount_paid' => $bookingRecord->total_amount,
                         'amount_due' => 0,
-                        'payment_details' => $request->all(),
+                        'confirmed_at' => now(),
                     ]);
 
                     // Create payment record
                     $bookingRecord->payments()->create([
+                        'transaction_id' => TourBookingPayment::generateTransactionId(),
                         'amount' => $bookingRecord->total_amount,
                         'payment_method' => 'sslcommerz',
-                        'transaction_id' => $request->input('tran_id'),
+                        'payment_gateway' => 'sslcommerz',
+                        'gateway_transaction_id' => $request->input('tran_id'),
                         'status' => 'completed',
-                        'payment_details' => $request->all(),
+                        'type' => 'full',
+                        'gateway_response' => $request->all(),
                         'paid_at' => now(),
                     ]);
+
+                    return redirect()->route('site.tour.bookingConfirmation', [
+                        'slug' => $bookingRecord->tour->slug,
+                        'booking' => $booking,
+                    ])->with('success', 'Payment successful! Your booking is confirmed.');
                 }
+
+                \Log::warning('SSLCommerz payment validation failed', [
+                    'booking' => $booking,
+                    'response' => $request->all(),
+                ]);
+
+                return redirect()->route('site.tour.payment', $booking)
+                    ->with('error', 'Payment verification failed. Please contact support if amount was deducted.');
             }
             // For bKash
             elseif ($request->has('paymentID')) {
                 $bookingRecord->update([
                     'payment_status' => 'paid',
-                    'payment_method' => 'bkash',
-                    'paid_amount' => $bookingRecord->total_amount,
+                    'status' => 'confirmed',
+                    'amount_paid' => $bookingRecord->total_amount,
                     'amount_due' => 0,
-                    'payment_details' => $request->all(),
+                    'confirmed_at' => now(),
                 ]);
 
                 $bookingRecord->payments()->create([
+                    'transaction_id' => TourBookingPayment::generateTransactionId(),
                     'amount' => $bookingRecord->total_amount,
                     'payment_method' => 'bkash',
-                    'transaction_id' => $request->input('paymentID'),
+                    'payment_gateway' => 'bkash',
+                    'gateway_transaction_id' => $request->input('paymentID'),
                     'status' => 'completed',
-                    'payment_details' => $request->all(),
+                    'type' => 'full',
+                    'gateway_response' => $request->all(),
                     'paid_at' => now(),
                 ]);
+
+                return redirect()->route('site.tour.bookingConfirmation', [
+                    'slug' => $bookingRecord->tour->slug,
+                    'booking' => $booking,
+                ])->with('success', 'Payment successful! Your booking is confirmed.');
             }
         } catch (\Exception $e) {
-            \Log::error('Payment verification error: ' . $e->getMessage());
+            \Log::error('Payment verification error: '.$e->getMessage(), [
+                'booking' => $booking,
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
 
+        // Fallback redirect if no payment details found
         return redirect()->route('site.tour.bookingConfirmation', [
             'slug' => $bookingRecord->tour->slug,
             'booking' => $booking,
-        ])->with('success', 'Payment successful! Your booking is confirmed.');
+        ])->with('warning', 'Payment status could not be verified. Please contact support.');
     }
 
-    public function paymentFail(Request $request, string $booking)
+    public function paymentFail(Request $request, string $booking): RedirectResponse
     {
-        $bookingRecord = \Modules\Tour\Models\TourBooking::where('booking_number', $booking)
+        $bookingRecord = TourBooking::where('booking_number', $booking)
             ->with(['tour'])
             ->firstOrFail();
 
-        // Log failed payment
-        \Log::warning('Payment failed for booking: ' . $booking, $request->all());
+        // Log failed payment with details
+        \Log::warning('Payment failed for booking: '.$booking, [
+            'request_data' => $request->all(),
+            'booking_number' => $booking,
+        ]);
 
         return redirect()->route('site.tour.payment', $booking)
             ->with('error', 'Payment failed. Please try again or choose a different payment method.');
     }
 
-    public function paymentCancel(Request $request, string $booking)
+    public function paymentCancel(Request $request, string $booking): RedirectResponse
     {
-        $bookingRecord = \Modules\Tour\Models\TourBooking::where('booking_number', $booking)
+        $bookingRecord = TourBooking::where('booking_number', $booking)
             ->with(['tour'])
             ->firstOrFail();
+
+        \Log::info('Payment cancelled for booking: '.$booking);
 
         return redirect()->route('site.tour.payment', $booking)
             ->with('info', 'Payment cancelled. You can try again when ready.');
@@ -630,44 +725,165 @@ class SiteTourController extends SiteController
     public function paymentIPN(Request $request, string $booking)
     {
         // Handle IPN (Instant Payment Notification) from payment gateways
-        \Log::info('Payment IPN received for booking: ' . $booking, $request->all());
+        \Log::info('Payment IPN received for booking: '.$booking, $request->all());
 
-        $bookingRecord = \Modules\Tour\Models\TourBooking::where('booking_number', $booking)->first();
+        $bookingRecord = TourBooking::where('booking_number', $booking)->first();
 
-        if (!$bookingRecord) {
+        if (! $bookingRecord) {
             return response()->json(['status' => 'error', 'message' => 'Booking not found'], 404);
         }
 
-        try {
-            // Verify and process IPN
-            if ($request->has('tran_id')) {
-                // SSLCommerz IPN
-                $sslcommerz = new \Raziul\Sslcommerz\SslcommerzClient();
-                $validation = $sslcommerz->validate($request->all());
+        // Skip if already paid
+        if ($bookingRecord->payment_status === 'paid') {
+            return response()->json(['status' => 'success', 'message' => 'Already processed']);
+        }
 
-                if ($validation->isSuccessful() && $bookingRecord->payment_status !== 'paid') {
+        try {
+            // Verify and process IPN for SSLCommerz
+            if ($request->has('tran_id') && $request->has('val_id')) {
+                // Verify hash
+                if (! Sslcommerz::verifyHash($request->all())) {
+                    \Log::warning('IPN hash verification failed', [
+                        'booking' => $booking,
+                        'data' => $request->all(),
+                    ]);
+
+                    return response()->json(['status' => 'error', 'message' => 'Hash verification failed'], 400);
+                }
+
+                // Validate payment
+                $isValid = Sslcommerz::validatePayment(
+                    $request->all(),
+                    $bookingRecord->booking_number,
+                    $bookingRecord->total_amount
+                );
+
+                if ($isValid) {
                     $bookingRecord->update([
                         'payment_status' => 'paid',
-                        'payment_method' => 'sslcommerz',
-                        'paid_amount' => $bookingRecord->total_amount,
+                        'status' => 'confirmed',
+                        'amount_paid' => $bookingRecord->total_amount,
                         'amount_due' => 0,
+                        'confirmed_at' => now(),
                     ]);
 
                     $bookingRecord->payments()->create([
+                        'transaction_id' => TourBookingPayment::generateTransactionId(),
                         'amount' => $bookingRecord->total_amount,
                         'payment_method' => 'sslcommerz',
-                        'transaction_id' => $request->input('tran_id'),
+                        'payment_gateway' => 'sslcommerz',
+                        'gateway_transaction_id' => $request->input('tran_id'),
                         'status' => 'completed',
-                        'payment_details' => $request->all(),
+                        'type' => 'full',
+                        'gateway_response' => $request->all(),
                         'paid_at' => now(),
                     ]);
+
+                    return response()->json(['status' => 'success']);
                 }
+
+                return response()->json(['status' => 'error', 'message' => 'Validation failed'], 400);
             }
 
-            return response()->json(['status' => 'success']);
+            return response()->json(['status' => 'error', 'message' => 'Invalid IPN data'], 400);
         } catch (\Exception $e) {
-            \Log::error('IPN processing error: ' . $e->getMessage());
+            \Log::error('IPN processing error: '.$e->getMessage(), [
+                'booking' => $booking,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function bkashCallback(Request $request, string $booking): RedirectResponse
+    {
+        $bookingRecord = TourBooking::where('booking_number', $booking)
+            ->with(['tour'])
+            ->first();
+
+        if (! $bookingRecord) {
+            return redirect()->route('site.tour.index')
+                ->with('error', 'Booking not found.');
+        }
+
+        $paymentId = $request->input('paymentID');
+        $status = $request->input('status');
+
+        \Log::info('bKash callback received', [
+            'booking' => $booking,
+            'paymentID' => $paymentId,
+            'status' => $status,
+            'request' => $request->all(),
+        ]);
+
+        // Check if payment was cancelled or failed
+        if ($status !== 'success') {
+            \Log::warning('bKash payment not successful', [
+                'booking' => $booking,
+                'status' => $status,
+            ]);
+
+            return redirect()->route('site.tour.payment', $booking)
+                ->with('error', 'Payment was not successful. Please try again.');
+        }
+
+        // Prevent duplicate processing
+        if ($bookingRecord->payment_status === 'paid') {
+            return redirect()->route('site.tour.bookingConfirmation', [
+                'slug' => $bookingRecord->tour->slug,
+                'booking' => $booking,
+            ])->with('info', 'This booking has already been paid.');
+        }
+
+        try {
+            $bkash = app(\Ihasan\Bkash\Bkash::class);
+
+            // Execute the payment to complete the transaction
+            $executeResponse = $bkash->executePayment($paymentId);
+
+            if (isset($executeResponse['trxID']) && $executeResponse['transactionStatus'] === 'Completed') {
+                $bookingRecord->update([
+                    'payment_status' => 'paid',
+                    'status' => 'confirmed',
+                    'amount_paid' => $bookingRecord->total_amount,
+                    'amount_due' => 0,
+                    'confirmed_at' => now(),
+                ]);
+
+                $bookingRecord->payments()->create([
+                    'transaction_id' => TourBookingPayment::generateTransactionId(),
+                    'amount' => $bookingRecord->total_amount,
+                    'payment_method' => 'bkash',
+                    'payment_gateway' => 'bkash',
+                    'gateway_transaction_id' => $executeResponse['trxID'],
+                    'status' => 'completed',
+                    'type' => 'full',
+                    'gateway_response' => $executeResponse,
+                    'paid_at' => now(),
+                ]);
+
+                return redirect()->route('site.tour.bookingConfirmation', [
+                    'slug' => $bookingRecord->tour->slug,
+                    'booking' => $booking,
+                ])->with('success', 'Payment successful! Your booking is confirmed.');
+            }
+
+            \Log::error('bKash payment execution failed', [
+                'booking' => $booking,
+                'response' => $executeResponse,
+            ]);
+
+            return redirect()->route('site.tour.payment', $booking)
+                ->with('error', 'Payment verification failed. '.($executeResponse['statusMessage'] ?? 'Please try again.'));
+        } catch (\Exception $e) {
+            \Log::error('bKash callback error: '.$e->getMessage(), [
+                'booking' => $booking,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('site.tour.payment', $booking)
+                ->with('error', 'Payment processing error. Please contact support if amount was deducted.');
         }
     }
 }

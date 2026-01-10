@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Modules\Menu\Models\Menu;
 use Modules\Setting\Services\SettingService;
+use Raziul\Sslcommerz\SslcommerzClient;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,6 +17,22 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(SettingService::class);
+
+        // Override SSLCommerz singleton with a simpler binding that doesn't require routes at bind time
+        $this->app->singleton(SslcommerzClient::class, function ($app) {
+            $config = $app->config->get('sslcommerz');
+
+            if (empty($config['store']['id']) || empty($config['store']['password'])) {
+                throw new \Raziul\Sslcommerz\Exceptions\SslcommerzException('SSLCommerz store credentials are not set.');
+            }
+
+            return new SslcommerzClient(
+                $config['store']['id'],
+                $config['store']['password'],
+                $config['store']['currency'] ?? 'BDT',
+                $config['sandbox'] ?? true
+            );
+        });
     }
 
     /**
