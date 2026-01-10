@@ -5,9 +5,19 @@ namespace Modules\Tour\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Support\Models\BaseModel;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Tour\Database\Factories\TourBookingExtraFactory;
+
 class TourBookingExtra extends BaseModel
 {
+    use HasFactory;
+
     protected $table = 'tour_booking_extras';
+
+    protected static function newFactory()
+    {
+        return TourBookingExtraFactory::new();
+    }
 
     protected function casts(): array
     {

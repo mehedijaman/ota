@@ -1,6 +1,7 @@
 <!-- NAVBAR -->
 <header
     class="sticky top-0 z-50 border-b border-gray-100 bg-white/80 backdrop-blur-md"
+    x-data="{ mobileMenuOpen: false }"
 >
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-20 items-center justify-between">
@@ -176,11 +177,11 @@
 
             <!-- Mobile Menu Button -->
             <button
-                id="mobile-menu-btn"
+                @click="mobileMenuOpen = !mobileMenuOpen"
                 class="rounded-lg p-2 text-slate-600 hover:bg-slate-100 focus:outline-none md:hidden"
             >
                 <svg
-                    id="menu-icon"
+                    x-show="!mobileMenuOpen"
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-6 w-6 transition-transform duration-300"
                     fill="none"
@@ -195,9 +196,10 @@
                     />
                 </svg>
                 <svg
-                    id="close-icon"
+                    x-show="mobileMenuOpen"
+                    x-cloak
                     xmlns="http://www.w3.org/2000/svg"
-                    class="hidden h-6 w-6 transition-transform duration-300"
+                    class="h-6 w-6 transition-transform duration-300"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -215,23 +217,26 @@
 
     <!-- Mobile Menu -->
     <div
-        id="mobile-menu"
-        class="hidden border-b border-gray-100 bg-white md:hidden"
+        x-show="mobileMenuOpen"
+        x-cloak
+        x-transition
+        class="border-b border-gray-100 bg-white md:hidden"
     >
         <div class="space-y-1 px-4 pb-6 pt-2">
             @foreach ($primaryMenu ?? [] as $index => $item)
                 @if ($item->children->isNotEmpty())
                     {{-- Mobile dropdown --}}
-                    <div class="mobile-dropdown space-y-1">
+                    <div class="mobile-dropdown space-y-1" x-data="{ open: false }">
                         <button
                             type="button"
-                            class="mobile-dropdown-toggle flex w-full items-center justify-between rounded-lg px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-blue-600"
-                            data-dropdown="mobile-dropdown-{{ $index }}"
+                            @click="open = !open"
+                            class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-blue-600"
                         >
                             <span>{{ $item->title }}</span>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                class="mobile-dropdown-icon h-4 w-4 transition-transform duration-200"
+                                class="h-4 w-4 transition-transform duration-200"
+                                :class="{ 'rotate-180': open }"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -245,8 +250,10 @@
                             </svg>
                         </button>
                         <div
-                            id="mobile-dropdown-{{ $index }}"
-                            class="mobile-dropdown-content hidden space-y-1 pl-4"
+                            x-show="open"
+                            x-cloak
+                            x-transition
+                            class="space-y-1 pl-4"
                         >
                             @foreach ($item->children as $child)
                                 <a
@@ -271,45 +278,16 @@
                 @endif
             @endforeach
 
-            <div class="mt-4 border-t border-gray-100 pt-4">
-                <button
-                    class="w-full rounded-lg bg-blue-600 px-5 py-3 text-base font-semibold text-white shadow-lg shadow-blue-200"
-                >
-                    Login
-                </button>
-            </div>
+            @guest
+                <div class="mt-4 border-t border-gray-100 pt-4">
+                    <a
+                        href="{{ route('auth.loginForm') }}"
+                        class="block w-full rounded-lg bg-blue-600 px-5 py-3 text-center text-base font-semibold text-white shadow-lg shadow-blue-200"
+                    >
+                        Login
+                    </a>
+                </div>
+            @endguest
         </div>
     </div>
 </header>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const btn = document.getElementById('mobile-menu-btn')
-        const menu = document.getElementById('mobile-menu')
-        const menuIcon = document.getElementById('menu-icon')
-        const closeIcon = document.getElementById('close-icon')
-
-        // Toggle mobile menu
-        btn.addEventListener('click', () => {
-            menu.classList.toggle('hidden')
-            menuIcon.classList.toggle('hidden')
-            closeIcon.classList.toggle('hidden')
-        })
-
-        // Handle mobile dropdown toggles
-        document
-            .querySelectorAll('.mobile-dropdown-toggle')
-            .forEach((toggle) => {
-                toggle.addEventListener('click', () => {
-                    const dropdownId = toggle.getAttribute('data-dropdown')
-                    const dropdown = document.getElementById(dropdownId)
-                    const icon = toggle.querySelector('.mobile-dropdown-icon')
-
-                    // Toggle visibility
-                    dropdown.classList.toggle('hidden')
-
-                    // Rotate icon
-                    icon.classList.toggle('rotate-180')
-                })
-            })
-    })
-</script>

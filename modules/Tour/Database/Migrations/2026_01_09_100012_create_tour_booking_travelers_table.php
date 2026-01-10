@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('booking_id')->constrained('tour_bookings')->cascadeOnDelete();
             $table->enum('type', ['adult', 'child', 'infant'])->default('adult');
             $table->boolean('is_lead')->default(false);
-            $table->string('title', 10)->nullable();
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->nullable();

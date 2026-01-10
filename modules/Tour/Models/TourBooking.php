@@ -11,11 +11,19 @@ use Modules\Support\Models\BaseModel;
 use Modules\Support\Traits\ActivityLog;
 use Modules\Support\Traits\Searchable;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Tour\Database\Factories\TourBookingFactory;
+
 class TourBooking extends BaseModel
 {
-    use ActivityLog, Searchable, SoftDeletes;
+    use ActivityLog, HasFactory, Searchable, SoftDeletes;
 
     protected $table = 'tour_bookings';
+
+    protected static function newFactory()
+    {
+        return TourBookingFactory::new();
+    }
 
     protected function casts(): array
     {
@@ -46,17 +54,28 @@ class TourBooking extends BaseModel
     /**
      * Get the pricing tier.
      */
+    /**
+     * Get the pricing tier.
+     */
     public function pricing(): BelongsTo
     {
         return $this->belongsTo(TourPricing::class, 'pricing_id');
     }
 
     /**
-     * Get the user.
+     * Get the customer.
      */
-    public function user(): BelongsTo
+    public function customer(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(\Modules\Customer\Models\Customer::class);
+    }
+
+    /**
+     * Get the creator (user).
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     /**
@@ -112,7 +131,7 @@ class TourBooking extends BaseModel
      */
     public function getTotalTravelersAttribute(): int
     {
-        return $this->adults_count + $this->children_count + $this->infants_count;
+        return $this->adult_count + $this->child_count + $this->infant_count;
     }
 
     /**

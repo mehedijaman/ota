@@ -18,18 +18,30 @@
 
     <link rel="icon" href="/favicon.svg" />
 
+    <!-- Remix Icon -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
     @vite(['resources-site/css/site.css', 'resources-site/js/index-app.js'])
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     @yield('headEndScripts')
 </head>
 
 <body>
     <div id="app">
         <x-header></x-header>
-        @yield('content')
+    </div>
+
+    @yield('content')
+
+    <div id="app-footer">
         <x-footer></x-footer>
     </div>
 
     @yield('bodyEndScripts')
+    @stack('scripts')
 </body>
 
 </html>

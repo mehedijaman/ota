@@ -5,9 +5,19 @@ namespace Modules\Tour\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Support\Models\BaseModel;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Tour\Database\Factories\TourPricingFactory;
+
 class TourPricing extends BaseModel
 {
+    use HasFactory;
+
     protected $table = 'tour_pricings';
+
+    protected static function newFactory()
+    {
+        return TourPricingFactory::new();
+    }
 
     protected function casts(): array
     {

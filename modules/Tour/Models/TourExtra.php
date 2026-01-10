@@ -6,9 +6,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Support\Models\BaseModel;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Tour\Database\Factories\TourExtraFactory;
+
 class TourExtra extends BaseModel
 {
+    use HasFactory;
+
     protected $table = 'tour_extras';
+
+    protected static function newFactory()
+    {
+        return TourExtraFactory::new();
+    }
 
     protected function casts(): array
     {

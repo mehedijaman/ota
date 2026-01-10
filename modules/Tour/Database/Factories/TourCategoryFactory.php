@@ -12,28 +12,17 @@ class TourCategoryFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->randomElement([
-            'Beach & Island',
-            'Adventure',
-            'Cultural & Heritage',
-            'Wildlife & Safari',
-            'Mountain & Trekking',
-            'City Tours',
-            'Honeymoon',
-            'Family Package',
-            'Pilgrimage',
-            'Cruise',
-        ]);
+        $name = 'Category ' . \Illuminate\Support\Str::uuid();
 
         return [
             'name' => $name,
             'slug' => Str::slug($name),
-            'description' => $this->faker->paragraph(),
-            'icon' => $this->faker->randomElement(['beach', 'mountain', 'city', 'camera', 'heart', 'users', 'compass', 'map']),
+            'description' => 'A wonderful tour category description that explains exactly what this category encompasses.',
+            'icon' => \Illuminate\Support\Arr::random(['beach', 'mountain', 'city', 'camera', 'heart', 'users', 'compass', 'map']),
             'is_active' => true,
-            'sort_order' => $this->faker->numberBetween(1, 100),
+            'sort_order' => rand(1, 100),
             'meta_title' => $name.' Tours',
-            'meta_description' => $this->faker->sentence(),
+            'meta_description' => 'Explore the best '.$name.' tours with us.',
         ];
     }
 

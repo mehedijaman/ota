@@ -12,30 +12,17 @@ class TourDestinationFactory extends Factory
 
     public function definition(): array
     {
-        $destinations = [
-            ['name' => "Cox's Bazar", 'country' => 'Bangladesh', 'city' => "Cox's Bazar", 'lat' => 21.4272, 'lng' => 92.0058],
-            ['name' => 'Sundarbans', 'country' => 'Bangladesh', 'city' => 'Khulna', 'lat' => 21.9497, 'lng' => 89.1833],
-            ['name' => 'Sajek Valley', 'country' => 'Bangladesh', 'city' => 'Rangamati', 'lat' => 23.3817, 'lng' => 92.2936],
-            ['name' => 'Bandarban', 'country' => 'Bangladesh', 'city' => 'Bandarban', 'lat' => 22.1953, 'lng' => 92.2184],
-            ['name' => 'Saint Martin', 'country' => 'Bangladesh', 'city' => 'Teknaf', 'lat' => 20.6273, 'lng' => 92.3226],
-            ['name' => 'Sylhet', 'country' => 'Bangladesh', 'city' => 'Sylhet', 'lat' => 24.8949, 'lng' => 91.8687],
-            ['name' => 'Rangamati', 'country' => 'Bangladesh', 'city' => 'Rangamati', 'lat' => 22.6372, 'lng' => 92.2061],
-            ['name' => 'Kuakata', 'country' => 'Bangladesh', 'city' => 'Patuakhali', 'lat' => 21.8167, 'lng' => 90.1167],
-        ];
-
-        $dest = $this->faker->randomElement($destinations);
-
         return [
-            'name' => $dest['name'],
-            'slug' => Str::slug($dest['name']),
-            'country' => $dest['country'],
-            'city' => $dest['city'],
+            'name' => $this->faker->city . ' ' . uniqid(),
+            'slug' => fn (array $attributes) => Str::slug($attributes['name']),
+            'country' => $this->faker->country,
+            'city' => $this->faker->city,
             'description' => $this->faker->paragraph(3),
-            'latitude' => $dest['lat'],
-            'longitude' => $dest['lng'],
+            'latitude' => $this->faker->latitude,
+            'longitude' => $this->faker->longitude,
             'is_featured' => $this->faker->boolean(30),
             'is_active' => true,
-            'meta_title' => $dest['name'].' Tours',
+            'meta_title' => $this->faker->sentence(),
             'meta_description' => $this->faker->sentence(),
         ];
     }

@@ -16,7 +16,7 @@ class TourBookingService
     public function getAll()
     {
         return TourBooking::query()
-            ->with(['tour', 'user'])
+            ->with(['tour', 'customer'])
             ->orderBy('id', 'desc')
             ->search(request('searchContext'), request('searchTerm'))
             ->paginate(request('rowsPerPage', 15))
@@ -42,7 +42,7 @@ class TourBookingService
         return TourBooking::with([
             'tour',
             'pricing',
-            'user',
+            'customer',
             'travelers',
             'payments',
             'extras.extra',
