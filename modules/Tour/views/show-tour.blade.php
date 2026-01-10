@@ -102,133 +102,44 @@
                     </div>
                 </div>
 
-                <!-- Photo Gallery -->
+                <!-- Photo Gallery with Vue Carousel -->
                 @php
                     $gallery = $tour->getMedia('gallery');
-                    $placeholderImage = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80';
+                    $galleryImages = $gallery->map(function($image) use ($tour) {
+                        return [
+                            'url' => $image->getUrl(),
+                            'alt' => $tour->name . ' - Gallery Image'
+                        ];
+                    })->values()->toArray();
                 @endphp
+                
+                @if(count($galleryImages) > 0)
                 <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="ri-image-line text-orange-500"></i>
                         Photo Gallery
                     </h2>
-                    @if($gallery->count())
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4" x-data="{ activeImage: null }">
-                        @foreach($gallery as $index => $image)
-                        <button 
-                            type="button"
-                            @click="activeImage = {{ $index }}" 
-                            class="group relative aspect-[4/3] rounded-xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-orange-500 {{ $index >= 4 && $index < 5 ? 'hidden sm:block' : '' }} {{ $index >= 5 ? 'hidden' : '' }}"
-                        >
-                            <img src="{{ $image->getUrl() }}" alt="{{ $tour->name }} - Photo {{ $index + 1 }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <i class="ri-zoom-in-line text-2xl sm:text-3xl text-white"></i>
-                            </div>
-                            @if($index === 4 && $gallery->count() > 5)
-                            <div class="absolute inset-0 bg-black/60 flex items-center justify-center sm:hidden">
-                                <span class="text-white font-bold text-lg">+{{ $gallery->count() - 4 }}</span>
-                            </div>
-                            @endif
-                        </button>
-                        @endforeach
-                        
-                        @if($gallery->count() > 5)
-                        <button 
-                            type="button"
-                            @click="activeImage = 5" 
-                            class="hidden sm:flex relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 items-center justify-center hover:bg-slate-200 transition-colors"
-                        >
-                            <div class="text-center">
-                                <i class="ri-image-2-line text-3xl text-slate-400"></i>
-                                <p class="text-slate-600 font-bold mt-1">+{{ $gallery->count() - 5 }} more</p>
-                            </div>
-                        </button>
-                        @endif
-
-                        <!-- Lightbox Modal -->
-                        <div 
-                            x-show="activeImage !== null" 
-                            x-cloak
-                            @keydown.escape.window="activeImage = null"
-                            @keydown.arrow-left.window="activeImage = activeImage > 0 ? activeImage - 1 : {{ $gallery->count() - 1 }}"
-                            @keydown.arrow-right.window="activeImage = activeImage < {{ $gallery->count() - 1 }} ? activeImage + 1 : 0"
-                            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
-                            x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0"
-                            x-transition:enter-end="opacity-100"
-                            x-transition:leave="transition ease-in duration-200"
-                            x-transition:leave-start="opacity-100"
-                            x-transition:leave-end="opacity-0"
-                        >
-                            <!-- Close Button -->
-                            <button @click="activeImage = null" class="absolute top-4 right-4 text-white/80 hover:text-white z-10">
-                                <i class="ri-close-line text-3xl"></i>
-                            </button>
-                            
-                            <!-- Navigation -->
-                            <button 
-                                @click="activeImage = activeImage > 0 ? activeImage - 1 : {{ $gallery->count() - 1 }}" 
-                                class="absolute left-2 sm:left-4 text-white/80 hover:text-white z-10 p-2 bg-black/30 rounded-full"
-                            >
-                                <i class="ri-arrow-left-s-line text-2xl sm:text-3xl"></i>
-                            </button>
-                            <button 
-                                @click="activeImage = activeImage < {{ $gallery->count() - 1 }} ? activeImage + 1 : 0" 
-                                class="absolute right-2 sm:right-4 text-white/80 hover:text-white z-10 p-2 bg-black/30 rounded-full"
-                            >
-                                <i class="ri-arrow-right-s-line text-2xl sm:text-3xl"></i>
-                            </button>
-
-                            <!-- Image Container -->
-                            <div class="max-w-5xl max-h-[85vh] w-full" @click.outside="activeImage = null">
-                                @foreach($gallery as $index => $image)
-                                <img 
-                                    x-show="activeImage === {{ $index }}"
-                                    src="{{ $image->getUrl() }}" 
-                                    alt="{{ $tour->name }} - Photo {{ $index + 1 }}" 
-                                    class="max-w-full max-h-[85vh] mx-auto object-contain rounded-lg"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 scale-95"
-                                    x-transition:enter-end="opacity-100 scale-100"
-                                >
-                                @endforeach
-                            </div>
-
-                            <!-- Counter -->
-                            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm bg-black/40 px-4 py-2 rounded-full">
-                                <span x-text="activeImage + 1"></span> / {{ $gallery->count() }}
-                            </div>
-                        </div>
-                    </div>
-                    @else
-                    <!-- No Gallery - Show Placeholder -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="sm:col-span-2 aspect-video rounded-xl overflow-hidden bg-slate-100 relative">
-                            <img src="{{ $tour->thumbnail_url ?: $placeholderImage }}" alt="{{ $tour->name }}" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 flex items-center justify-center bg-slate-900/20">
-                                <div class="text-center text-white">
-                                    <i class="ri-image-line text-4xl opacity-80"></i>
-                                    <p class="text-sm mt-2 opacity-80">Tour Preview</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="hidden sm:grid grid-rows-2 gap-4">
-                            <div class="aspect-[4/3] rounded-xl bg-slate-100 flex items-center justify-center">
-                                <div class="text-center text-slate-400">
-                                    <i class="ri-camera-line text-2xl"></i>
-                                    <p class="text-xs mt-1">No photos yet</p>
-                                </div>
-                            </div>
-                            <div class="aspect-[4/3] rounded-xl bg-slate-100 flex items-center justify-center">
-                                <div class="text-center text-slate-400">
-                                    <i class="ri-camera-line text-2xl"></i>
-                                    <p class="text-xs mt-1">No photos yet</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
+                    <tour-carousel :images='@json($galleryImages)'></tour-carousel>
                 </div>
+                @else
+                <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="ri-image-line text-orange-500"></i>
+                        Photo Gallery
+                    </h2>
+                    <div class="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 relative">
+                        @if($tour->thumbnail_url)
+                        <img src="{{ $tour->thumbnail_url }}" alt="{{ $tour->name }}" class="w-full h-full object-cover">
+                        @endif
+                        <div class="absolute inset-0 flex items-center justify-center {{ $tour->thumbnail_url ? 'bg-slate-900/20' : '' }}">
+                            <div class="text-center {{ $tour->thumbnail_url ? 'text-white' : 'text-slate-400' }}">
+                                <i class="ri-image-line text-4xl sm:text-5xl opacity-80"></i>
+                                <p class="text-sm sm:text-base mt-2 opacity-80">{{ $tour->thumbnail_url ? 'Tour Preview' : 'No photos available' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Overview Card -->
                 <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
@@ -368,41 +279,60 @@
                 @endif
 
                 <!-- Inclusions & Exclusions -->
-                @if($tour->inclusions->count())
+                @php
+                    $inclusions = $tour->inclusions->where('type', 'inclusion');
+                    $exclusions = $tour->inclusions->where('type', 'exclusion');
+                @endphp
+                @if($inclusions->count() > 0 || $exclusions->count() > 0)
                 <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                        <i class="ri-checkbox-circle-line text-green-500"></i>
-                        What's Included
+                        <i class="ri-list-check text-blue-500"></i>
+                        What's Included & Excluded
                     </h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-green-50 rounded-xl p-4 sm:p-5">
-                            <h3 class="font-bold text-green-700 mb-4 flex items-center gap-2 text-sm sm:text-base">
-                                <i class="ri-checkbox-circle-fill"></i>
-                                Included
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                        <!-- Inclusions -->
+                        @if($inclusions->count() > 0)
+                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 sm:p-5 border-2 border-green-100">
+                            <h3 class="font-bold text-green-700 mb-4 flex items-center gap-2 text-base sm:text-lg">
+                                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                                    <i class="ri-checkbox-circle-fill text-white text-lg"></i>
+                                </div>
+                                Included in Package
                             </h3>
                             <ul class="space-y-2 sm:space-y-3">
-                                @foreach($tour->inclusions->where('type', 'inclusion') as $item)
-                                <li class="flex items-start gap-2 sm:gap-3 text-slate-700 text-sm sm:text-base">
-                                    <i class="{{ $item->icon ?: 'ri-check-line' }} text-green-600 mt-0.5 shrink-0"></i>
-                                    {{ $item->title }}
+                                @foreach($inclusions as $item)
+                                <li class="flex items-start gap-2 sm:gap-3 text-slate-700 text-sm sm:text-base group">
+                                    <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-green-200 transition-colors">
+                                        <i class="{{ $item->icon ?: 'ri-check-line' }} text-green-600 text-sm"></i>
+                                    </div>
+                                    <span class="leading-relaxed">{{ $item->title }}</span>
                                 </li>
                                 @endforeach
                             </ul>
                         </div>
-                        <div class="bg-red-50 rounded-xl p-4 sm:p-5">
-                            <h3 class="font-bold text-red-700 mb-4 flex items-center gap-2 text-sm sm:text-base">
-                                <i class="ri-close-circle-fill"></i>
+                        @endif
+                        
+                        <!-- Exclusions -->
+                        @if($exclusions->count() > 0)
+                        <div class="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl p-4 sm:p-5 border-2 border-red-100">
+                            <h3 class="font-bold text-red-700 mb-4 flex items-center gap-2 text-base sm:text-lg">
+                                <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                                    <i class="ri-close-circle-fill text-white text-lg"></i>
+                                </div>
                                 Not Included
                             </h3>
                             <ul class="space-y-2 sm:space-y-3">
-                                @foreach($tour->inclusions->where('type', 'exclusion') as $item)
-                                <li class="flex items-start gap-2 sm:gap-3 text-slate-700 text-sm sm:text-base">
-                                    <i class="{{ $item->icon ?: 'ri-close-line' }} text-red-600 mt-0.5 shrink-0"></i>
-                                    {{ $item->title }}
+                                @foreach($exclusions as $item)
+                                <li class="flex items-start gap-2 sm:gap-3 text-slate-700 text-sm sm:text-base group">
+                                    <div class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-red-200 transition-colors">
+                                        <i class="{{ $item->icon ?: 'ri-close-line' }} text-red-600 text-sm"></i>
+                                    </div>
+                                    <span class="leading-relaxed">{{ $item->title }}</span>
                                 </li>
                                 @endforeach
                             </ul>
                         </div>
+                        @endif
                     </div>
                 </div>
                 @endif
@@ -745,16 +675,41 @@
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="flex gap-3">
-                        <button class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 text-sm">
-                            <i class="ri-heart-line"></i>
-                            Save
-                        </button>
-                        <button class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 text-sm">
-                            <i class="ri-share-line"></i>
-                            Share
-                        </button>
+                    <!-- Social Share Buttons -->
+                    <div class="pt-4 border-t border-slate-100">
+                        <p class="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">Share This Tour</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <!-- Facebook -->
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('site.tour.show', $tour->slug)) }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-3 rounded-lg font-medium transition-all text-xs sm:text-sm group">
+                                <i class="ri-facebook-fill text-base group-hover:scale-110 transition-transform"></i>
+                                <span class="hidden sm:inline">Facebook</span>
+                            </a>
+                            <!-- Twitter -->
+                            <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('site.tour.show', $tour->slug)) }}&text={{ urlencode($tour->name) }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white py-2.5 px-3 rounded-lg font-medium transition-all text-xs sm:text-sm group">
+                                <i class="ri-twitter-x-fill text-base group-hover:scale-110 transition-transform"></i>
+                                <span class="hidden sm:inline">Twitter</span>
+                            </a>
+                            <!-- WhatsApp -->
+                            <a href="https://wa.me/?text={{ urlencode($tour->name . ' - ' . route('site.tour.show', $tour->slug)) }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2.5 px-3 rounded-lg font-medium transition-all text-xs sm:text-sm group">
+                                <i class="ri-whatsapp-fill text-base group-hover:scale-110 transition-transform"></i>
+                                <span class="hidden sm:inline">WhatsApp</span>
+                            </a>
+                            <!-- LinkedIn -->
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(route('site.tour.show', $tour->slug)) }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white py-2.5 px-3 rounded-lg font-medium transition-all text-xs sm:text-sm group">
+                                <i class="ri-linkedin-fill text-base group-hover:scale-110 transition-transform"></i>
+                                <span class="hidden sm:inline">LinkedIn</span>
+                            </a>
+                            <!-- Email -->
+                            <a href="mailto:?subject={{ urlencode($tour->name) }}&body={{ urlencode('Check out this tour: ' . route('site.tour.show', $tour->slug)) }}" class="flex items-center justify-center gap-2 bg-slate-600 hover:bg-slate-700 text-white py-2.5 px-3 rounded-lg font-medium transition-all text-xs sm:text-sm group">
+                                <i class="ri-mail-fill text-base group-hover:scale-110 transition-transform"></i>
+                                <span class="hidden sm:inline">Email</span>
+                            </a>
+                            <!-- Copy Link -->
+                            <button onclick="navigator.clipboard.writeText('{{ route('site.tour.show', $tour->slug) }}'); this.innerHTML = '<i class=\"ri-check-line text-base\"></i><span class=\"hidden sm:inline\">Copied!</span>'; setTimeout(() => { this.innerHTML = '<i class=\"ri-link text-base\"></i><span class=\"hidden sm:inline\">Copy Link</span>'; }, 2000);" class="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white py-2.5 px-3 rounded-lg font-medium transition-all text-xs sm:text-sm group">
+                                <i class="ri-link text-base group-hover:scale-110 transition-transform"></i>
+                                <span class="hidden sm:inline">Copy Link</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -802,3 +757,4 @@
     </section>
     @endif
 @endsection
+

@@ -1,6 +1,8 @@
 import { createVueApp } from './create-vue-app.js'
-import IndexExampleComponent from './Components/IndexExampleComponent.vue'
+import TourCarousel from './Components/TourCarousel.vue'
+import ScrollToTop from './Components/ScrollToTop.vue'
 
 createVueApp({
-    IndexExampleComponent
+    TourCarousel,
+    ScrollToTop
 }).mount('#app')
