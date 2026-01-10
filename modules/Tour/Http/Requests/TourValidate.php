@@ -21,17 +21,6 @@ class TourValidate extends Request
             'description' => ['nullable', 'string'],
             'duration_days' => ['required', 'integer', 'min:1'],
             'duration_nights' => ['required', 'integer', 'min:0'],
-            'min_group_size' => ['nullable', 'integer', 'min:1'],
-            'max_group_size' => ['nullable', 'integer', 'min:1'],
-            'difficulty_level' => ['required', Rule::in(['easy', 'moderate', 'challenging', 'extreme'])],
-            'tour_type' => ['required', Rule::in(['group', 'private', 'custom'])],
-            'base_price' => ['required', 'numeric', 'min:0'],
-            'discount_price' => ['nullable', 'numeric', 'min:0'],
-            'child_price' => ['nullable', 'numeric', 'min:0'],
-            'infant_price' => ['nullable', 'numeric', 'min:0'],
-            'deposit_amount' => ['nullable', 'numeric', 'min:0'],
-            'deposit_type' => ['nullable', Rule::in(['fixed', 'percentage'])],
-            'cancellation_days' => ['nullable', 'integer', 'min:0'],
             'is_featured' => ['boolean'],
             'is_bestseller' => ['boolean'],
             'is_active' => ['boolean'],
@@ -49,9 +38,16 @@ class TourValidate extends Request
             'gallery.*' => ['image', 'max:2048'],
             'remove_previous_thumbnail' => ['nullable', 'boolean'],
 
+            // Pricings
+            'pricings' => ['nullable', 'array'],
+            'pricings.*.name' => ['required', 'string', 'max:255'],
+            'pricings.*.description' => ['nullable', 'string', 'max:500'],
+            'pricings.*.adult_price' => ['required', 'numeric', 'min:0'],
+            'pricings.*.child_price' => ['nullable', 'numeric', 'min:0'],
+            'pricings.*.infant_price' => ['nullable', 'numeric', 'min:0'],
+
             // Itineraries
             'itineraries' => ['nullable', 'array'],
-            'itineraries.*.day_number' => ['required', 'integer', 'min:1'],
             'itineraries.*.title' => ['required', 'string', 'max:255'],
             'itineraries.*.description' => ['nullable', 'string'],
             'itineraries.*.meals_included' => ['nullable', 'array'],
@@ -74,7 +70,6 @@ class TourValidate extends Request
             'slug.required' => 'URL slug is required.',
             'slug.unique' => 'This slug is already taken.',
             'duration_days.required' => 'Duration (days) is required.',
-            'base_price.required' => 'Base price is required.',
         ];
     }
 }

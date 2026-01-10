@@ -22,17 +22,6 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->unsignedSmallInteger('duration_days')->default(1);
             $table->unsignedSmallInteger('duration_nights')->default(0);
-            $table->unsignedSmallInteger('min_group_size')->default(1);
-            $table->unsignedSmallInteger('max_group_size')->nullable();
-            $table->enum('difficulty_level', ['easy', 'moderate', 'challenging', 'extreme'])->default('easy');
-            $table->enum('tour_type', ['group', 'private', 'custom'])->default('group');
-            $table->decimal('base_price', 12, 2)->default(0);
-            $table->decimal('discount_price', 12, 2)->nullable();
-            $table->decimal('child_price', 12, 2)->nullable();
-            $table->decimal('infant_price', 12, 2)->nullable();
-            $table->decimal('deposit_amount', 12, 2)->nullable();
-            $table->enum('deposit_type', ['fixed', 'percentage'])->default('fixed');
-            $table->unsignedSmallInteger('cancellation_days')->default(0);
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_bestseller')->default(false);
             $table->boolean('is_active')->default(true);
@@ -45,13 +34,16 @@ return new class extends Migration
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->text('meta_keywords')->nullable();
+
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
 
             $table->index(['is_active', 'is_featured']);
             $table->index(['category_id', 'is_active']);
             $table->index(['destination_id', 'is_active']);
-            $table->index('base_price');
         });
     }
 

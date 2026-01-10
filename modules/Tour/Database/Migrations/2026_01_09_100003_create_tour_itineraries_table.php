@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('tour_itineraries', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tour_id')->constrained('tours')->cascadeOnDelete();
-            $table->unsignedSmallInteger('day_number');
             $table->string('title');
             $table->text('description')->nullable();
             $table->json('meals_included')->nullable();
@@ -24,7 +23,6 @@ return new class extends Migration
             $table->json('highlights')->nullable();
             $table->timestamps();
 
-            $table->unique(['tour_id', 'day_number']);
             $table->index('tour_id');
         });
     }

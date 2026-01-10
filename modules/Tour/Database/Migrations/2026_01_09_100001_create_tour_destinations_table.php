@@ -24,6 +24,10 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
+
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
 

@@ -126,11 +126,19 @@ class TourService
 
     public function getForEdit(int $id): array
     {
-        $tour = Tour::with(['itineraries', 'inclusions', 'exclusions'])->findOrFail($id);
+        $tour = Tour::with(['pricings', 'itineraries', 'inclusions', 'exclusions'])->findOrFail($id);
 
         return [
             ...$tour->toArray(),
             'thumbnail_url' => $tour->getFirstMediaUrl('thumbnail'),
+            'pricings' => $tour->pricings->map(fn ($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'description' => $p->description,
+                'adult_price' => $p->adult_price,
+                'child_price' => $p->child_price,
+                'infant_price' => $p->infant_price,
+            ])->toArray(),
             'inclusions' => $tour->inclusions->pluck('title')->toArray(),
             'exclusions' => $tour->exclusions->pluck('title')->toArray(),
             'gallery' => $tour->getMedia('gallery')->map(fn ($m) => [
@@ -147,6 +155,7 @@ class TourService
             $tourData = $this->extractTourFields($data);
             $tour = Tour::create($tourData);
 
+            $this->syncPricings($tour, $data['pricings'] ?? []);
             $this->syncItineraries($tour, $data['itineraries'] ?? []);
             $this->syncInclusions($tour, $data['inclusions'] ?? [], 'inclusion');
             $this->syncInclusions($tour, $data['exclusions'] ?? [], 'exclusion');
@@ -162,6 +171,7 @@ class TourService
             $tourData = $this->extractTourFields($data);
             $tour->update($tourData);
 
+            $this->syncPricings($tour, $data['pricings'] ?? []);
             $this->syncItineraries($tour, $data['itineraries'] ?? []);
             $this->syncInclusions($tour, $data['inclusions'] ?? [], 'inclusion');
             $this->syncInclusions($tour, $data['exclusions'] ?? [], 'exclusion');
@@ -239,9 +249,26 @@ class TourService
 
     protected function extractTourFields(array $data): array
     {
-        $excluded = ['itineraries', 'inclusions', 'exclusions', 'thumbnail', 'gallery', 'remove_thumbnail', 'remove_gallery_ids'];
+        $excluded = ['pricings', 'itineraries', 'inclusions', 'exclusions', 'thumbnail', 'gallery', 'remove_thumbnail', 'remove_gallery_ids'];
 
         return array_diff_key($data, array_flip($excluded));
+    }
+
+    protected function syncPricings(Tour $tour, array $pricings): void
+    {
+        $tour->pricings()->delete();
+
+        foreach ($pricings as $pricing) {
+            if (! empty($pricing['name'])) {
+                $tour->pricings()->create([
+                    'name' => $pricing['name'],
+                    'description' => $pricing['description'] ?? null,
+                    'adult_price' => $pricing['adult_price'] ?? 0,
+                    'child_price' => $pricing['child_price'] ?? null,
+                    'infant_price' => $pricing['infant_price'] ?? null,
+                ]);
+            }
+        }
     }
 
     protected function syncItineraries(Tour $tour, array $itineraries): void
@@ -252,7 +279,6 @@ class TourService
             if (! empty($itin['title'])) {
                 TourItinerary::create([
                     'tour_id' => $tour->id,
-                    'day_number' => $itin['day_number'] ?? 1,
                     'title' => $itin['title'],
                     'description' => $itin['description'] ?? null,
                     'meals_included' => $itin['meals_included'] ?? [],

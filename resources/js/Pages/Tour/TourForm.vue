@@ -105,7 +105,7 @@
                     />
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-2 gap-4">
                     <div>
                         <AppLabel for="duration_days">Days *</AppLabel>
                         <AppInputText
@@ -124,26 +124,6 @@
                             v-model="form.duration_nights"
                             type="number"
                             min="0"
-                        />
-                    </div>
-
-                    <div>
-                        <AppLabel for="difficulty_level">Difficulty</AppLabel>
-                        <AppCombobox
-                            v-model="form.difficulty_level"
-                            :options="difficultyOptions"
-                            combo-label="Select Difficulty"
-                            class="w-full"
-                        />
-                    </div>
-
-                    <div>
-                        <AppLabel for="tour_type">Tour Type</AppLabel>
-                        <AppCombobox
-                            v-model="form.tour_type"
-                            :options="tourTypeOptions"
-                            combo-label="Select Tour Type"
-                            class="w-full"
                         />
                     </div>
                 </div>
@@ -188,6 +168,35 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <AppLabel for="languages">Languages (comma separated)</AppLabel>
+                        <AppInputText
+                            id="languages"
+                            v-model="languagesInput"
+                            type="text"
+                            placeholder="English, Bengali, Hindi"
+                        />
+                    </div>
+                    <div>
+                        <AppLabel>Age Restrictions</AppLabel>
+                        <div class="grid grid-cols-2 gap-2">
+                            <AppInputText
+                                v-model="form.age_restrictions.min_age"
+                                type="number"
+                                min="0"
+                                placeholder="Min Age"
+                            />
+                            <AppInputText
+                                v-model="form.age_restrictions.max_age"
+                                type="number"
+                                min="0"
+                                placeholder="Max Age"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex items-center gap-4">
                     <AppCheckbox
                         id="is_featured"
@@ -212,96 +221,88 @@
 
             <!-- Pricing Tab -->
             <div v-show="activeTab === 'pricing'" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <AppLabel for="base_price">Base Price (৳) *</AppLabel>
-                        <AppInputText
-                            id="base_price"
-                            v-model="form.base_price"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            :class="{ 'input-error': errorsFields.includes('base_price') }"
-                        />
+                <div
+                    v-for="(pricing, index) in form.pricings"
+                    :key="index"
+                    class="p-4 border rounded-lg bg-slate-50"
+                >
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-medium">{{ pricing.name || 'Pricing Package' }}</h4>
+                        <button
+                            type="button"
+                            @click="removePricing(index)"
+                            class="text-red-500 hover:text-red-700"
+                        >
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
                     </div>
 
-                    <div>
-                        <AppLabel for="discount_price">Discount Price (৳)</AppLabel>
-                        <AppInputText
-                            id="discount_price"
-                            v-model="form.discount_price"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                        />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <AppLabel>Package Name *</AppLabel>
+                            <AppInputText
+                                v-model="pricing.name"
+                                type="text"
+                                placeholder="e.g., Standard, Premium, Budget"
+                            />
+                        </div>
+                        <div>
+                            <AppLabel>Description</AppLabel>
+                            <AppInputText
+                                v-model="pricing.description"
+                                type="text"
+                                placeholder="Package description"
+                            />
+                        </div>
                     </div>
 
-                    <div>
-                        <AppLabel for="child_price">Child Price (৳)</AppLabel>
-                        <AppInputText
-                            id="child_price"
-                            v-model="form.child_price"
-                            type="number"
-                            min="0"
-                            step="0.01"
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <AppLabel>Adult Price (৳) *</AppLabel>
+                            <AppInputText
+                                v-model="pricing.adult_price"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                            />
+                        </div>
+                        <div>
+                            <AppLabel>Child Price (৳)</AppLabel>
+                            <AppInputText
+                                v-model="pricing.child_price"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                            />
+                        </div>
+                        <div>
+                            <AppLabel>Infant Price (৳)</AppLabel>
+                            <AppInputText
+                                v-model="pricing.infant_price"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <AppCheckbox
+                            v-model="pricing.is_active"
+                            :checked="pricing.is_active"
+                            label="Active"
                         />
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <AppLabel for="deposit_amount">Deposit Amount (৳)</AppLabel>
-                        <AppInputText
-                            id="deposit_amount"
-                            v-model="form.deposit_amount"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                        />
-                    </div>
-
-                    <div>
-                        <AppLabel for="deposit_type">Deposit Type</AppLabel>
-                        <AppCombobox
-                            v-model="form.deposit_type"
-                            :options="depositTypeOptions"
-                            combo-label="Select Deposit Type"
-                            class="w-full"
-                        />
-                    </div>
-
-                    <div>
-                        <AppLabel for="cancellation_days">Free Cancellation Days</AppLabel>
-                        <AppInputText
-                            id="cancellation_days"
-                            v-model="form.cancellation_days"
-                            type="number"
-                            min="0"
-                        />
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <AppLabel for="min_group_size">Min Group Size</AppLabel>
-                        <AppInputText
-                            id="min_group_size"
-                            v-model="form.min_group_size"
-                            type="number"
-                            min="1"
-                        />
-                    </div>
-
-                    <div>
-                        <AppLabel for="max_group_size">Max Group Size</AppLabel>
-                        <AppInputText
-                            id="max_group_size"
-                            v-model="form.max_group_size"
-                            type="number"
-                            min="1"
-                        />
-                    </div>
-                </div>
+                <AppButton
+                    type="button"
+                    class="btn btn-secondary"
+                    @click="addPricing"
+                >
+                    <i class="ri-add-line mr-1"></i>
+                    Add Pricing Package
+                </AppButton>
             </div>
 
             <!-- Itinerary Tab -->
@@ -312,7 +313,7 @@
                     class="p-4 border rounded-lg bg-slate-50"
                 >
                     <div class="flex justify-between items-center mb-3">
-                        <h4 class="font-medium">Day {{ day.day_number }}</h4>
+                        <h4 class="font-medium">{{ day.title || 'Itinerary Item' }}</h4>
                         <button
                             type="button"
                             @click="removeItinerary(index)"
@@ -402,6 +403,163 @@
                         <i class="ri-add-line mr-1"></i> Add Exclusion
                     </AppButton>
                 </div>
+            </div>
+
+            <!-- Highlights Tab -->
+            <div v-show="activeTab === 'highlights'" class="space-y-4">
+                <div
+                    v-for="(highlight, index) in form.highlights"
+                    :key="index"
+                    class="p-4 border rounded-lg bg-slate-50"
+                >
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-medium">{{ highlight.title || 'Highlight' }}</h4>
+                        <button type="button" @click="removeHighlight(index)" class="text-red-500 hover:text-red-700">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <AppLabel>Title *</AppLabel>
+                            <AppInputText v-model="highlight.title" type="text" placeholder="Highlight title" />
+                        </div>
+                        <div>
+                            <AppLabel>Icon (Remix Icon class)</AppLabel>
+                            <AppInputText v-model="highlight.icon" type="text" placeholder="e.g., ri-star-line" />
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <AppLabel>Description</AppLabel>
+                        <AppTextArea v-model="highlight.description" rows="2" placeholder="Highlight description" />
+                    </div>
+                </div>
+                <AppButton type="button" class="btn btn-secondary" @click="addHighlight">
+                    <i class="ri-add-line mr-1"></i> Add Highlight
+                </AppButton>
+            </div>
+
+            <!-- FAQs Tab -->
+            <div v-show="activeTab === 'faqs'" class="space-y-4">
+                <div
+                    v-for="(faq, index) in form.faqs"
+                    :key="index"
+                    class="p-4 border rounded-lg bg-slate-50"
+                >
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-medium">FAQ {{ index + 1 }}</h4>
+                        <button type="button" @click="removeFaq(index)" class="text-red-500 hover:text-red-700">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <AppLabel>Question *</AppLabel>
+                            <AppInputText v-model="faq.question" type="text" placeholder="Frequently asked question" />
+                        </div>
+                        <div>
+                            <AppLabel>Answer *</AppLabel>
+                            <AppTextArea v-model="faq.answer" rows="3" placeholder="Answer to the question" />
+                        </div>
+                        <AppCheckbox v-model="faq.is_active" :checked="faq.is_active" label="Active" />
+                    </div>
+                </div>
+                <AppButton type="button" class="btn btn-secondary" @click="addFaq">
+                    <i class="ri-add-line mr-1"></i> Add FAQ
+                </AppButton>
+            </div>
+
+            <!-- Extras Tab -->
+            <div v-show="activeTab === 'extras'" class="space-y-4">
+                <div
+                    v-for="(extra, index) in form.extras"
+                    :key="index"
+                    class="p-4 border rounded-lg bg-slate-50"
+                >
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-medium">{{ extra.name || 'Extra' }}</h4>
+                        <button type="button" @click="removeExtra(index)" class="text-red-500 hover:text-red-700">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <AppLabel>Name *</AppLabel>
+                            <AppInputText v-model="extra.name" type="text" placeholder="e.g., Airport Transfer" />
+                        </div>
+                        <div>
+                            <AppLabel>Description</AppLabel>
+                            <AppInputText v-model="extra.description" type="text" placeholder="Extra description" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                        <div>
+                            <AppLabel>Price (৳)</AppLabel>
+                            <AppInputText v-model="extra.price" type="number" min="0" step="0.01" />
+                        </div>
+                        <div>
+                            <AppLabel>Price Type</AppLabel>
+                            <AppCombobox v-model="extra.price_type" :options="priceTypeOptions" combo-label="Select Type" class="w-full" />
+                        </div>
+                        <div>
+                            <AppLabel>Max Quantity</AppLabel>
+                            <AppInputText v-model="extra.max_quantity" type="number" min="1" />
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <AppCheckbox v-model="extra.is_required" :checked="extra.is_required" label="Required" />
+                        <AppCheckbox v-model="extra.is_active" :checked="extra.is_active" label="Active" />
+                    </div>
+                </div>
+                <AppButton type="button" class="btn btn-secondary" @click="addExtra">
+                    <i class="ri-add-line mr-1"></i> Add Extra
+                </AppButton>
+            </div>
+
+            <!-- Cancellation Policies Tab -->
+            <div v-show="activeTab === 'cancellation'" class="space-y-4">
+                <div
+                    v-for="(policy, index) in form.cancellation_policies"
+                    :key="index"
+                    class="p-4 border rounded-lg bg-slate-50"
+                >
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-medium">{{ policy.name || 'Policy' }}</h4>
+                        <button type="button" @click="removeCancellationPolicy(index)" class="text-red-500 hover:text-red-700">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <AppLabel>Policy Name *</AppLabel>
+                            <AppInputText v-model="policy.name" type="text" placeholder="e.g., Full Refund" />
+                        </div>
+                        <div>
+                            <AppLabel>Description</AppLabel>
+                            <AppInputText v-model="policy.description" type="text" placeholder="Policy description" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                        <div>
+                            <AppLabel>Days Before Departure</AppLabel>
+                            <AppInputText v-model="policy.days_before_departure" type="number" min="0" />
+                        </div>
+                        <div>
+                            <AppLabel>Refund Percentage (%)</AppLabel>
+                            <AppInputText v-model="policy.refund_percentage" type="number" min="0" max="100" step="0.01" />
+                        </div>
+                        <div>
+                            <AppLabel>Cancellation Fee (৳)</AppLabel>
+                            <AppInputText v-model="policy.cancellation_fee" type="number" min="0" step="0.01" />
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <AppCheckbox v-model="policy.is_default" :checked="policy.is_default" label="Default Policy" />
+                        <AppCheckbox v-model="policy.is_active" :checked="policy.is_active" label="Active" />
+                    </div>
+                </div>
+                <AppButton type="button" class="btn btn-secondary" @click="addCancellationPolicy">
+                    <i class="ri-add-line mr-1"></i> Add Cancellation Policy
+                </AppButton>
             </div>
 
             <!-- Media Tab -->
@@ -577,29 +735,15 @@ const tabs = [
     { id: 'pricing', label: 'Pricing', icon: 'ri-money-dollar-circle-line' },
     { id: 'itinerary', label: 'Itinerary', icon: 'ri-route-line' },
     { id: 'inclusions', label: 'Inclusions', icon: 'ri-checkbox-circle-line' },
+    { id: 'highlights', label: 'Highlights', icon: 'ri-star-line' },
+    { id: 'faqs', label: 'FAQs', icon: 'ri-question-line' },
+    { id: 'extras', label: 'Extras', icon: 'ri-add-box-line' },
+    { id: 'cancellation', label: 'Cancellation', icon: 'ri-close-circle-line' },
     { id: 'media', label: 'Media', icon: 'ri-image-line' },
     { id: 'seo', label: 'SEO', icon: 'ri-search-eye-line' }
 ]
 
 const activeTab = ref('basic')
-
-const difficultyOptions = [
-    { value: 'easy', label: 'Easy' },
-    { value: 'moderate', label: 'Moderate' },
-    { value: 'challenging', label: 'Challenging' },
-    { value: 'extreme', label: 'Extreme' }
-]
-
-const tourTypeOptions = [
-    { value: 'group', label: 'Group Tour' },
-    { value: 'private', label: 'Private Tour' },
-    { value: 'custom', label: 'Custom Tour' }
-]
-
-const depositTypeOptions = [
-    { value: 'fixed', label: 'Fixed Amount' },
-    { value: 'percentage', label: 'Percentage' }
-]
 
 const form = useForm({
     name: props.tour?.name || '',
@@ -611,29 +755,26 @@ const form = useForm({
     description: props.tour?.description || '',
     duration_days: props.tour?.duration_days || 1,
     duration_nights: props.tour?.duration_nights || 0,
-    difficulty_level: props.tour?.difficulty_level || 'easy',
-    tour_type: props.tour?.tour_type || 'group',
-    base_price: props.tour?.base_price || 0,
-    discount_price: props.tour?.discount_price || null,
-    child_price: props.tour?.child_price || null,
-    deposit_amount: props.tour?.deposit_amount || null,
-    deposit_type: props.tour?.deposit_type || 'fixed',
-    cancellation_days: props.tour?.cancellation_days || 0,
-    min_group_size: props.tour?.min_group_size || 1,
-    max_group_size: props.tour?.max_group_size || null,
-    start_location: props.tour?.start_location || 'Dhaka',
-    end_location: props.tour?.end_location || 'Dhaka',
+    start_location: props.tour?.start_location || '',
+    end_location: props.tour?.end_location || '',
     valid_from: props.tour?.valid_from || null,
     valid_to: props.tour?.valid_to || null,
+    languages: props.tour?.languages || [],
+    age_restrictions: props.tour?.age_restrictions || {},
     is_featured: props.tour?.is_featured ?? false,
     is_bestseller: props.tour?.is_bestseller ?? false,
     is_active: props.tour?.is_active ?? true,
     meta_title: props.tour?.meta_title || '',
     meta_description: props.tour?.meta_description || '',
     meta_keywords: props.tour?.meta_keywords || '',
+    pricings: props.tour?.pricings || [],
     itineraries: props.tour?.itineraries || [],
-    inclusions: props.tour?.inclusions || [''],
-    exclusions: props.tour?.exclusions || [''],
+    inclusions: props.tour?.inclusions || [],
+    exclusions: props.tour?.exclusions || [],
+    highlights: props.tour?.highlights || [],
+    faqs: props.tour?.faqs || [],
+    extras: props.tour?.extras || [],
+    cancellation_policies: props.tour?.cancellation_policies || [],
     thumbnail: null,
     gallery: [],
     remove_thumbnail: false,
@@ -641,6 +782,16 @@ const form = useForm({
 })
 
 const { isCreate, isEdit } = useFormContext()
+
+// Options for extras price type
+const priceTypeOptions = [
+    { value: 'per_person', label: 'Per Person' },
+    { value: 'per_booking', label: 'Per Booking' },
+    { value: 'per_day', label: 'Per Day' }
+]
+
+// Languages input handling
+const languagesInput = ref(props.tour?.languages?.join(', ') || '')
 
 const generateSlug = () => {
     if (isCreate.value) {
@@ -650,29 +801,101 @@ const generateSlug = () => {
     }
 }
 
+const addPricing = () => {
+    form.pricings.push({
+        name: '',
+        description: '',
+        adult_price: 0,
+        child_price: null,
+        infant_price: null,
+        is_active: true
+    })
+}
+
+const removePricing = (index) => {
+    form.pricings.splice(index, 1)
+}
+
 const addItinerary = () => {
     const nextDay = form.itineraries.length + 1
     form.itineraries.push({
-        day_number: nextDay,
         title: `Day ${nextDay}`,
         description: '',
         accommodation: '',
-        meals_included: []
+        meals_included: [],
+        distance_km: null,
+        activities: [],
+        highlights: []
     })
 }
 
 const removeItinerary = (index) => {
     form.itineraries.splice(index, 1)
-    // Renumber days
-    form.itineraries.forEach((item, i) => {
-        item.day_number = i + 1
+}
+
+const addHighlight = () => {
+    form.highlights.push({
+        title: '',
+        description: '',
+        icon: ''
     })
 }
 
+const removeHighlight = (index) => {
+    form.highlights.splice(index, 1)
+}
+
+const addFaq = () => {
+    form.faqs.push({
+        question: '',
+        answer: '',
+        is_active: true
+    })
+}
+
+const removeFaq = (index) => {
+    form.faqs.splice(index, 1)
+}
+
+const addExtra = () => {
+    form.extras.push({
+        name: '',
+        description: '',
+        price: 0,
+        price_type: 'per_person',
+        max_quantity: null,
+        is_required: false,
+        is_active: true
+    })
+}
+
+const removeExtra = (index) => {
+    form.extras.splice(index, 1)
+}
+
+const addCancellationPolicy = () => {
+    form.cancellation_policies.push({
+        name: '',
+        description: '',
+        days_before_departure: 0,
+        refund_percentage: 100,
+        cancellation_fee: 0,
+        is_default: false,
+        is_active: true
+    })
+}
+
+const removeCancellationPolicy = (index) => {
+    form.cancellation_policies.splice(index, 1)
+}
+
 const submitForm = () => {
+    // Convert languages input to array
+    form.languages = languagesInput.value.split(',').map(l => l.trim()).filter(l => l)
+    
     // Filter out empty inclusions/exclusions
-    form.inclusions = form.inclusions.filter(i => i.trim())
-    form.exclusions = form.exclusions.filter(e => e.trim())
+    form.inclusions = form.inclusions.filter(i => typeof i === 'string' ? i.trim() : i?.title?.trim())
+    form.exclusions = form.exclusions.filter(e => typeof e === 'string' ? e.trim() : e?.title?.trim())
 
     if (isCreate.value) {
         form.post(route('tour.store'), {

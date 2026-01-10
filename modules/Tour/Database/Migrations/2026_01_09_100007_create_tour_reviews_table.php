@@ -28,6 +28,10 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->date('travel_date')->nullable();
             $table->unsignedInteger('helpful_count')->default(0);
+
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
 
