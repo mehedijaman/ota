@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('payment_gateway')->nullable();
             $table->string('gateway_transaction_id')->nullable();
             $table->decimal('amount', 12, 2)->default(0);
-            $table->string('currency', 3)->default('BDT');
             $table->enum('status', ['pending', 'processing', 'completed', 'failed', 'refunded'])->default('pending');
             $table->enum('type', ['deposit', 'partial', 'full', 'refund'])->default('full');
             $table->timestamp('paid_at')->nullable();

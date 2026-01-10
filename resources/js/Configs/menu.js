@@ -14,6 +14,12 @@ export default {
             icon: 'ri-compass-3-line',
             children: [
                 {
+                    label: 'Bookings',
+                    permission: 'tour-booking-list',
+                    icon: 'ri-calendar-check-line',
+                    link: route('tourBooking.index')
+                },
+                {
                     label: 'Tour List',
                     permission: 'tour-list',
                     icon: 'ri-map-pin-line',
@@ -37,12 +43,7 @@ export default {
                     icon: 'ri-road-map-line',
                     link: route('tourDestination.index')
                 },
-                {
-                    label: 'Bookings',
-                    permission: 'tour-booking-list',
-                    icon: 'ri-calendar-check-line',
-                    link: route('tourBooking.index')
-                },
+               
                 {
                     label: 'Reviews',
                     permission: 'tour-review-list',

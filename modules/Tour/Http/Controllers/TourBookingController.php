@@ -7,8 +7,7 @@ use Inertia\Response;
 use Modules\Support\Http\Controllers\BackendController;
 use Modules\Tour\Http\Requests\TourBookingValidate;
 use Modules\Tour\Models\TourBooking;
-use Modules\Tour\Services\GetTourCategoryOptions;
-use Modules\Tour\Services\GetTourDestinationOptions;
+use Modules\Tour\Services\GetTourOptions;
 use Modules\Tour\Services\TourBookingService;
 
 class TourBookingController extends BackendController
@@ -31,13 +30,16 @@ class TourBookingController extends BackendController
         ]);
     }
 
-    public function create(
-        GetTourCategoryOptions $categoryOptions,
-        GetTourDestinationOptions $destinationOptions
-    ): Response {
+    public function create(GetTourOptions $tourOptions): Response
+    {
         return inertia('TourBooking/BookingForm', [
-            'categories' => $categoryOptions->get(),
-            'destinations' => $destinationOptions->get(),
+            'tours' => $tourOptions->getWithPricing(),
+            'customers' => \Modules\Customer\Models\Customer::select('id', 'name', 'email')
+                ->orderBy('name')
+                ->get(),
+            'agents' => \Modules\Agent\Models\Agent::select('id', 'name', 'email')
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 
@@ -49,10 +51,17 @@ class TourBookingController extends BackendController
             ->with('success', 'Booking created successfully. Booking #'.$booking->booking_number);
     }
 
-    public function edit(int $id): Response
+    public function edit(int $id, GetTourOptions $tourOptions): Response
     {
         return inertia('TourBooking/BookingForm', [
             'booking' => $this->bookingService->getById($id),
+            'tours' => $tourOptions->getWithPricing(),
+            'customers' => \Modules\Customer\Models\Customer::select('id', 'name', 'email')
+                ->orderBy('name')
+                ->get(),
+            'agents' => \Modules\Agent\Models\Agent::select('id', 'name', 'email')
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 

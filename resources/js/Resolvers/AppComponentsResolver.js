@@ -20,7 +20,8 @@ const componentGroups = {
         'AppLabel',
         'AppRadioButton',
         'AppTextArea',
-        'AppTipTapEditor'
+        'AppTipTapEditor',
+        'AppSelect'
     ],
     Menu: [
         'AppBreadCrumb',
