@@ -422,9 +422,17 @@ class SiteTourController extends SiteController
             abort(403, 'Unauthorized access to this booking');
         }
 
-        $validated = $request->validate([
+        $rules = [
             'payment_gateway' => 'required|in:sslcommerz,bkash,manual',
-        ]);
+        ];
+
+        // Add validation for manual payment
+        if ($request->payment_gateway === 'manual') {
+            $rules['transaction_number'] = 'required|string|max:255';
+            $rules['notes'] = 'nullable|string|max:1000';
+        }
+
+        $validated = $request->validate($rules);
 
         $gateway = $validated['payment_gateway'];
 
@@ -447,7 +455,7 @@ class SiteTourController extends SiteController
     protected function initiateSslcommerzPayment($booking)
     {
         try {
-            $sslcommerz = new \Raziul\Sslcommerz\Sslcommerz();
+            $sslcommerz = app(\Raziul\Sslcommerz\SslcommerzClient::class);
 
             $sslcommerz->setAmount($booking->total_amount);
             $sslcommerz->setTransactionId($booking->booking_number);
@@ -502,16 +510,36 @@ class SiteTourController extends SiteController
 
     protected function handleManualPayment($booking)
     {
-        // Update booking with manual payment instructions
+        $transactionNumber = request('transaction_number');
+        $notes = request('notes');
+
+        // Update booking with manual payment instructions and transaction details
         $booking->update([
             'payment_method' => 'manual',
-            'notes' => ($booking->notes ?? '') . "\n\nManual payment requested at " . now()->format('Y-m-d H:i:s'),
+            'status' => 'pending', // Explicitly set status to pending
+            'payment_status' => 'pending', // Payment is pending verification
+            'notes' => ($booking->notes ?? '') . "\n\nManual Payment Request:" . 
+                       "\nTransaction ID: " . $transactionNumber . 
+                       "\nNotes: " . $notes . 
+                       "\nRequested at: " . now()->format('Y-m-d H:i:s'),
+        ]);
+
+        // Create a payment record for the manual transaction
+        $booking->payments()->create([
+            'amount' => $booking->total_amount,
+            'payment_method' => 'manual',
+            'transaction_id' => $transactionNumber,
+            'status' => 'pending',
+            'payment_details' => [
+                'notes' => $notes,
+                'user_ip' => request()->ip(),
+            ],
         ]);
 
         return redirect()->route('site.tour.bookingConfirmation', [
             'slug' => $booking->tour->slug,
             'booking' => $booking->booking_number,
-        ])->with('info', 'Manual payment selected. Our team will contact you with payment instructions.');
+        ])->with('success', 'Manual payment submitted! We will verify your transaction (' . $transactionNumber . ') and confirm your booking shortly.');
     }
 
     public function paymentSuccess(Request $request, string $booking)
@@ -524,7 +552,7 @@ class SiteTourController extends SiteController
         try {
             // For SSLCommerz
             if ($request->has('tran_id')) {
-                $sslcommerz = new \Raziul\Sslcommerz\Sslcommerz();
+                $sslcommerz = new \Raziul\Sslcommerz\SslcommerzClient();
                 $validation = $sslcommerz->validate($request->all());
 
                 if ($validation->isSuccessful()) {
@@ -614,7 +642,7 @@ class SiteTourController extends SiteController
             // Verify and process IPN
             if ($request->has('tran_id')) {
                 // SSLCommerz IPN
-                $sslcommerz = new \Raziul\Sslcommerz\Sslcommerz();
+                $sslcommerz = new \Raziul\Sslcommerz\SslcommerzClient();
                 $validation = $sslcommerz->validate($request->all());
 
                 if ($validation->isSuccessful() && $bookingRecord->payment_status !== 'paid') {

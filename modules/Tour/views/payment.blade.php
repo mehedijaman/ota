@@ -47,13 +47,15 @@
         <div class="bg-white rounded-2xl shadow-lg p-6">
             <h2 class="font-bold text-xl text-slate-800 mb-6">Select Payment Method</h2>
 
-            <form action="{{ route('site.tour.processPayment', $booking->booking_number) }}" method="POST">
+            <form action="{{ route('site.tour.processPayment', $booking->booking_number) }}" method="POST"
+                x-data="{ gateway: '' }">
                 @csrf
 
                 <div class="space-y-4">
                     <!-- SSLCommerz -->
                     <label class="block cursor-pointer">
-                        <input type="radio" name="payment_gateway" value="sslcommerz" required class="sr-only peer">
+                        <input type="radio" name="payment_gateway" value="sslcommerz" required class="sr-only peer"
+                            x-model="gateway">
                         <div
                             class="border-2 border-slate-200 rounded-xl p-6 transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:border-blue-300">
                             <div class="flex items-center justify-between">
@@ -77,7 +79,8 @@
 
                     <!-- bKash -->
                     <label class="block cursor-pointer">
-                        <input type="radio" name="payment_gateway" value="bkash" required class="sr-only peer">
+                        <input type="radio" name="payment_gateway" value="bkash" required class="sr-only peer"
+                            x-model="gateway">
                         <div
                             class="border-2 border-slate-200 rounded-xl p-6 transition-all peer-checked:border-pink-500 peer-checked:bg-pink-50 hover:border-pink-300">
                             <div class="flex items-center justify-between">
@@ -101,7 +104,8 @@
 
                     <!-- Manual Payment -->
                     <label class="block cursor-pointer">
-                        <input type="radio" name="payment_gateway" value="manual" required class="sr-only peer">
+                        <input type="radio" name="payment_gateway" value="manual" required class="sr-only peer"
+                            x-model="gateway">
                         <div
                             class="border-2 border-slate-200 rounded-xl p-6 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 hover:border-green-300">
                             <div class="flex items-center justify-between">
@@ -123,34 +127,70 @@
                         </div>
                     </label>
                 </div>
-
-                @error('payment_gateway')
-                    <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
-                @enderror
-
-                <div class="mt-8 flex gap-4">
-                    <a href="{{ route('site.tour.bookingConfirmation', ['slug' => $booking->tour->slug, 'booking' => $booking->booking_number]) }}"
-                        class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 px-6 rounded-xl font-semibold text-center transition-colors">
-                        Pay Later
-                    </a>
-                    <button type="submit"
-                        class="flex-1 bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 px-6 rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
-                        <i class="ri-secure-payment-line"></i>
-                        Proceed to Payment
-                    </button>
-                </div>
-            </form>
         </div>
 
-        <!-- Security Notice -->
-        <div class="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <div class="flex items-start gap-3">
-                <i class="ri-shield-check-line text-blue-600 text-xl"></i>
-                <div class="text-sm text-blue-800">
-                    <p class="font-semibold mb-1">Secure Payment</p>
-                    <p>Your payment information is encrypted and secure. We never store your card details.</p>
+        <!-- Manual Payment Details -->
+        <div x-show="gateway === 'manual'"
+            class="mt-8 border-l-4 border-green-500 bg-green-50 p-6 rounded-r-xl transition-all duration-300"
+            style="display: none;">
+            <div class="flex gap-3 mb-4">
+                <div class="p-2 bg-green-100 rounded-lg h-fit">
+                    <i class="ri-information-line text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-800 text-lg">Manual Payment Instructions</h4>
+                    <p class="text-slate-600 text-sm mt-1">
+                        Please provide the transaction details of your payment. We will verify the transaction and confirm
+                        your booking.
+                    </p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Transaction ID / Number <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="transaction_number" x-bind:required="gateway === 'manual'"
+                        class="w-full border-slate-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 py-2.5 px-4"
+                        placeholder="e.g. TRPM12345678">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Notes (Optional)</label>
+                    <textarea name="notes" rows="3"
+                        class="w-full border-slate-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 py-2.5 px-4"
+                        placeholder="Bank name, branch, or any additional information..."></textarea>
                 </div>
             </div>
         </div>
+
+        @error('payment_gateway')
+            <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+        @enderror
+
+        <div class="mt-8 flex gap-4">
+            <a href="{{ route('site.tour.bookingConfirmation', ['slug' => $booking->tour->slug, 'booking' => $booking->booking_number]) }}"
+                class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 px-6 rounded-xl font-semibold text-center transition-colors">
+                Pay Later
+            </a>
+            <button type="submit"
+                class="flex-1 bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 px-6 rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                <i class="ri-secure-payment-line"></i>
+                Proceed to Payment
+            </button>
+        </div>
+        </form>
+    </div>
+
+    <!-- Security Notice -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+            <i class="ri-shield-check-line text-blue-600 text-xl"></i>
+            <div class="text-sm text-blue-800">
+                <p class="font-semibold mb-1">Secure Payment</p>
+                <p>Your payment information is encrypted and secure. We never store your card details.</p>
+            </div>
+        </div>
+    </div>
     </div>
 @endsection

@@ -48,7 +48,8 @@
                     </div>
                 </div>
 
-                <form @submit="submitBooking" class="space-y-6">
+                <form action="{{ route('site.tour.submitBooking', $tour->slug) }}" method="POST" @submit="submitBooking"
+                    class="space-y-6">
                     @csrf
 
                     <!-- Pricing Plan Selection -->
