@@ -2,8 +2,10 @@
 
 namespace Modules\Tour\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Modules\Support\Http\Controllers\SiteController;
 use Modules\Tour\Models\Tour;
@@ -19,6 +21,20 @@ class SiteTourController extends SiteController
     public function __construct(
         protected TourBookingService $bookingService
     ) {}
+
+    /**
+     * Re-authenticate the user who created the booking.
+     * This is needed for payment gateway callbacks where session is lost.
+     */
+    protected function reAuthenticateBookingOwner(TourBooking $booking): void
+    {
+        if (! Auth::check() && $booking->created_by) {
+            $user = User::find($booking->created_by);
+            if ($user) {
+                Auth::login($user);
+            }
+        }
+    }
 
     public function index(): View
     {
@@ -587,6 +603,9 @@ class SiteTourController extends SiteController
             ->with(['tour'])
             ->firstOrFail();
 
+        // Re-authenticate the booking owner (session may be lost from external payment gateway callback)
+        $this->reAuthenticateBookingOwner($bookingRecord);
+
         // Prevent duplicate processing
         if ($bookingRecord->payment_status === 'paid') {
             return redirect()->route('site.tour.bookingConfirmation', [
@@ -700,6 +719,9 @@ class SiteTourController extends SiteController
             ->with(['tour'])
             ->firstOrFail();
 
+        // Re-authenticate the booking owner (session may be lost from external payment gateway callback)
+        $this->reAuthenticateBookingOwner($bookingRecord);
+
         // Log failed payment with details
         \Log::warning('Payment failed for booking: '.$booking, [
             'request_data' => $request->all(),
@@ -715,6 +737,9 @@ class SiteTourController extends SiteController
         $bookingRecord = TourBooking::where('booking_number', $booking)
             ->with(['tour'])
             ->firstOrFail();
+
+        // Re-authenticate the booking owner (session may be lost from external payment gateway callback)
+        $this->reAuthenticateBookingOwner($bookingRecord);
 
         \Log::info('Payment cancelled for booking: '.$booking);
 
