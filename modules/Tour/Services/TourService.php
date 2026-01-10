@@ -46,7 +46,6 @@ class TourService
             'faqs',
             'pricings',
             'extras',
-            'departureDates' => fn ($q) => $q->upcoming()->limit(10),
             'reviews' => fn ($q) => $q->approved()->latest()->limit(5),
         ])->findOrFail($id);
 
@@ -116,12 +115,6 @@ class TourService
                 'name' => $e->name,
                 'price' => $e->price,
             ])->toArray(),
-            'departure_dates' => $tour->departureDates->map(fn ($d) => [
-                'id' => $d->id,
-                'date' => $d->departure_date->format('M d, Y'),
-                'available' => $d->available_slots - $d->booked_slots,
-                'status' => $d->status,
-            ])->toArray(),
             'reviews' => $tour->reviews->map(fn ($r) => [
                 'rating' => $r->rating,
                 'reviewer_name' => $r->reviewer_name,
@@ -184,6 +177,40 @@ class TourService
             return false;
         }
 
+        return $tour->delete();
+    }
+
+    public function getRecycleBin()
+    {
+        return Tour::query()
+            ->onlyTrashed()
+            ->with(['category', 'destination'])
+            ->orderBy('deleted_at', 'desc')
+            ->search(request('searchContext'), request('searchTerm'))
+            ->paginate(request('rowsPerPage', 15))
+            ->withQueryString()
+            ->through(fn ($tour) => [
+                'id' => $tour->id,
+                'name' => $tour->name,
+                'code' => $tour->code,
+                'category' => $tour->category?->name,
+                'destination' => $tour->destination?->name,
+                'duration' => $tour->duration,
+                'deleted_at' => $tour->deleted_at->format('M d, Y H:i'),
+            ]);
+    }
+
+    public function restore(int $id): bool
+    {
+        $tour = Tour::onlyTrashed()->findOrFail($id);
+
+        return $tour->restore();
+    }
+
+    public function forceDelete(int $id): bool
+    {
+        $tour = Tour::onlyTrashed()->findOrFail($id);
+
         return DB::transaction(function () use ($tour) {
             $tour->itineraries()->delete();
             $tour->allInclusions()->delete();
@@ -192,8 +219,22 @@ class TourService
             $tour->clearMediaCollection('thumbnail');
             $tour->clearMediaCollection('gallery');
 
-            return $tour->delete();
+            return $tour->forceDelete();
         });
+    }
+
+    public function emptyRecycleBin(): void
+    {
+        $tours = Tour::onlyTrashed()->get();
+
+        foreach ($tours as $tour) {
+            $this->forceDelete($tour->id);
+        }
+    }
+
+    public function restoreAll(): void
+    {
+        Tour::onlyTrashed()->restore();
     }
 
     protected function extractTourFields(array $data): array

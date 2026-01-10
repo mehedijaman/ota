@@ -31,6 +31,7 @@ class TourBooking extends BaseModel
             'amount_due' => 'decimal:2',
             'confirmed_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'travel_date' => 'date',
         ];
     }
 
@@ -40,14 +41,6 @@ class TourBooking extends BaseModel
     public function tour(): BelongsTo
     {
         return $this->belongsTo(Tour::class);
-    }
-
-    /**
-     * Get the departure date.
-     */
-    public function departureDate(): BelongsTo
-    {
-        return $this->belongsTo(TourDepartureDate::class, 'departure_date_id');
     }
 
     /**

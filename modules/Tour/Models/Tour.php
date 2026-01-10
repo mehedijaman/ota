@@ -32,6 +32,8 @@ class Tour extends BaseModel implements HasMedia
             'is_featured' => 'boolean',
             'is_bestseller' => 'boolean',
             'is_active' => 'boolean',
+            'valid_from' => 'date',
+            'valid_to' => 'date',
         ];
     }
 
@@ -97,22 +99,6 @@ class Tour extends BaseModel implements HasMedia
     public function pricings(): HasMany
     {
         return $this->hasMany(TourPricing::class);
-    }
-
-    /**
-     * Get departure dates.
-     */
-    public function departureDates(): HasMany
-    {
-        return $this->hasMany(TourDepartureDate::class)->orderBy('departure_date');
-    }
-
-    /**
-     * Get upcoming departure dates.
-     */
-    public function upcomingDepartures(): HasMany
-    {
-        return $this->departureDates()->upcoming();
     }
 
     /**

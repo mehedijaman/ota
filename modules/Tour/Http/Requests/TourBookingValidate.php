@@ -11,7 +11,7 @@ class TourBookingValidate extends Request
     {
         return [
             'tour_id' => ['required', 'exists:tours,id'],
-            'departure_date_id' => ['nullable', 'exists:tour_departure_dates,id'],
+            'travel_date' => ['nullable', 'date'],
             'pricing_id' => ['nullable', 'exists:tour_pricings,id'],
             'adults_count' => ['required', 'integer', 'min:1'],
             'children_count' => ['nullable', 'integer', 'min:0'],

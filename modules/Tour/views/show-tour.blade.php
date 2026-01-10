@@ -299,19 +299,18 @@
                         <span class="text-sm text-slate-500">per person</span>
                     </div>
 
-                    @if($tour->departureDates->count())
+                    @if($tour->valid_from || $tour->valid_to)
                     <div class="mb-6">
-                        <label class="text-sm font-medium text-slate-700 mb-2 block">Select Departure Date</label>
-                        <select class="w-full border border-slate-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
-                            @foreach($tour->departureDates as $date)
-                            <option value="{{ $date->id }}">
-                                {{ $date->departure_date->format('M d, Y') }} 
-                                ({{ $date->available_slots - $date->booked_slots }} slots left)
-                            </option>
-                            @endforeach
-                        </select>
+                        <label class="text-sm font-medium text-slate-700 mb-2 block">Tour Validity</label>
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg py-3 px-4 text-slate-600">
+                            <i class="ri-calendar-line mr-2"></i>
+                            {{ $tour->valid_from?->format('M d, Y') ?? 'Anytime' }} 
+                            - 
+                            {{ $tour->valid_to?->format('M d, Y') ?? 'Ongoing' }}
+                        </div>
                     </div>
                     @endif
+
 
                     <a href="{{ route('site.tour.booking', $tour->slug) }}" class="block w-full bg-orange-600 hover:bg-orange-700 text-white py-4 px-6 rounded-xl font-bold text-center shadow-lg shadow-orange-500/30 transition-all hover:scale-[1.02]">
                         Book Now

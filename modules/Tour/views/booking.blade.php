@@ -36,24 +36,23 @@
                         </div>
                     </div>
 
-                    <!-- Departure Date -->
-                    @if($tour->departureDates->count())
+                    <!-- Travel Date -->
                     <div class="bg-white rounded-2xl shadow-lg p-6">
-                        <h3 class="font-bold text-slate-800 mb-4">Select Departure Date</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            @foreach($tour->departureDates as $date)
-                            <label class="relative cursor-pointer">
-                                <input type="radio" name="departure_date_id" value="{{ $date->id }}" class="peer sr-only" {{ $loop->first ? 'checked' : '' }}>
-                                <div class="p-4 border-2 border-slate-200 rounded-xl peer-checked:border-orange-500 peer-checked:bg-orange-50 transition-all">
-                                    <p class="font-bold text-slate-800">{{ $date->departure_date->format('M d') }}</p>
-                                    <p class="text-xs text-slate-500">{{ $date->departure_date->format('Y') }}</p>
-                                    <p class="text-xs text-green-600 mt-1">{{ $date->available_slots - $date->booked_slots }} slots</p>
-                                </div>
-                            </label>
-                            @endforeach
+                        <h3 class="font-bold text-slate-800 mb-4">Select Travel Date</h3>
+                        <div>
+                            <label class="text-sm text-slate-600 mb-2 block">Preferred Travel Date</label>
+                            <input type="date" name="travel_date" class="w-full border border-slate-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500" min="{{ date('Y-m-d') }}">
+                            @if($tour->valid_from || $tour->valid_to)
+                            <p class="text-xs text-slate-500 mt-2">
+                                Tour available: 
+                                {{ $tour->valid_from?->format('M d, Y') ?? 'Anytime' }} 
+                                - 
+                                {{ $tour->valid_to?->format('M d, Y') ?? 'Ongoing' }}
+                            </p>
+                            @endif
                         </div>
                     </div>
-                    @endif
+
 
                     <!-- Travelers -->
                     <div class="bg-white rounded-2xl shadow-lg p-6">

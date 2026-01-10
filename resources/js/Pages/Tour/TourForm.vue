@@ -10,18 +10,19 @@
 
             <!-- Tabs -->
             <div class="border-b mb-6">
-                <nav class="flex gap-4">
+                <nav class="flex gap-6 overflow-x-auto">
                     <button
                         v-for="tab in tabs"
                         :key="tab.id"
                         @click="activeTab = tab.id"
                         :class="[
-                            'pb-3 px-1 font-medium text-sm border-b-2 transition-colors',
+                            'pb-3 px-1 font-medium text-sm border-b-2 transition-colors whitespace-nowrap flex items-center gap-2',
                             activeTab === tab.id
                                 ? 'border-primary-600 text-primary-600'
                                 : 'border-transparent text-slate-500 hover:text-slate-700'
                         ]"
                     >
+                        <i :class="tab.icon"></i>
                         {{ tab.label }}
                     </button>
                 </nav>
@@ -163,6 +164,26 @@
                             id="end_location"
                             v-model="form.end_location"
                             type="text"
+                        />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <AppLabel for="valid_from">Valid From</AppLabel>
+                        <AppInputText
+                            id="valid_from"
+                            v-model="form.valid_from"
+                            type="date"
+                        />
+                    </div>
+
+                    <div>
+                        <AppLabel for="valid_to">Valid To</AppLabel>
+                        <AppInputText
+                            id="valid_to"
+                            v-model="form.valid_to"
+                            type="date"
                         />
                     </div>
                 </div>
@@ -552,12 +573,12 @@ const breadCrumb = [
 ]
 
 const tabs = [
-    { id: 'basic', label: 'Basic Info' },
-    { id: 'pricing', label: 'Pricing' },
-    { id: 'itinerary', label: 'Itinerary' },
-    { id: 'inclusions', label: 'Inclusions' },
-    { id: 'media', label: 'Media' },
-    { id: 'seo', label: 'SEO' }
+    { id: 'basic', label: 'Basic Info', icon: 'ri-information-line' },
+    { id: 'pricing', label: 'Pricing', icon: 'ri-money-dollar-circle-line' },
+    { id: 'itinerary', label: 'Itinerary', icon: 'ri-route-line' },
+    { id: 'inclusions', label: 'Inclusions', icon: 'ri-checkbox-circle-line' },
+    { id: 'media', label: 'Media', icon: 'ri-image-line' },
+    { id: 'seo', label: 'SEO', icon: 'ri-search-eye-line' }
 ]
 
 const activeTab = ref('basic')
@@ -602,6 +623,8 @@ const form = useForm({
     max_group_size: props.tour?.max_group_size || null,
     start_location: props.tour?.start_location || 'Dhaka',
     end_location: props.tour?.end_location || 'Dhaka',
+    valid_from: props.tour?.valid_from || null,
+    valid_to: props.tour?.valid_to || null,
     is_featured: props.tour?.is_featured ?? false,
     is_bestseller: props.tour?.is_bestseller ?? false,
     is_active: props.tour?.is_active ?? true,

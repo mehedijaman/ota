@@ -15,18 +15,19 @@ return new class extends Migration
             $table->id();
             $table->string('booking_number')->unique();
             $table->foreignId('tour_id')->constrained('tours')->restrictOnDelete();
-            $table->foreignId('departure_date_id')->nullable()->constrained('tour_departure_dates')->nullOnDelete();
             $table->foreignId('pricing_id')->nullable()->constrained('tour_pricings')->nullOnDelete();
             $table->foreignId('customer_id')->nullable()->constrained('customers')->nullOnDelete();
-            $table->unsignedBigInteger('agent_id')->nullable();
-            $table->enum('status', ['pending', 'confirmed', 'processing', 'completed', 'cancelled', 'refunded'])->default('pending');
+            $table->foreignId('agent_id')->nullable()->constrained('agents')->nullOnDelete();
+            $table->date('travel_date')->nullable();
+            $table->enum('status', ['pending', 'processing', 'confirmed', 'completed', 'cancelled', 'refunded'])->default('pending');
             $table->enum('payment_status', ['unpaid', 'partial', 'paid', 'refunded'])->default('unpaid');
-            $table->unsignedSmallInteger('adults_count')->default(1);
-            $table->unsignedSmallInteger('children_count')->default(0);
-            $table->unsignedSmallInteger('infants_count')->default(0);
+            $table->unsignedSmallInteger('adult_count')->default(1);
+            $table->unsignedSmallInteger('child_count')->default(0);
+            $table->unsignedSmallInteger('infant_count')->default(0);
             $table->string('contact_name');
             $table->string('contact_email');
             $table->string('contact_phone')->nullable();
+            $table->string('whatsapp')->nullable();
             $table->text('contact_address')->nullable();
             $table->string('emergency_contact')->nullable();
             $table->string('emergency_phone')->nullable();
@@ -51,13 +52,13 @@ return new class extends Migration
             $table->timestamp('confirmed_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
             $table->text('cancellation_reason')->nullable();
+            $table->foreignId('confirmed_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('cancelled_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
 
             $table->index(['tour_id', 'status']);
-            $table->index(['user_id', 'status']);
             $table->index(['status', 'payment_status']);
-            $table->index('departure_date_id');
             $table->index('created_at');
         });
     }

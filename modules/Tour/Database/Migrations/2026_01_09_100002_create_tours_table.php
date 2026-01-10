@@ -36,6 +36,8 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_bestseller')->default(false);
             $table->boolean('is_active')->default(true);
+            $table->date('valid_from')->nullable();
+            $table->date('valid_to')->nullable();
             $table->string('start_location')->nullable();
             $table->string('end_location')->nullable();
             $table->json('languages')->nullable();

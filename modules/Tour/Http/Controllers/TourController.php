@@ -84,6 +84,45 @@ class TourController extends BackendController
         }
 
         return redirect()->route('tour.index')
-            ->with('success', 'Tour deleted successfully.');
+            ->with('success', 'Tour moved to recycle bin.');
+    }
+
+    public function recycleBin(): Response
+    {
+        return inertia('Tour/TourRecycleBin', [
+            'tours' => $this->tourService->getRecycleBin(),
+        ]);
+    }
+
+    public function restore(int $id): RedirectResponse
+    {
+        $this->tourService->restore($id);
+
+        return redirect()->route('tour.recycleBin')
+            ->with('success', 'Tour restored successfully.');
+    }
+
+    public function destroyForce(int $id): RedirectResponse
+    {
+        $this->tourService->forceDelete($id);
+
+        return redirect()->route('tour.recycleBin')
+            ->with('success', 'Tour permanently deleted.');
+    }
+
+    public function emptyRecycleBin(): RedirectResponse
+    {
+        $this->tourService->emptyRecycleBin();
+
+        return redirect()->route('tour.recycleBin')
+            ->with('success', 'Recycle bin emptied.');
+    }
+
+    public function restoreRecycleBin(): RedirectResponse
+    {
+        $this->tourService->restoreAll();
+
+        return redirect()->route('tour.recycleBin')
+            ->with('success', 'All tours restored.');
     }
 }

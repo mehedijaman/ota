@@ -4,7 +4,6 @@ namespace Modules\Tour\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Modules\Tour\Models\Tour;
-use Modules\Tour\Models\TourDepartureDate;
 use Modules\Tour\Models\TourFaq;
 use Modules\Tour\Models\TourHighlight;
 use Modules\Tour\Models\TourInclusion;
@@ -76,7 +75,6 @@ class TourSeeder extends Seeder
             $this->createExclusions($tour);
             $this->createHighlights($tour);
             $this->createFaqs($tour);
-            $this->createDepartureDates($tour);
 
             $this->command->getOutput()->progressAdvance();
         }
@@ -152,26 +150,6 @@ class TourSeeder extends Seeder
                 'question' => $faq['q'],
                 'answer' => $faq['a'],
                 'sort_order' => $i,
-            ]);
-        }
-    }
-
-    protected function createDepartureDates(Tour $tour): void
-    {
-        // Create 5-10 upcoming departure dates
-        $count = fake()->numberBetween(5, 10);
-
-        for ($i = 0; $i < $count; $i++) {
-            $departureDate = now()->addDays(fake()->numberBetween(7 + ($i * 15), 14 + ($i * 15)));
-            $slots = fake()->numberBetween(10, 30);
-
-            TourDepartureDate::create([
-                'tour_id' => $tour->id,
-                'departure_date' => $departureDate,
-                'return_date' => $departureDate->copy()->addDays($tour->duration_days - 1),
-                'available_slots' => $slots,
-                'booked_slots' => fake()->numberBetween(0, (int) ($slots * 0.5)),
-                'status' => 'available',
             ]);
         }
     }

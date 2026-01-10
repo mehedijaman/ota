@@ -16,21 +16,13 @@ return new class extends Migration
             $table->foreignId('tour_id')->constrained('tours')->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price_per_person', 12, 2)->default(0);
-            $table->decimal('price_per_couple', 12, 2)->nullable();
-            $table->decimal('price_per_group', 12, 2)->nullable();
-            $table->unsignedSmallInteger('group_size_min')->nullable();
-            $table->unsignedSmallInteger('group_size_max')->nullable();
+            $table->decimal('adult_price', 12, 2)->default(0);
             $table->decimal('child_price', 12, 2)->nullable();
             $table->decimal('infant_price', 12, 2)->nullable();
-            $table->decimal('single_supplement', 12, 2)->nullable();
-            $table->date('valid_from')->nullable();
-            $table->date('valid_until')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
             $table->index(['tour_id', 'is_active']);
-            $table->index(['valid_from', 'valid_until']);
         });
     }
 

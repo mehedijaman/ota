@@ -116,7 +116,6 @@ class SiteTourController extends SiteController
                 'faqs',
                 'highlights',
                 'reviews' => fn ($q) => $q->approved()->latest()->take(5),
-                'departureDates' => fn ($q) => $q->upcoming()->orderBy('departure_date'),
             ])
             ->firstOrFail();
 
@@ -143,7 +142,6 @@ class SiteTourController extends SiteController
             ->where('slug', $slug)
             ->active()
             ->with([
-                'departureDates' => fn ($q) => $q->upcoming()->orderBy('departure_date'),
                 'extras',
             ])
             ->firstOrFail();
@@ -159,7 +157,7 @@ class SiteTourController extends SiteController
 
         $validated = $request->validate([
             'tour_id' => 'required|exists:tours,id',
-            'departure_date_id' => 'nullable|exists:tour_departure_dates,id',
+            'travel_date' => 'nullable|date',
             'adults_count' => 'required|integer|min:1|max:50',
             'children_count' => 'nullable|integer|min:0|max:50',
             'infants_count' => 'nullable|integer|min:0|max:50',

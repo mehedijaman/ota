@@ -10,14 +10,13 @@ use Modules\Tour\Models\Tour;
 use Modules\Tour\Models\TourBooking;
 use Modules\Tour\Models\TourBookingExtra;
 use Modules\Tour\Models\TourBookingTraveler;
-use Modules\Tour\Models\TourDepartureDate;
 
 class TourBookingService
 {
     public function getAll()
     {
         return TourBooking::query()
-            ->with(['tour', 'departureDate', 'user'])
+            ->with(['tour', 'user'])
             ->orderBy('id', 'desc')
             ->search(request('searchContext'), request('searchTerm'))
             ->paginate(request('rowsPerPage', 15))
@@ -26,7 +25,7 @@ class TourBookingService
                 'id' => $booking->id,
                 'booking_number' => $booking->booking_number,
                 'tour' => $booking->tour?->name,
-                'departure_date' => $booking->departureDate?->departure_date?->format('d M Y'),
+                'travel_date' => $booking->travel_date?->format('d M Y'),
                 'contact_name' => $booking->contact_name,
                 'contact_email' => $booking->contact_email,
                 'total_travelers' => $booking->total_travelers,
@@ -42,7 +41,6 @@ class TourBookingService
     {
         return TourBooking::with([
             'tour',
-            'departureDate',
             'pricing',
             'user',
             'travelers',
@@ -73,13 +71,8 @@ class TourBookingService
                 $this->saveExtras($booking, $data['extras']);
             }
 
-            // Update departure date slots
-            if ($booking->departure_date_id) {
-                $this->updateDepartureSlots($booking->departure_date_id, $booking->total_travelers);
-            }
-
             // Load relationships for emails
-            $booking->load(['tour', 'departureDate']);
+            $booking->load(['tour']);
 
             // Send confirmation email to customer
             if ($booking->contact_email) {
@@ -207,18 +200,6 @@ class TourBookingService
                 'unit_price' => $extra['unit_price'] ?? 0,
                 'total_price' => ($extra['unit_price'] ?? 0) * $extra['quantity'],
             ]);
-        }
-    }
-
-    protected function updateDepartureSlots(int $departureDateId, int $travelers): void
-    {
-        $departure = TourDepartureDate::find($departureDateId);
-        if ($departure) {
-            $departure->increment('booked_slots', $travelers);
-
-            if ($departure->booked_slots >= $departure->available_slots) {
-                $departure->update(['status' => 'sold_out']);
-            }
         }
     }
 }

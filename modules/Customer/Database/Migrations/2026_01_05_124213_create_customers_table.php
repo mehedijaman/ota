@@ -23,6 +23,9 @@ return new class extends Migration
 
             $table->string('email')->unique();
             $table->string('phone', 50)->nullable()->index();
+            $table->string('whatsapp', 50)->nullable()->index();
+            $table->string('viber', 50)->nullable()->index();
+            $table->string('telegram', 50)->nullable()->index();
 
             // Address
             $table->string('address', 500)->nullable();

@@ -42,6 +42,8 @@ class TourValidate extends Request
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string'],
             'meta_keywords' => ['nullable', 'string'],
+            'valid_from' => ['nullable', 'date'],
+            'valid_to' => ['nullable', 'date', 'after_or_equal:valid_from'],
             'thumbnail' => ['nullable', 'image', 'max:2048'],
             'gallery' => ['nullable', 'array'],
             'gallery.*' => ['image', 'max:2048'],
