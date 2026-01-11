@@ -14,7 +14,7 @@ export default {
             icon: 'ri-compass-3-line',
             children: [
                 {
-                    label: 'Bookings',
+                    label: 'Tour Bookings',
                     permission: 'tour-booking-list',
                     icon: 'ri-calendar-check-line',
                     link: route('tourBooking.index')
@@ -26,26 +26,26 @@ export default {
                     link: route('tour.index')
                 },
                 {
-                    label: 'New Tour',
+                    label: 'Create New Tour',
                     permission: 'tour-create',
                     icon: 'ri-add-circle-line',
                     link: route('tour.create')
                 },
                 {
-                    label: 'Categories',
+                    label: 'Tour Categories',
                     permission: 'tour-category-list',
                     icon: 'ri-folders-line',
                     link: route('tourCategory.index')
                 },
                 {
-                    label: 'Destinations',
+                    label: 'Tour Destinations',
                     permission: 'tour-destination-list',
                     icon: 'ri-road-map-line',
                     link: route('tourDestination.index')
                 },
                
                 {
-                    label: 'Reviews',
+                    label: 'Tour Reviews',
                     permission: 'tour-review-list',
                     icon: 'ri-star-line',
                     link: route('tourReview.index')
