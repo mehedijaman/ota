@@ -85,7 +85,7 @@
 
                 @if(count($galleryImages) > 0)
                     <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
-                        <tour-carousel :images='@json($galleryImages)'></tour-carousel>
+                        <tour-photo-gallery :images='@json($galleryImages)'></tour-photo-gallery>
                     </div>
                 @else
                     <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">

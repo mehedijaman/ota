@@ -22,11 +22,6 @@ class Tour extends BaseModel implements HasMedia
     protected function casts(): array
     {
         return [
-            'base_price' => 'decimal:2',
-            'discount_price' => 'decimal:2',
-            'child_price' => 'decimal:2',
-            'infant_price' => 'decimal:2',
-            'deposit_amount' => 'decimal:2',
             'languages' => 'array',
             'age_restrictions' => 'array',
             'is_featured' => 'boolean',
