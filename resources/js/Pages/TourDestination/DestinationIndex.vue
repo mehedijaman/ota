@@ -2,13 +2,24 @@
     <Head :title="title"></Head>
     <AppSectionHeader :title="title" :bread-crumb="breadCrumb">
         <template #right>
-            <AppButton
-                class="btn btn-primary"
-                @click="$inertia.visit(route('tourDestination.create'))"
-            >
-                <i class="ri-add-fill mr-1"></i>
-                Add Destination
-            </AppButton>
+            <div class="flex flex-col gap-2 sm:flex-row">
+                <AppButton
+                    v-if="can('tour-destination-delete')"
+                    class="btn btn-secondary"
+                    @click="$inertia.visit(route('tourDestination.recycleBin'))"
+                >
+                    <i class="ri-delete-bin-line mr-1"></i>
+                    Recycle Bin
+                </AppButton>
+                <AppButton
+                    v-if="can('tour-destination-create')"
+                    class="btn btn-primary"
+                    @click="$inertia.visit(route('tourDestination.create'))"
+                >
+                    <i class="ri-add-fill mr-1"></i>
+                    Add Destination
+                </AppButton>
+            </div>
         </template>
     </AppSectionHeader>
 
@@ -118,7 +129,9 @@
 import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
+import useAuthCan from '@/Composables/useAuthCan'
 
+const { can } = useAuthCan()
 const { title } = useTitle('Tour Destinations')
 
 defineProps({

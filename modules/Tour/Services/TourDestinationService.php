@@ -60,6 +60,56 @@ class TourDestinationService
         return $destination->delete();
     }
 
+    public function getRecycleBin()
+    {
+        return TourDestination::onlyTrashed()
+            ->withCount('tours')
+            ->orderBy('deleted_at', 'desc')
+            ->search(request('searchContext'), request('searchTerm'))
+            ->paginate(request('rowsPerPage', 15))
+            ->withQueryString()
+            ->through(fn ($dest) => [
+                'id' => $dest->id,
+                'name' => $dest->name,
+                'slug' => $dest->slug,
+                'country' => $dest->country,
+                'city' => $dest->city,
+                'image_url' => $dest->getFirstMediaUrl('image'),
+                'tours_count' => $dest->tours_count,
+                'deleted_at' => $dest->deleted_at->toDateTimeString(),
+            ]);
+    }
+
+    public function restore(int $id): bool
+    {
+        $destination = TourDestination::onlyTrashed()->findOrFail($id);
+
+        return $destination->restore();
+    }
+
+    public function forceDelete(int $id): bool
+    {
+        $destination = TourDestination::onlyTrashed()->findOrFail($id);
+        $destination->clearMediaCollection('image');
+        $destination->clearMediaCollection('gallery');
+
+        return $destination->forceDelete();
+    }
+
+    public function emptyRecycleBin(): void
+    {
+        TourDestination::onlyTrashed()->each(function ($destination) {
+            $destination->clearMediaCollection('image');
+            $destination->clearMediaCollection('gallery');
+            $destination->forceDelete();
+        });
+    }
+
+    public function restoreAll(): void
+    {
+        TourDestination::onlyTrashed()->restore();
+    }
+
     protected function handleMediaUploads(TourDestination $destination, array $data): void
     {
         if (isset($data['image']) && $data['image'] instanceof UploadedFile) {

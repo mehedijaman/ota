@@ -11,6 +11,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Tour Categories
     Route::prefix('tour-categories')->controller(TourCategoryController::class)->name('tourCategory.')->group(function () {
+        // Recycle Bin
+        Route::get('/recycle-bin', 'recycleBin')->name('recycleBin')->can('tour-category-delete');
+        Route::post('/recycle-bin/{id}/restore', 'restore')->name('restore')->can('tour-category-delete');
+        Route::delete('/recycle-bin/{id}/force', 'destroyForce')->name('destroyForce')->can('tour-category-delete');
+        Route::delete('/recycle-bin/empty', 'emptyRecycleBin')->name('emptyRecycleBin')->can('tour-category-delete');
+        Route::post('/recycle-bin/restore-all', 'restoreRecycleBin')->name('restoreRecycleBin')->can('tour-category-delete');
+
+        // Standard CRUD
         Route::get('/', 'index')->name('index')->can('tour-category-list');
         Route::get('create', 'create')->name('create')->can('tour-category-create');
         Route::post('/', 'store')->name('store')->can('tour-category-create');
@@ -21,6 +29,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Tour Destinations
     Route::prefix('tour-destinations')->controller(TourDestinationController::class)->name('tourDestination.')->group(function () {
+        // Recycle Bin
+        Route::get('/recycle-bin', 'recycleBin')->name('recycleBin')->can('tour-destination-delete');
+        Route::post('/recycle-bin/{id}/restore', 'restore')->name('restore')->can('tour-destination-delete');
+        Route::delete('/recycle-bin/{id}/force', 'destroyForce')->name('destroyForce')->can('tour-destination-delete');
+        Route::delete('/recycle-bin/empty', 'emptyRecycleBin')->name('emptyRecycleBin')->can('tour-destination-delete');
+        Route::post('/recycle-bin/restore-all', 'restoreRecycleBin')->name('restoreRecycleBin')->can('tour-destination-delete');
+
+        // Standard CRUD
         Route::get('/', 'index')->name('index')->can('tour-destination-list');
         Route::get('create', 'create')->name('create')->can('tour-destination-create');
         Route::post('/', 'store')->name('store')->can('tour-destination-create');

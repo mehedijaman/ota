@@ -69,4 +69,43 @@ class TourCategoryController extends BackendController
         return redirect()->route('tourCategory.index')
             ->with('success', 'Category deleted successfully.');
     }
+
+    public function recycleBin(): Response
+    {
+        return inertia('TourCategory/CategoryRecycleBin', [
+            'categories' => $this->categoryService->getRecycleBin(),
+        ]);
+    }
+
+    public function restore(int $id): RedirectResponse
+    {
+        $this->categoryService->restore($id);
+
+        return redirect()->route('tourCategory.recycleBin')
+            ->with('success', 'Category restored successfully.');
+    }
+
+    public function destroyForce(int $id): RedirectResponse
+    {
+        $this->categoryService->forceDelete($id);
+
+        return redirect()->route('tourCategory.recycleBin')
+            ->with('success', 'Category permanently deleted.');
+    }
+
+    public function emptyRecycleBin(): RedirectResponse
+    {
+        $this->categoryService->emptyRecycleBin();
+
+        return redirect()->route('tourCategory.recycleBin')
+            ->with('success', 'Recycle bin emptied.');
+    }
+
+    public function restoreRecycleBin(): RedirectResponse
+    {
+        $this->categoryService->restoreAll();
+
+        return redirect()->route('tourCategory.recycleBin')
+            ->with('success', 'All categories restored.');
+    }
 }

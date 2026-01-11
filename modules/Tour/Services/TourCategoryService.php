@@ -60,6 +60,52 @@ class TourCategoryService
         return $category->delete();
     }
 
+    public function getRecycleBin()
+    {
+        return TourCategory::onlyTrashed()
+            ->withCount('tours')
+            ->orderBy('deleted_at', 'desc')
+            ->search(request('searchContext'), request('searchTerm'))
+            ->paginate(request('rowsPerPage', 15))
+            ->withQueryString()
+            ->through(fn ($category) => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'image_url' => $category->getFirstMediaUrl('image'),
+                'tours_count' => $category->tours_count,
+                'deleted_at' => $category->deleted_at->toDateTimeString(),
+            ]);
+    }
+
+    public function restore(int $id): bool
+    {
+        $category = TourCategory::onlyTrashed()->findOrFail($id);
+
+        return $category->restore();
+    }
+
+    public function forceDelete(int $id): bool
+    {
+        $category = TourCategory::onlyTrashed()->findOrFail($id);
+        $category->clearMediaCollection('image');
+
+        return $category->forceDelete();
+    }
+
+    public function emptyRecycleBin(): void
+    {
+        TourCategory::onlyTrashed()->each(function ($category) {
+            $category->clearMediaCollection('image');
+            $category->forceDelete();
+        });
+    }
+
+    public function restoreAll(): void
+    {
+        TourCategory::onlyTrashed()->restore();
+    }
+
     protected function handleMediaUploads(TourCategory $category, array $data): void
     {
         if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
