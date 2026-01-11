@@ -1,11 +1,11 @@
 <?php
 
-namespace Xenon\LaravelBDSms\Provider;
+namespace App\SmsProviders;
 
 use App\Jobs\SendShiramSystemSmsJob;
 use Illuminate\Support\Facades\Http;
-use Xenon\LaravelBDSms\Handler\RenderException;
-use Xenon\LaravelBDSms\Sender;
+use App\Handler\RenderException;
+use App\Sender;
 
 class ShiramSystem extends AbstractProvider
 {
