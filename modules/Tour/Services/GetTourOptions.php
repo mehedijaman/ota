@@ -23,7 +23,10 @@ class GetTourOptions
     {
         return Tour::query()
             ->where('is_active', true)
-            ->with(['pricings' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
+            ->with([
+                'pricings' => fn ($q) => $q->where('is_active', true)->orderBy('name'),
+                'extras' => fn ($q) => $q->where('is_active', true)->orderBy('name'),
+            ])
             ->orderBy('name')
             ->get(['id', 'name', 'code', 'base_price', 'discount_price', 'child_price', 'infant_price'])
             ->map(fn ($tour) => [
@@ -38,6 +41,15 @@ class GetTourOptions
                     'adult_price' => $p->adult_price,
                     'child_price' => $p->child_price,
                     'infant_price' => $p->infant_price,
+                ])->toArray(),
+                'extras' => $tour->extras->map(fn ($e) => [
+                    'id' => $e->id,
+                    'name' => $e->name,
+                    'description' => $e->description,
+                    'price' => $e->price,
+                    'price_type' => $e->price_type,
+                    'max_quantity' => $e->max_quantity,
+                    'is_required' => $e->is_required,
                 ])->toArray(),
             ])
             ->toArray();

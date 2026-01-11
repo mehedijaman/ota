@@ -10,6 +10,7 @@ use Modules\Tour\Models\Tour;
 use Modules\Tour\Models\TourBooking;
 use Modules\Tour\Models\TourBookingExtra;
 use Modules\Tour\Models\TourBookingTraveler;
+use Modules\Tour\Models\TourExtra;
 
 class TourBookingService
 {
@@ -43,6 +44,7 @@ class TourBookingService
             'tour',
             'pricing',
             'customer',
+            'agent',
             'travelers',
             'payments',
             'extras.extra',
@@ -92,11 +94,20 @@ class TourBookingService
     public function update(TourBooking $booking, array $data): TourBooking
     {
         return DB::transaction(function () use ($booking, $data) {
+            // Recalculate pricing
+            $pricing = $this->calculatePricing($data);
+            $data = array_merge($data, $pricing);
+
             $booking->update($data);
 
             if (isset($data['travelers'])) {
                 $booking->travelers()->delete();
                 $this->saveTravelers($booking, $data['travelers']);
+            }
+
+            if (isset($data['extras'])) {
+                $booking->extras()->delete();
+                $this->saveExtras($booking, $data['extras']);
             }
 
             return $booking;
@@ -133,14 +144,53 @@ class TourBookingService
         $childrenCount = $data['child_count'] ?? 0;
         $infantsCount = $data['infant_count'] ?? 0;
 
-        $adultPrice = $tour->discount_price ?? $tour->base_price;
-        $childPrice = $tour->child_price ?? ($adultPrice * 0.6);
-        $infantPrice = $tour->infant_price ?? 0;
+        // Use selected pricing plan if provided, otherwise fall back to tour's base price
+        $pricing = null;
+        if (! empty($data['pricing_id'])) {
+            $pricing = $tour->pricings()->find($data['pricing_id']);
+        }
+
+        if ($pricing) {
+            $adultPrice = $pricing->adult_price ?? 0;
+            $childPrice = $pricing->child_price ?? 0;
+            $infantPrice = $pricing->infant_price ?? 0;
+        } else {
+            $adultPrice = $tour->discount_price ?? $tour->base_price;
+            $childPrice = $tour->child_price ?? ($adultPrice * 0.6);
+            $infantPrice = $tour->infant_price ?? 0;
+        }
 
         $subtotal = ($adultsCount * $adultPrice) + ($childrenCount * $childPrice) + ($infantsCount * $infantPrice);
+
+        // Calculate extras total from extras array
         $extrasTotal = 0;
+        if (! empty($data['extras']) && is_array($data['extras'])) {
+            $extraIds = array_column($data['extras'], 'extra_id');
+            $tourExtras = TourExtra::whereIn('id', $extraIds)->get()->keyBy('id');
+
+            foreach ($data['extras'] as $extra) {
+                $extraId = $extra['extra_id'] ?? null;
+                $quantity = $extra['quantity'] ?? 1;
+
+                if ($extraId && isset($tourExtras[$extraId])) {
+                    $tourExtra = $tourExtras[$extraId];
+                    $extraPrice = $tourExtra->price ?? 0;
+
+                    // Handle different price types
+                    if ($tourExtra->price_type === 'per_person') {
+                        $extrasTotal += $extraPrice * $quantity * ($adultsCount + $childrenCount);
+                    } elseif ($tourExtra->price_type === 'per_day') {
+                        $extrasTotal += $extraPrice * $quantity;
+                    } else {
+                        // per_booking
+                        $extrasTotal += $extraPrice * $quantity;
+                    }
+                }
+            }
+        }
+
         $discountAmount = $data['discount_amount'] ?? 0;
-        $taxAmount = 0; // Can be calculated based on settings
+        $taxAmount = $data['tax_amount'] ?? 0;
 
         $totalAmount = $subtotal + $extrasTotal - $discountAmount + $taxAmount;
         $depositAmount = $tour->deposit_amount ?? ($totalAmount * 0.3);
@@ -188,17 +238,25 @@ class TourBookingService
 
     protected function saveExtras(TourBooking $booking, array $extras): void
     {
+        // Get all extra IDs and fetch their prices from the database
+        $extraIds = array_column($extras, 'extra_id');
+        $tourExtras = TourExtra::whereIn('id', $extraIds)->get()->keyBy('id');
+
         foreach ($extras as $extra) {
             if (empty($extra['extra_id']) || empty($extra['quantity'])) {
                 continue;
             }
 
+            $tourExtra = $tourExtras[$extra['extra_id']] ?? null;
+            $unitPrice = $tourExtra?->price ?? 0;
+            $quantity = $extra['quantity'];
+
             TourBookingExtra::create([
                 'booking_id' => $booking->id,
                 'extra_id' => $extra['extra_id'],
-                'quantity' => $extra['quantity'],
-                'unit_price' => $extra['unit_price'] ?? 0,
-                'total_price' => ($extra['unit_price'] ?? 0) * $extra['quantity'],
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'total_price' => $unitPrice * $quantity,
             ]);
         }
     }

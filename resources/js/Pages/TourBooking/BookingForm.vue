@@ -410,6 +410,84 @@
             </template>
         </AppCard>
 
+        <!-- Optional Extras -->
+        <AppCard v-if="tourExtras.length > 0">
+            <template #title>
+                <div class="flex items-center gap-2">
+                    <i class="ri-add-circle-line text-primary-600"></i>
+                    Optional Extras
+                </div>
+            </template>
+            <template #content>
+                <div class="space-y-4">
+                    <div
+                        v-for="extra in tourExtras"
+                        :key="extra.id"
+                        class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700"
+                        :class="{ 'border-primary-400 dark:border-primary-600 bg-primary-50 dark:bg-primary-900/20': isExtraSelected(extra.id) }"
+                    >
+                        <div class="flex items-start gap-4">
+                            <div class="flex items-center pt-1">
+                                <input
+                                    type="checkbox"
+                                    :checked="isExtraSelected(extra.id)"
+                                    @change="toggleExtra(extra)"
+                                    class="w-5 h-5 rounded text-primary-600 focus:ring-primary-500 cursor-pointer"
+                                />
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h4 class="font-semibold text-slate-800 dark:text-slate-200">
+                                            {{ extra.name }}
+                                            <span v-if="extra.is_required" class="ml-2 text-xs text-red-500">(Required)</span>
+                                        </h4>
+                                        <p v-if="extra.description" class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                                            {{ extra.description }}
+                                        </p>
+                                        <p class="text-sm text-slate-500 dark:text-slate-500 mt-1">
+                                            {{ getPriceTypeLabel(extra.price_type) }}
+                                        </p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-lg font-bold text-primary-600 dark:text-primary-400">
+                                            ৳{{ formatNumber(extra.price) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-if="isExtraSelected(extra.id)" class="mt-3 flex items-center gap-3">
+                                    <AppLabel class="mb-0">Quantity:</AppLabel>
+                                    <div class="flex items-center border border-slate-300 dark:border-slate-600 rounded-lg">
+                                        <button
+                                            type="button"
+                                            @click="updateExtraQuantity(extra.id, -1)"
+                                            class="px-3 py-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-l-lg"
+                                        >
+                                            <i class="ri-subtract-line"></i>
+                                        </button>
+                                        <span class="px-4 py-1 font-medium border-x border-slate-300 dark:border-slate-600">
+                                            {{ getExtraQuantity(extra.id) }}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            @click="updateExtraQuantity(extra.id, 1)"
+                                            class="px-3 py-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-r-lg"
+                                            :disabled="extra.max_quantity && getExtraQuantity(extra.id) >= extra.max_quantity"
+                                        >
+                                            <i class="ri-add-line"></i>
+                                        </button>
+                                    </div>
+                                    <span class="text-sm text-slate-500">
+                                        = ৳{{ formatNumber(calculateExtraTotal(extra)) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </AppCard>
+
         <!-- Pricing & Payment -->
         <AppCard>
             <template #title>
@@ -427,8 +505,8 @@
                                 <span class="font-medium">৳{{ formatNumber(calculatedSubtotal) }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
-                                <span>Extras:</span>
-                                <span class="font-medium">৳{{ formatNumber(form.extras_total) }}</span>
+                                <span>Extras ({{ form.extras.length }} items):</span>
+                                <span class="font-medium">৳{{ formatNumber(calculatedExtrasTotal) }}</span>
                             </div>
                             <div v-if="form.discount_amount > 0" class="flex justify-between text-sm text-green-600">
                                 <span>Discount:</span>
@@ -443,17 +521,11 @@
                                 <span>Total:</span>
                                 <span>৳{{ formatNumber(calculatedTotal) }}</span>
                             </div>
+                            <div class="flex justify-between text-sm text-slate-600 dark:text-slate-400">
+                                <span>Amount Due:</span>
+                                <span class="font-medium">৳{{ formatNumber(calculatedTotal - form.amount_paid) }}</span>
+                            </div>
                         </div>
-                    </div>
-
-                    <div>
-                        <AppLabel for="extras_total">Extras Total</AppLabel>
-                        <AppInputText
-                            v-model.number="form.extras_total"
-                            type="number"
-                            step="0.01"
-                            :error="form.errors.extras_total"
-                        />
                     </div>
 
                     <div>
@@ -619,11 +691,22 @@ const form = useForm({
     tax_amount: props.booking?.tax_amount || 0,
     total_amount: props.booking?.total_amount || 0,
     amount_paid: props.booking?.amount_paid || 0,
+    amount_due: props.booking?.amount_due || 0,
     currency: props.booking?.currency || 'BDT',
     booking_source: props.booking?.booking_source || 'admin',
     internal_notes: props.booking?.internal_notes || '',
     travelers: props.booking?.travelers || [],
+    extras: initializeExtras(),
 })
+
+// Initialize extras from booking data
+function initializeExtras() {
+    if (!props.booking?.extras) return []
+    return props.booking.extras.map(e => ({
+        extra_id: e.extra_id || e.extra?.id,
+        quantity: e.quantity || 1,
+    }))
+}
 
 // Options
 const tourOptions = computed(() => 
@@ -670,6 +753,12 @@ const pricingSelectOptions = computed(() =>
         label: p.name
     }))
 )
+
+// Tour extras
+const tourExtras = computed(() => {
+    if (!selectedTour.value) return []
+    return selectedTour.value.extras || []
+})
 
 const bookingSourceOptions = [
     { value: 'website', label: 'Website' },
@@ -725,9 +814,32 @@ const calculatedSubtotal = computed(() => {
     return adultTotal + childTotal + infantTotal
 })
 
+const calculatedExtrasTotal = computed(() => {
+    if (!form.extras || form.extras.length === 0) return 0
+    
+    let total = 0
+    form.extras.forEach(extra => {
+        const tourExtra = tourExtras.value.find(e => e.id === extra.extra_id)
+        if (tourExtra) {
+            const extraPrice = tourExtra.price || 0
+            const quantity = extra.quantity || 1
+            
+            // Handle different price types
+            if (tourExtra.price_type === 'per_person') {
+                total += extraPrice * quantity * (form.adult_count + form.child_count)
+            } else {
+                // per_booking or per_day
+                total += extraPrice * quantity
+            }
+        }
+    })
+    
+    return total
+})
+
 const calculatedTotal = computed(() => {
     return calculatedSubtotal.value + 
-           form.extras_total - 
+           calculatedExtrasTotal.value - 
            form.discount_amount + 
            form.tax_amount
 })
@@ -744,6 +856,59 @@ const getTravelerTypeBadge = (type) => {
     return badges[type] || 'bg-slate-100 text-slate-700'
 }
 
+// Extras methods
+const isExtraSelected = (extraId) => {
+    return form.extras.some(e => e.extra_id === extraId)
+}
+
+const getExtraQuantity = (extraId) => {
+    const extra = form.extras.find(e => e.extra_id === extraId)
+    return extra ? extra.quantity : 0
+}
+
+const toggleExtra = (extra) => {
+    const index = form.extras.findIndex(e => e.extra_id === extra.id)
+    if (index > -1) {
+        form.extras.splice(index, 1)
+    } else {
+        form.extras.push({
+            extra_id: extra.id,
+            quantity: 1
+        })
+    }
+}
+
+const updateExtraQuantity = (extraId, delta) => {
+    const extra = form.extras.find(e => e.extra_id === extraId)
+    if (extra) {
+        const tourExtra = tourExtras.value.find(e => e.id === extraId)
+        const maxQty = tourExtra?.max_quantity || 99
+        extra.quantity = Math.max(1, Math.min(maxQty, extra.quantity + delta))
+    }
+}
+
+const calculateExtraTotal = (extra) => {
+    const selectedExtra = form.extras.find(e => e.extra_id === extra.id)
+    if (!selectedExtra) return 0
+    
+    const quantity = selectedExtra.quantity || 1
+    const price = extra.price || 0
+    
+    if (extra.price_type === 'per_person') {
+        return price * quantity * (form.adult_count + form.child_count)
+    }
+    return price * quantity
+}
+
+const getPriceTypeLabel = (priceType) => {
+    const labels = {
+        'per_person': 'Per Person',
+        'per_booking': 'Per Booking',
+        'per_day': 'Per Day'
+    }
+    return labels[priceType] || priceType
+}
+
 const onTourChange = () => {
     console.log('Tour changed, tour_id:', form.tour_id)
     console.log('Selected tour:', selectedTour.value)
@@ -757,6 +922,9 @@ const onTourChange = () => {
         form.pricing_id = pricingOptions.value[0].id
         console.log('Auto-selected pricing:', form.pricing_id)
     }
+    
+    // Reset extras when tour changes
+    form.extras = []
     
     // Reset calculated values
     form.subtotal = 0
@@ -867,6 +1035,7 @@ const updateLeadTraveler = (index) => {
 const submit = () => {
     // Update calculated values
     form.subtotal = calculatedSubtotal.value
+    form.extras_total = calculatedExtrasTotal.value
     form.total_amount = calculatedTotal.value
     form.amount_due = calculatedTotal.value - form.amount_paid
     

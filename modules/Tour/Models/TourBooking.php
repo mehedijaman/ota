@@ -3,6 +3,7 @@
 namespace Modules\Tour\Models;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -10,8 +11,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Support\Models\BaseModel;
 use Modules\Support\Traits\ActivityLog;
 use Modules\Support\Traits\Searchable;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Tour\Database\Factories\TourBookingFactory;
 
 class TourBooking extends BaseModel
@@ -68,6 +67,14 @@ class TourBooking extends BaseModel
     public function customer(): BelongsTo
     {
         return $this->belongsTo(\Modules\Customer\Models\Customer::class);
+    }
+
+    /**
+     * Get the agent.
+     */
+    public function agent(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Agent\Models\Agent::class);
     }
 
     /**

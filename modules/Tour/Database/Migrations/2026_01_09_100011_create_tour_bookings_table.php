@@ -36,13 +36,12 @@ return new class extends Migration
             $table->text('medical_conditions')->nullable();
             $table->decimal('subtotal', 12, 2)->default(0);
             $table->decimal('extras_total', 12, 2)->default(0);
+            $table->decimal('tax_amount', 12, 2)->default(0);
             $table->decimal('discount_amount', 12, 2)->default(0);
             $table->string('discount_code')->nullable();
-            $table->decimal('tax_amount', 12, 2)->default(0);
             $table->decimal('total_amount', 12, 2)->default(0);
             $table->decimal('amount_paid', 12, 2)->default(0);
             $table->decimal('amount_due', 12, 2)->default(0);
-            $table->string('currency', 3)->default('BDT');
             $table->enum('booking_source', ['website', 'admin', 'agent', 'api'])->default('website');
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
