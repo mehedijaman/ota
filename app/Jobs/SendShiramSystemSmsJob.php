@@ -24,6 +24,11 @@ class SendShiramSystemSmsJob implements ShouldQueue
     public int $backoff;
 
     /**
+     * The number of seconds the job can run before timing out.
+     */
+    public int $timeout = 30;
+
+    /**
      * @param  array<string,mixed>  $post
      */
     public function __construct(
