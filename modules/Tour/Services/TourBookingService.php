@@ -129,9 +129,9 @@ class TourBookingService
             return [];
         }
 
-        $adultsCount = $data['adults_count'] ?? 1;
-        $childrenCount = $data['children_count'] ?? 0;
-        $infantsCount = $data['infants_count'] ?? 0;
+        $adultsCount = $data['adult_count'] ?? 1;
+        $childrenCount = $data['child_count'] ?? 0;
+        $infantsCount = $data['infant_count'] ?? 0;
 
         $adultPrice = $tour->discount_price ?? $tour->base_price;
         $childPrice = $tour->child_price ?? ($adultPrice * 0.6);

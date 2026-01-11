@@ -32,12 +32,29 @@ class TourBookingController extends BackendController
 
     public function create(GetTourOptions $tourOptions): Response
     {
+        $customers = \Modules\Customer\Models\Customer::select('id', 'first_name', 'last_name', 'email', 'phone', 'whatsapp', 'address')
+            ->orderBy('first_name')
+            ->get()
+            ->map(fn ($customer) => [
+                'id' => $customer->id,
+                'name' => $customer->full_name,
+                'email' => $customer->email,
+                'phone' => $customer->phone,
+                'whatsapp' => $customer->whatsapp,
+                'address' => $customer->address,
+            ]);
+
         return inertia('TourBooking/BookingForm', [
             'tours' => $tourOptions->getWithPricing(),
-            'customers' => \Modules\Customer\Models\Customer::select('id', 'name', 'email')
-                ->orderBy('name')
-                ->get(),
-            'agents' => \Modules\Agent\Models\Agent::select('id', 'name', 'email')
+            'customers' => $customers,
+            'agents' => \Modules\Agent\Models\Agent::select(
+                'id',
+                'name',
+                'email',
+                'phone',
+                'whatsapp',
+                'address'
+            )
                 ->orderBy('name')
                 ->get(),
         ]);
@@ -53,13 +70,30 @@ class TourBookingController extends BackendController
 
     public function edit(int $id, GetTourOptions $tourOptions): Response
     {
+        $customers = \Modules\Customer\Models\Customer::select('id', 'first_name', 'last_name', 'email', 'phone', 'whatsapp', 'address')
+            ->orderBy('first_name')
+            ->get()
+            ->map(fn ($customer) => [
+                'id' => $customer->id,
+                'name' => $customer->full_name,
+                'email' => $customer->email,
+                'phone' => $customer->phone,
+                'whatsapp' => $customer->whatsapp,
+                'address' => $customer->address,
+            ]);
+
         return inertia('TourBooking/BookingForm', [
             'booking' => $this->bookingService->getById($id),
             'tours' => $tourOptions->getWithPricing(),
-            'customers' => \Modules\Customer\Models\Customer::select('id', 'name', 'email')
-                ->orderBy('name')
-                ->get(),
-            'agents' => \Modules\Agent\Models\Agent::select('id', 'name', 'email')
+            'customers' => $customers,
+            'agents' => \Modules\Agent\Models\Agent::select(
+                'id',
+                'name',
+                'email',
+                'phone',
+                'whatsapp',
+                'address'
+            )
                 ->orderBy('name')
                 ->get(),
         ]);

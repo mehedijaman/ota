@@ -40,8 +40,6 @@ return new class extends Migration
             $table->string('discount_code')->nullable();
             $table->decimal('tax_amount', 12, 2)->default(0);
             $table->decimal('total_amount', 12, 2)->default(0);
-            $table->decimal('deposit_amount', 12, 2)->default(0);
-            $table->decimal('deposit_paid', 12, 2)->default(0);
             $table->decimal('amount_paid', 12, 2)->default(0);
             $table->decimal('amount_due', 12, 2)->default(0);
             $table->string('currency', 3)->default('BDT');

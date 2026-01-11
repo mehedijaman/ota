@@ -20,60 +20,52 @@
             <template #content>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Tour Selection -->
-                    <div class="md:col-span-2">
+                    <div>
                         <AppLabel for="tour_id" required>Select Tour</AppLabel>
                         <AppCombobox
                             class="w-full"
                             v-model="form.tour_id"
                             :options="tourOptions"
                             :error="form.errors.tour_id"
-                            @change="onTourChange"
-                            placeholder="Choose a tour..."
+                            :emit-value="true"
+                            combo-label="Choose a tour..."
+                            @update:modelValue="onTourChange"
                         />
                     </div>
 
-                    <!-- Pricing Plan -->
-                    <div v-if="selectedTour && pricingOptions.length" class="md:col-span-2">
+                    <!-- Pricing Plan Selection -->
+                    <div>
                         <AppLabel for="pricing_id" required>Select Pricing Plan</AppLabel>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">Choose a pricing plan for this tour</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div
-                                v-for="pricing in pricingOptions"
-                                :key="pricing.id"
-                                @click="form.pricing_id = pricing.id"
-                                :class="[
-                                    'relative border-2 rounded-lg p-4 cursor-pointer transition-all',
-                                    form.pricing_id === pricing.id
-                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-md'
-                                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-primary-300 dark:hover:border-primary-600'
-                                ]"
-                            >
-                                <!-- Selected Indicator -->
-                                <div 
-                                    v-if="form.pricing_id === pricing.id" 
-                                    class="absolute top-2 right-2 bg-primary-500 text-white rounded-full p-1"
-                                >
-                                    <i class="ri-check-line text-sm"></i>
+                        <AppSelect
+                            v-model="form.pricing_id"
+                            :options="pricingSelectOptions"
+                            :error="form.errors.pricing_id"
+                            placeholder="Choose a pricing plan..."
+                        />
+                    </div>
+
+                    <!-- Pricing Details Display -->
+                    <div v-if="selectedPricing" class="md:col-span-2">
+                        <div class="bg-linear-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 p-6 rounded-xl border-2 border-primary-200 dark:border-primary-700 shadow-sm">
+                            <div class="flex items-center gap-2 mb-4">
+                                <i class="ri-price-tag-3-line text-primary-600 dark:text-primary-400 text-xl"></i>
+                                <h4 class="font-semibold text-primary-900 dark:text-primary-100">{{ selectedPricing.name }} - Pricing Details</h4>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-lg">
+                                    <div class="text-sm text-slate-600 dark:text-slate-400 mb-1">Adult Price</div>
+                                    <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">৳{{ formatNumber(selectedPricing.adult_price) }}</div>
                                 </div>
-                                
-                                <h4 class="font-semibold text-slate-800 dark:text-slate-200 mb-3 pr-8">{{ pricing.name }}</h4>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-slate-600 dark:text-slate-400">Adult:</span>
-                                        <span class="text-primary-600 dark:text-primary-400 font-bold">৳{{ formatNumber(pricing.adult_price) }}</span>
-                                    </div>
-                                    <div v-if="pricing.child_price > 0" class="flex justify-between items-center">
-                                        <span class="text-slate-600 dark:text-slate-400">Child:</span>
-                                        <span class="text-slate-700 dark:text-slate-300 font-medium">৳{{ formatNumber(pricing.child_price) }}</span>
-                                    </div>
-                                    <div v-if="pricing.infant_price > 0" class="flex justify-between items-center">
-                                        <span class="text-slate-600 dark:text-slate-400">Infant:</span>
-                                        <span class="text-slate-700 dark:text-slate-300 font-medium">৳{{ formatNumber(pricing.infant_price) }}</span>
-                                    </div>
+                                <div v-if="selectedPricing.child_price > 0" class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-lg">
+                                    <div class="text-sm text-slate-600 dark:text-slate-400 mb-1">Child Price</div>
+                                    <div class="text-2xl font-bold text-amber-600 dark:text-amber-400">৳{{ formatNumber(selectedPricing.child_price) }}</div>
+                                </div>
+                                <div v-if="selectedPricing.infant_price > 0" class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-lg">
+                                    <div class="text-sm text-slate-600 dark:text-slate-400 mb-1">Infant Price</div>
+                                    <div class="text-2xl font-bold text-green-600 dark:text-green-400">৳{{ formatNumber(selectedPricing.infant_price) }}</div>
                                 </div>
                             </div>
                         </div>
-                        <p v-if="form.errors.pricing_id" class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.errors.pricing_id }}</p>
                     </div>
 
                     <!-- Travel Date -->
@@ -150,7 +142,8 @@
                             :options="customerOptions"
                             :error="form.errors.customer_id"
                             placeholder="Select customer (optional)"
-                            clearable
+                            searchable
+                            @update:modelValue="onCustomerChange"
                         />
                     </div>
 
@@ -161,7 +154,8 @@
                             :options="agentOptions"
                             :error="form.errors.agent_id"
                             placeholder="Select agent (optional)"
-                            clearable
+                            searchable
+                            @update:modelValue="onAgentChange"
                         />
                     </div>
                 </div>
@@ -491,26 +485,6 @@
                     </div>
 
                     <div>
-                        <AppLabel for="deposit_amount">Deposit Amount</AppLabel>
-                        <AppInputText
-                            v-model.number="form.deposit_amount"
-                            type="number"
-                            step="0.01"
-                            :error="form.errors.deposit_amount"
-                        />
-                    </div>
-
-                    <div>
-                        <AppLabel for="deposit_paid">Deposit Paid</AppLabel>
-                        <AppInputText
-                            v-model.number="form.deposit_paid"
-                            type="number"
-                            step="0.01"
-                            :error="form.errors.deposit_paid"
-                        />
-                    </div>
-
-                    <div>
                         <AppLabel for="amount_paid">Amount Paid</AppLabel>
                         <AppInputText
                             v-model.number="form.amount_paid"
@@ -644,8 +618,6 @@ const form = useForm({
     discount_code: props.booking?.discount_code || '',
     tax_amount: props.booking?.tax_amount || 0,
     total_amount: props.booking?.total_amount || 0,
-    deposit_amount: props.booking?.deposit_amount || 0,
-    deposit_paid: props.booking?.deposit_paid || 0,
     amount_paid: props.booking?.amount_paid || 0,
     currency: props.booking?.currency || 'BDT',
     booking_source: props.booking?.booking_source || 'admin',
@@ -656,41 +628,48 @@ const form = useForm({
 // Options
 const tourOptions = computed(() => 
     props.tours?.map(tour => ({ 
-        value: tour.id || tour.value, 
-        label: tour.name || tour.label 
+        value: tour.id, 
+        label: tour.name 
     })) || []
 )
 
 const customerOptions = computed(() => 
     props.customers?.map(customer => ({ 
         value: customer.id, 
-        label: `${customer.name} (${customer.email})` 
+        label: `${customer.name}${customer.email ? ' - ' + customer.email : ''}${customer.phone ? ' - ' + customer.phone : ''}` 
     })) || []
 )
 
 const agentOptions = computed(() => 
     props.agents?.map(agent => ({ 
         value: agent.id, 
-        label: `${agent.name} (${agent.email})` 
+        label: `${agent.name}${agent.email ? ' - ' + agent.email : ''}${agent.phone ? ' - ' + agent.phone : ''}` 
     })) || []
 )
 
 const selectedTour = computed(() => {
     if (!form.tour_id) return null
-    return props.tours?.find(tour => (tour.id || tour.value) === form.tour_id)
+    return props.tours?.find(tour => tour.id === form.tour_id)
 })
 
 const pricingOptions = computed(() => {
     if (!selectedTour.value) return []
     const pricings = selectedTour.value.pricings || []
     return pricings.map(p => ({
-        id: p.id || p.value,
-        name: p.name || p.label,
+        id: p.id,
+        name: p.name,
         adult_price: p.adult_price || 0,
         child_price: p.child_price || 0,
         infant_price: p.infant_price || 0,
     }))
 })
+
+const pricingSelectOptions = computed(() => 
+    pricingOptions.value.map(p => ({
+        value: p.id,
+        label: p.name
+    }))
+)
 
 const bookingSourceOptions = [
     { value: 'website', label: 'Website' },
@@ -766,17 +745,70 @@ const getTravelerTypeBadge = (type) => {
 }
 
 const onTourChange = () => {
+    console.log('Tour changed, tour_id:', form.tour_id)
+    console.log('Selected tour:', selectedTour.value)
+    console.log('Pricing options:', pricingOptions.value)
+    
     // Reset pricing when tour changes
     form.pricing_id = null
     
     // Auto-select first pricing if available
     if (pricingOptions.value.length > 0) {
         form.pricing_id = pricingOptions.value[0].id
+        console.log('Auto-selected pricing:', form.pricing_id)
     }
     
     // Reset calculated values
     form.subtotal = 0
     form.total_amount = 0
+}
+
+const onCustomerChange = (customerId) => {
+    if (!customerId) return
+    
+    const customer = props.customers?.find(c => c.id === customerId)
+    if (!customer) return
+    
+    // Auto-fill contact details from customer
+    if (!isEditing.value || !form.contact_name) {
+        form.contact_name = customer.name || ''
+    }
+    if (!isEditing.value || !form.contact_email) {
+        form.contact_email = customer.email || ''
+    }
+    if (!isEditing.value || !form.contact_phone) {
+        form.contact_phone = customer.phone || ''
+    }
+    if (!isEditing.value || !form.whatsapp) {
+        form.whatsapp = customer.whatsapp || customer.phone || ''
+    }
+    if (!isEditing.value || !form.contact_address) {
+        form.contact_address = customer.address || ''
+    }
+}
+
+const onAgentChange = (agentId) => {
+    if (!agentId) return
+    
+    const agent = props.agents?.find(a => a.id === agentId)
+    if (!agent) return
+    
+    // Auto-fill contact details from agent
+    if (!isEditing.value || !form.contact_name) {
+        form.contact_name = agent.name || ''
+    }
+    if (!isEditing.value || !form.contact_email) {
+        form.contact_email = agent.email || ''
+    }
+    if (!isEditing.value || !form.contact_phone) {
+        form.contact_phone = agent.phone || ''
+    }
+    if (!isEditing.value || !form.whatsapp) {
+        form.whatsapp = agent.whatsapp || agent.phone || ''
+    }
+    if (!isEditing.value || !form.contact_address) {
+        form.contact_address = agent.address || ''
+    }
 }
 
 const updateTravelerForms = () => {
