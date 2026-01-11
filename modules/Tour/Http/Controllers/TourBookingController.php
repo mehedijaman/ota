@@ -20,6 +20,7 @@ class TourBookingController extends BackendController
     {
         return inertia('TourBooking/BookingIndex', [
             'bookings' => $this->bookingService->getAll(),
+            'stats' => $this->bookingService->getStats(),
         ]);
     }
 

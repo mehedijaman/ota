@@ -16,10 +16,40 @@ class TourBookingService
 {
     public function getAll()
     {
-        return TourBooking::query()
+        $query = TourBooking::query()
             ->with(['tour', 'customer'])
-            ->orderBy('id', 'desc')
-            ->search(request('searchContext'), request('searchTerm'))
+            ->orderBy('id', 'desc');
+
+        // Apply filters
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('booking_number', 'like', "%{$search}%")
+                    ->orWhere('contact_name', 'like', "%{$search}%")
+                    ->orWhere('contact_email', 'like', "%{$search}%");
+            });
+        }
+
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        if (request('payment_status')) {
+            $query->where('payment_status', request('payment_status'));
+        }
+
+        if (request('travel_from')) {
+            $query->whereDate('travel_date', '>=', request('travel_from'));
+        }
+
+        if (request('travel_to')) {
+            $query->whereDate('travel_date', '<=', request('travel_to'));
+        }
+
+        // Also support legacy search
+        $query->search(request('searchContext'), request('searchTerm'));
+
+        return $query
             ->paginate(request('rowsPerPage', 15))
             ->withQueryString()
             ->through(fn ($booking) => [
@@ -36,6 +66,16 @@ class TourBookingService
                 'payment_status' => $booking->payment_status,
                 'created_at' => $booking->created_at->format('d M Y H:i'),
             ]);
+    }
+
+    public function getStats(): array
+    {
+        return [
+            'total' => TourBooking::count(),
+            'pending' => TourBooking::where('status', 'pending')->count(),
+            'confirmed' => TourBooking::where('status', 'confirmed')->count(),
+            'revenue' => TourBooking::whereIn('status', ['confirmed', 'completed'])->sum('amount_paid'),
+        ];
     }
 
     public function getById(int $id): TourBooking
