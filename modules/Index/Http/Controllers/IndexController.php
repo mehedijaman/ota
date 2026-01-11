@@ -2,8 +2,9 @@
 
 namespace Modules\Index\Http\Controllers;
 
-use Modules\Blog\Services\PostService;
 use Modules\Page\Models\Page;
+use Modules\Blog\Services\PostService;
+use Modules\Tour\Services\TourService;
 use Modules\Support\Http\Controllers\SiteController;
 use Modules\Testimonial\Services\TestimonialService;
 
@@ -14,10 +15,12 @@ class IndexController extends SiteController
         if (is_null($slug)) {
             $topTestimonials = TestimonialService::getTopTestimonials(3);
             $latestPosts = PostService::getLatestPosts(3);
+            $featuredTours = TourService::getFeaturedTours(5);
 
             return view('index::index', [
                 'topTestimonials' => $topTestimonials,
                 'latestPosts' => $latestPosts,
+                'featuredTours' => $featuredTours,
             ]);
         }
 

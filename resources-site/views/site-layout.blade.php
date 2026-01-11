@@ -32,9 +32,9 @@
 <body>
     <div id="app">
         <x-header></x-header>
-    </div>
 
-    @yield('content')
+        @yield('content')
+    </div>
 
     <div id="app-footer">
         <x-footer></x-footer>

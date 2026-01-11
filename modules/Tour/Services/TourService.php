@@ -34,6 +34,16 @@ class TourService
             ]);
     }
 
+    public static function getFeaturedTours($limit = 5)
+    {
+        return Tour::query()
+        ->active()
+        ->featured()
+        ->with(['category', 'destination'])
+        ->take($limit)
+        ->get();
+    }
+
     public function getById(int $id): array
     {
         $tour = Tour::with([
