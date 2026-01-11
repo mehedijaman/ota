@@ -260,4 +260,62 @@ class TourBookingService
             ]);
         }
     }
+
+    public function getRecycleBin()
+    {
+        return TourBooking::onlyTrashed()
+            ->with(['tour'])
+            ->orderBy('deleted_at', 'desc')
+            ->search(request('searchContext'), request('searchTerm'))
+            ->paginate(request('rowsPerPage', 15))
+            ->withQueryString()
+            ->through(fn ($booking) => [
+                'id' => $booking->id,
+                'booking_number' => $booking->booking_number,
+                'tour' => $booking->tour?->name,
+                'travel_date' => $booking->travel_date?->format('d M Y'),
+                'contact_name' => $booking->contact_name,
+                'contact_email' => $booking->contact_email,
+                'total_travelers' => $booking->total_travelers,
+                'total_amount' => $booking->total_amount,
+                'status' => $booking->status,
+                'payment_status' => $booking->payment_status,
+                'deleted_at' => $booking->deleted_at->toDateTimeString(),
+            ]);
+    }
+
+    public function restore(int $id): bool
+    {
+        $booking = TourBooking::onlyTrashed()->findOrFail($id);
+
+        return $booking->restore();
+    }
+
+    public function forceDelete(int $id): bool
+    {
+        $booking = TourBooking::onlyTrashed()->findOrFail($id);
+
+        return DB::transaction(function () use ($booking) {
+            $booking->travelers()->forceDelete();
+            $booking->extras()->forceDelete();
+            $booking->payments()->forceDelete();
+
+            return $booking->forceDelete();
+        });
+    }
+
+    public function emptyRecycleBin(): void
+    {
+        TourBooking::onlyTrashed()->each(function ($booking) {
+            $booking->travelers()->forceDelete();
+            $booking->extras()->forceDelete();
+            $booking->payments()->forceDelete();
+            $booking->forceDelete();
+        });
+    }
+
+    public function restoreAll(): void
+    {
+        TourBooking::onlyTrashed()->restore();
+    }
 }

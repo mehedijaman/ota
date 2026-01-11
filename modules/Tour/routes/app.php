@@ -66,6 +66,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Tour Bookings
     Route::prefix('tour-bookings')->controller(TourBookingController::class)->name('tourBooking.')->group(function () {
+        // Recycle Bin
+        Route::get('/recycle-bin', 'recycleBin')->name('recycleBin')->can('tour-booking-delete');
+        Route::post('/recycle-bin/{id}/restore', 'restore')->name('restore')->can('tour-booking-delete');
+        Route::delete('/recycle-bin/{id}/force', 'destroyForce')->name('destroyForce')->can('tour-booking-delete');
+        Route::delete('/recycle-bin/empty', 'emptyRecycleBin')->name('emptyRecycleBin')->can('tour-booking-delete');
+        Route::post('/recycle-bin/restore-all', 'restoreRecycleBin')->name('restoreRecycleBin')->can('tour-booking-delete');
+
+        // Standard CRUD
         Route::get('/', 'index')->name('index')->can('tour-booking-list');
         Route::get('create', 'create')->name('create')->can('tour-booking-create');
         Route::post('/', 'store')->name('store')->can('tour-booking-create');

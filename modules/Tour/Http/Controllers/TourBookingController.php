@@ -133,4 +133,43 @@ class TourBookingController extends BackendController
         return redirect()->route('tourBooking.index')
             ->with('success', 'Booking deleted successfully.');
     }
+
+    public function recycleBin(): Response
+    {
+        return inertia('TourBooking/BookingRecycleBin', [
+            'bookings' => $this->bookingService->getRecycleBin(),
+        ]);
+    }
+
+    public function restore(int $id): RedirectResponse
+    {
+        $this->bookingService->restore($id);
+
+        return redirect()->route('tourBooking.recycleBin')
+            ->with('success', 'Booking restored successfully.');
+    }
+
+    public function destroyForce(int $id): RedirectResponse
+    {
+        $this->bookingService->forceDelete($id);
+
+        return redirect()->route('tourBooking.recycleBin')
+            ->with('success', 'Booking permanently deleted.');
+    }
+
+    public function emptyRecycleBin(): RedirectResponse
+    {
+        $this->bookingService->emptyRecycleBin();
+
+        return redirect()->route('tourBooking.recycleBin')
+            ->with('success', 'Recycle bin emptied.');
+    }
+
+    public function restoreRecycleBin(): RedirectResponse
+    {
+        $this->bookingService->restoreAll();
+
+        return redirect()->route('tourBooking.recycleBin')
+            ->with('success', 'All bookings restored.');
+    }
 }
