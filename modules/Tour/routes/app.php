@@ -81,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{id}/edit', 'edit')->name('edit')->can('tour-booking-edit');
         Route::put('{id}', 'update')->name('update')->can('tour-booking-edit');
         Route::patch('{id}/status/{status}', 'updateStatus')->name('updateStatus')->can('tour-booking-edit');
+        Route::post('{id}/payment', 'addPayment')->name('addPayment')->can('tour-booking-edit');
         Route::delete('{id}', 'destroy')->name('destroy')->can('tour-booking-delete');
     });
 

@@ -2,6 +2,7 @@
 
 namespace Modules\Tour\Http\Controllers;
 
+use App\Http\Requests\Tour\AddPaymentRequest;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Modules\Support\Http\Controllers\BackendController;
@@ -118,6 +119,16 @@ class TourBookingController extends BackendController
 
         return redirect()->back()
             ->with('success', 'Booking status updated to '.$status.'.');
+    }
+
+    public function addPayment(AddPaymentRequest $request, int $id): RedirectResponse
+    {
+        $booking = TourBooking::findOrFail($id);
+
+        $this->bookingService->addPayment($booking, $request->validated());
+
+        return redirect()->back()
+            ->with('success', 'Payment of ৳'.number_format($request->amount, 2).' recorded successfully.');
     }
 
     public function destroy(int $id): RedirectResponse

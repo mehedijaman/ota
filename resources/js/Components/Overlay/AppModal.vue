@@ -1,14 +1,14 @@
 <template>
     <transition name="modal-fade">
         <div
-            v-show="isModalOpen"
+            v-show="isOpen"
             :class="[backdropClasses]"
             class="fixed inset-0 z-50 flex items-center justify-center p-4"
             @click="hideModal"
         >
             <transition name="modal-scale">
                 <div
-                    v-show="isModalOpen"
+                    v-show="isOpen"
                     :class="[
                         modalSizeClass,
                         placementClass,
@@ -17,11 +17,23 @@
                     @click.stop
                 >
                     <!-- Modal Header -->
-                    <slot v-if="$slots.header" name="header" />
+                    <div v-if="title || $slots.header" class="flex items-center justify-between border-b border-neutral-200 px-6 py-4 dark:border-neutral-700">
+                        <slot name="header">
+                            <h3 class="text-lg font-semibold">{{ title }}</h3>
+                        </slot>
+                        <button
+                            type="button"
+                            class="rounded-lg p-1.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+                            @click="hideModal"
+                        >
+                            <i class="ri-close-line text-xl"></i>
+                        </button>
+                    </div>
 
                     <!-- Modal Body -->
                     <div class="max-h-[80vh] overflow-y-auto px-6 py-4">
                         <slot v-if="$slots.body" name="body" />
+                        <slot v-else />
                     </div>
 
                     <!-- Modal Footer -->
@@ -42,25 +54,42 @@ const props = defineProps({
     },
     placement: {
         type: String,
-        default: 'center' // center, top, bottom, etc.
+        default: 'center'
+    },
+    modelValue: {
+        type: Boolean,
+        default: false
     },
     isModalOpen: {
         type: Boolean,
         default: false
     },
+    title: {
+        type: String,
+        default: ''
+    },
+    maxWidth: {
+        type: String,
+        default: 'md',
+        validator: (value) => ['sm', 'md', 'lg', 'xl', 'full'].includes(value)
+    },
     size: {
         type: String,
-        default: 'md', // sm, md, lg, xl, full
+        default: null,
         validator: (value) => ['sm', 'md', 'lg', 'xl', 'full'].includes(value)
     }
 })
 
-const emit = defineEmits(['modal:toggle'])
+const emit = defineEmits(['update:modelValue', 'modal:toggle'])
+
+const isOpen = computed(() => props.modelValue || props.isModalOpen)
+
+const effectiveSize = computed(() => props.size || props.maxWidth)
 
 const placementClass = computed(() => {
     switch (props.placement) {
         case 'center':
-            return '' // Handled by flex parent
+            return ''
         case 'top':
             return 'mb-auto mt-10'
         case 'bottom':
@@ -75,7 +104,7 @@ const placementClass = computed(() => {
 })
 
 const modalSizeClass = computed(() => {
-    switch (props.size) {
+    switch (effectiveSize.value) {
         case 'sm':
             return 'w-full max-w-sm'
         case 'md':
@@ -92,6 +121,7 @@ const modalSizeClass = computed(() => {
 })
 
 function hideModal() {
+    emit('update:modelValue', false)
     emit('modal:toggle')
 }
 </script>

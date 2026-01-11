@@ -6,6 +6,13 @@
         <template #right>
             <div class="flex flex-wrap gap-2">
                 <AppButton
+                    v-if="booking.payment_status !== 'paid' && booking.status !== 'cancelled' && can('tour-booking-edit')"
+                    class="btn btn-primary"
+                    @click="openPaymentModal"
+                >
+                    <i class="ri-bank-card-line mr-1"></i> Add Payment
+                </AppButton>
+                <AppButton
                     v-if="booking.status === 'pending' && can('tour-booking-edit')"
                     class="btn btn-success"
                     @click="updateStatus('confirmed')"
@@ -911,13 +918,124 @@
             </div>
         </template>
     </AppModal>
+
+    <!-- Add Payment Modal -->
+    <AppModal v-model="showPaymentModal" title="Add Manual Payment" max-width="md">
+        <form @submit.prevent="submitPayment">
+            <div class="space-y-4">
+                <!-- Amount Due Info -->
+                <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-emerald-600 dark:text-emerald-400">Amount Due</p>
+                            <p class="text-2xl font-bold text-emerald-700 dark:text-emerald-300">৳{{ formatNumber(booking.amount_due) }}</p>
+                        </div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/50">
+                            <i class="ri-wallet-3-line text-xl text-emerald-600 dark:text-emerald-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div>
+                    <AppLabel for="amount" required>Payment Amount (৳)</AppLabel>
+                    <AppInputText
+                        id="amount"
+                        v-model="paymentForm.amount"
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        :max="booking.amount_due"
+                        placeholder="Enter payment amount"
+                        :error="paymentForm.errors.amount"
+                    />
+                    <div class="mt-1 flex gap-2">
+                        <button
+                            type="button"
+                            class="rounded bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                            @click="paymentForm.amount = booking.amount_due"
+                        >
+                            Full Amount
+                        </button>
+                        <button
+                            v-if="booking.amount_due > 0"
+                            type="button"
+                            class="rounded bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                            @click="paymentForm.amount = (booking.amount_due / 2).toFixed(2)"
+                        >
+                            50%
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div>
+                    <AppLabel for="payment_method" required>Payment Method</AppLabel>
+                    <AppSelect
+                        id="payment_method"
+                        v-model="paymentForm.payment_method"
+                        :options="paymentMethodOptions"
+                        placeholder="Select payment method..."
+                        :error="paymentForm.errors.payment_method"
+                    />
+                </div>
+
+                <!-- Transaction ID -->
+                <div>
+                    <AppLabel for="transaction_id">Transaction ID / Reference</AppLabel>
+                    <AppInputText
+                        id="transaction_id"
+                        v-model="paymentForm.transaction_id"
+                        placeholder="Enter transaction ID (optional)"
+                        :error="paymentForm.errors.transaction_id"
+                    />
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <AppLabel for="notes">Notes</AppLabel>
+                    <AppTextArea
+                        id="notes"
+                        v-model="paymentForm.notes"
+                        rows="2"
+                        placeholder="Add any notes about this payment..."
+                        :error="paymentForm.errors.notes"
+                    />
+                </div>
+            </div>
+        </form>
+        
+        <template #footer>
+            <div class="flex justify-end gap-3 border-t border-neutral-200 px-6 py-4 dark:border-neutral-700">
+                <AppButton
+                    class="btn btn-secondary"
+                    @click="closePaymentModal"
+                >
+                    Cancel
+                </AppButton>
+                <AppButton
+                    class="btn btn-primary"
+                    @click="submitPayment"
+                    :loading="paymentForm.processing"
+                    :disabled="!paymentForm.amount || !paymentForm.payment_method"
+                >
+                    <i class="ri-check-line mr-1"></i> Record Payment
+                </AppButton>
+            </div>
+        </template>
+    </AppModal>
 </template>
 
 <script setup>
-import { Head, router } from '@inertiajs/vue3'
+import { Head, router, useForm } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import useTitle from '@/Composables/useTitle'
 import useAuthCan from '@/Composables/useAuthCan'
+import AppModal from '@/Components/Overlay/AppModal.vue'
+import AppLabel from '@/Components/Form/AppLabel.vue'
+import AppTextArea from '@/Components/Form/AppTextArea.vue'
+import AppSelect from '@/Components/Form/AppSelect.vue'
+import AppInputText from '@/Components/Form/AppInputText.vue'
 
 const { can } = useAuthCan()
 const { title } = useTitle('Booking Details')
@@ -932,10 +1050,28 @@ const props = defineProps({
 // Modal states
 const showCancelModal = ref(false)
 const showStatusModal = ref(false)
+const showPaymentModal = ref(false)
 const cancelReason = ref('')
 const cancelReasonError = ref('')
 const newStatus = ref('')
 const statusNotes = ref('')
+
+// Payment form
+const paymentForm = useForm({
+    amount: '',
+    payment_method: '',
+    transaction_id: '',
+    notes: ''
+})
+
+const paymentMethodOptions = [
+    { value: 'cash', label: 'Cash' },
+    { value: 'bank_transfer', label: 'Bank Transfer' },
+    { value: 'mobile_banking', label: 'Mobile Banking (bKash/Nagad)' },
+    { value: 'card', label: 'Credit/Debit Card' },
+    { value: 'cheque', label: 'Cheque' },
+    { value: 'other', label: 'Other' }
+]
 
 const breadCrumb = [
     { label: 'Home', href: route('dashboard.index') },
@@ -1088,6 +1224,27 @@ const confirmStatusChange = () => {
             }
         }
     )
+}
+
+const openPaymentModal = () => {
+    paymentForm.reset()
+    paymentForm.clearErrors()
+    showPaymentModal.value = true
+}
+
+const closePaymentModal = () => {
+    showPaymentModal.value = false
+    paymentForm.reset()
+    paymentForm.clearErrors()
+}
+
+const submitPayment = () => {
+    paymentForm.post(route('tourBooking.addPayment', props.booking.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closePaymentModal()
+        }
+    })
 }
 </script>
 

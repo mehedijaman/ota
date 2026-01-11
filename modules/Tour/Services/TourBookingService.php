@@ -9,6 +9,7 @@ use Modules\Tour\Mail\TourBookingConfirmationMail;
 use Modules\Tour\Models\Tour;
 use Modules\Tour\Models\TourBooking;
 use Modules\Tour\Models\TourBookingExtra;
+use Modules\Tour\Models\TourBookingPayment;
 use Modules\Tour\Models\TourBookingTraveler;
 use Modules\Tour\Models\TourExtra;
 
@@ -170,6 +171,45 @@ class TourBookingService
             $booking->save();
 
             return $booking;
+        });
+    }
+
+    /**
+     * Add a manual payment to a booking.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function addPayment(TourBooking $booking, array $data): TourBooking
+    {
+        return DB::transaction(function () use ($booking, $data) {
+            $payment = $booking->payments()->create([
+                'transaction_id' => ! empty($data['transaction_id']) ? $data['transaction_id'] : TourBookingPayment::generateTransactionId(),
+                'amount' => $data['amount'],
+                'payment_method' => $data['payment_method'],
+                'payment_gateway' => 'manual',
+                'status' => 'completed',
+                'notes' => $data['notes'] ?? null,
+                'processed_by' => auth()->id(),
+                'paid_at' => now(),
+            ]);
+
+            $newAmountPaid = $booking->amount_paid + $data['amount'];
+            $newAmountDue = $booking->total_amount - $newAmountPaid;
+
+            $paymentStatus = 'unpaid';
+            if ($newAmountPaid >= $booking->total_amount) {
+                $paymentStatus = 'paid';
+            } elseif ($newAmountPaid > 0) {
+                $paymentStatus = 'partial';
+            }
+
+            $booking->update([
+                'amount_paid' => $newAmountPaid,
+                'amount_due' => max(0, $newAmountDue),
+                'payment_status' => $paymentStatus,
+            ]);
+
+            return $booking->fresh();
         });
     }
 
