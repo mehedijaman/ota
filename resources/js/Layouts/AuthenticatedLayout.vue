@@ -24,13 +24,13 @@
     <main
         class="flex flex-1 flex-col pb-9 transition-[padding-top] duration-300"
         :class="[
-            { 'md:pl-64': isSideBarOpen },
+            { 'md:pl-70': isSideBarOpen },
             isImpersonating ? 'pt-12' : 'pt-0'
         ]"
     >
         <AppFlashMessage />
         <AppTopBar
-            :class="{ 'ml-64': isSideBarOpen }"
+            :class="{ 'ml-70': isSideBarOpen }"
             class="md:ml-0"
             @sidebar:toggle="sidebarToggle"
         />

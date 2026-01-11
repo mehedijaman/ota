@@ -2,10 +2,9 @@
 
 namespace Modules\Tour\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Support\Models\BaseModel;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Tour\Database\Factories\TourPricingFactory;
 
 class TourPricing extends BaseModel
@@ -22,14 +21,9 @@ class TourPricing extends BaseModel
     protected function casts(): array
     {
         return [
-            'price_per_person' => 'decimal:2',
-            'price_per_couple' => 'decimal:2',
-            'price_per_group' => 'decimal:2',
+            'adult_price' => 'decimal:2',
             'child_price' => 'decimal:2',
             'infant_price' => 'decimal:2',
-            'single_supplement' => 'decimal:2',
-            'valid_from' => 'date',
-            'valid_until' => 'date',
             'is_active' => 'boolean',
         ];
     }

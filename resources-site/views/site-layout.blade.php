@@ -36,6 +36,8 @@
         @yield('content')
     </div>
 
+    @yield('alpine-content')
+
     <div id="app-footer">
         <x-footer></x-footer>
     </div>

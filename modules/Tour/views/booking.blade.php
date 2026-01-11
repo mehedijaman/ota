@@ -17,7 +17,9 @@
             <h1 class="text-3xl font-bold text-white">Book Your Trip</h1>
         </div>
     </div>
+@endsection
 
+@section('alpine-content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
         x-data="bookingForm({{ json_encode($tour) }}, {{ json_encode($user) }}, {{ json_encode($customer) }})">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -381,6 +383,7 @@
             </div>
         </div>
     </div>
+@endsection
 
     @push('scripts')
         <script>
@@ -591,4 +594,3 @@
             }
         </script>
     @endpush
-@endsection

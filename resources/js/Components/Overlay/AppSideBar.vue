@@ -1,7 +1,7 @@
 <template>
     <div :class="baseClasses" :aria-hidden="!isVisible.toString()">
         <!-- Sidebar Content -->
-        <div class="sidebar-container fixed z-40 h-screen w-64 overflow-hidden">
+        <div class="sidebar-container fixed z-40 h-screen w-70 overflow-hidden">
             <!-- Dark navy background -->
             <div class="absolute inset-0 sidebar-bg"></div>
             

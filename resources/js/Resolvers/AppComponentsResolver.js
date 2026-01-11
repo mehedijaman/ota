@@ -21,7 +21,9 @@ const componentGroups = {
         'AppRadioButton',
         'AppTextArea',
         'AppTipTapEditor',
-        'AppSelect'
+        'AppSelect',
+        'AppDropdown',
+        'AppDropdownItem'
     ],
     Menu: [
         'AppBreadCrumb',
@@ -31,7 +33,9 @@ const componentGroups = {
         'AppMenuSection'
     ],
     Message: ['AppAlert', 'AppFlashMessage', 'AppToast', 'AppTooltip'],
-    Misc: ['AppButton', 'AppCard', 'AppLink', 'AppSectionHeader', 'AppTopBar'],
+    Misc: [
+        'AppButton', 'AppCard', 'AppLink', 'AppSectionHeader', 'AppTopBar', 
+        'AppEmptyState'],
     Overlay: ['AppConfirmDialog', 'AppModal', 'AppSideBar']
 }
 

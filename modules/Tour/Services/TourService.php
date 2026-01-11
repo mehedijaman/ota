@@ -13,7 +13,40 @@ class TourService
     public function getAll()
     {
         return Tour::query()
-            ->with(['category', 'destination'])
+            ->with(['category', 'destination', 'pricings' => fn ($q) => $q->active()->orderBy('adult_price')])
+            ->when(request('category_id'), fn ($q, $categoryId) => $q->where('category_id', $categoryId))
+            ->when(request('destination_id'), fn ($q, $destinationId) => $q->where('destination_id', $destinationId))
+            ->when(request('status') !== null && request('status') !== '', function ($q) {
+                $q->where('is_active', request('status') === 'active');
+            })
+            ->when(request('is_featured') !== null && request('is_featured') !== '', function ($q) {
+                $q->where('is_featured', request('is_featured') === 'yes');
+            })
+            ->when(request('is_bestseller') !== null && request('is_bestseller') !== '', function ($q) {
+                $q->where('is_bestseller', request('is_bestseller') === 'yes');
+            })
+            ->when(request('valid_from'), fn ($q, $date) => $q->where(function ($query) use ($date) {
+                $query->whereNull('valid_from')->orWhere('valid_from', '<=', $date);
+            })->where(function ($query) use ($date) {
+                $query->whereNull('valid_to')->orWhere('valid_to', '>=', $date);
+            }))
+            ->when(request('valid_to'), fn ($q, $date) => $q->where(function ($query) use ($date) {
+                $query->whereNull('valid_from')->orWhere('valid_from', '<=', $date);
+            })->where(function ($query) use ($date) {
+                $query->whereNull('valid_to')->orWhere('valid_to', '>=', $date);
+            }))
+            ->when(request('duration'), function ($q) {
+                $duration = request('duration');
+                if ($duration === '1') {
+                    $q->where('duration_days', 1);
+                } elseif ($duration === '2-3') {
+                    $q->whereBetween('duration_days', [2, 3]);
+                } elseif ($duration === '4-7') {
+                    $q->whereBetween('duration_days', [4, 7]);
+                } elseif ($duration === '8+') {
+                    $q->where('duration_days', '>=', 8);
+                }
+            })
             ->orderBy('id', 'desc')
             ->search(request('searchContext'), request('searchTerm'))
             ->paginate(request('rowsPerPage', 15))
@@ -27,7 +60,8 @@ class TourService
                 'category' => $tour->category?->name,
                 'destination' => $tour->destination?->name,
                 'duration' => $tour->duration,
-                'base_price' => $tour->base_price,
+                'min_price' => $tour->pricings->first()?->adult_price ?? 0,
+                'max_price' => $tour->pricings->count() > 1 ? $tour->pricings->last()?->adult_price : null,
                 'is_featured' => $tour->is_featured,
                 'is_bestseller' => $tour->is_bestseller,
                 'is_active' => $tour->is_active,
@@ -37,11 +71,11 @@ class TourService
     public static function getFeaturedTours($limit = 5)
     {
         return Tour::query()
-        ->active()
-        ->featured()
-        ->with(['category', 'destination'])
-        ->take($limit)
-        ->get();
+            ->active()
+            ->featured()
+            ->with(['category', 'destination'])
+            ->take($limit)
+            ->get();
     }
 
     public function getById(int $id): array

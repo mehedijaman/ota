@@ -20,10 +20,14 @@ class TourController extends BackendController
         protected TourService $tourService
     ) {}
 
-    public function index(): Response
-    {
+    public function index(
+        GetTourCategoryOptions $categoryOptions,
+        GetTourDestinationOptions $destinationOptions
+    ): Response {
         return inertia('Tour/TourIndex', [
             'tours' => $this->tourService->getAll(),
+            'categories' => $categoryOptions->get(),
+            'destinations' => $destinationOptions->get(),
         ]);
     }
 

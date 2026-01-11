@@ -161,7 +161,7 @@ class SiteTourController extends SiteController
             ->where('slug', $slug)
             ->active()
             ->with([
-                'pricings' => fn ($q) => $q->active()->orderBy('price_per_person'),
+                'pricings' => fn ($q) => $q->active()->orderBy('adult_price'),
                 'extras' => fn ($q) => $q->active()->orderBy('sort_order'),
             ])
             ->firstOrFail();
