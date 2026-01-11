@@ -213,6 +213,44 @@ class TourBookingService
         });
     }
 
+    /**
+     * Verify a pending payment and update booking totals.
+     */
+    public function verifyPayment(TourBooking $booking, int $paymentId): TourBooking
+    {
+        return DB::transaction(function () use ($booking, $paymentId) {
+            $payment = $booking->payments()->where('id', $paymentId)->firstOrFail();
+
+            if ($payment->status !== 'pending') {
+                throw new \Exception('Only pending payments can be verified.');
+            }
+
+            $payment->update([
+                'status' => 'completed',
+                'processed_by' => auth()->id(),
+                'paid_at' => now(),
+            ]);
+
+            $newAmountPaid = $booking->amount_paid + $payment->amount;
+            $newAmountDue = $booking->total_amount - $newAmountPaid;
+
+            $paymentStatus = 'unpaid';
+            if ($newAmountPaid >= $booking->total_amount) {
+                $paymentStatus = 'paid';
+            } elseif ($newAmountPaid > 0) {
+                $paymentStatus = 'partial';
+            }
+
+            $booking->update([
+                'amount_paid' => $newAmountPaid,
+                'amount_due' => max(0, $newAmountDue),
+                'payment_status' => $paymentStatus,
+            ]);
+
+            return $booking->fresh();
+        });
+    }
+
     public function calculatePricing(array $data): array
     {
         $tour = Tour::find($data['tour_id']);

@@ -131,6 +131,16 @@ class TourBookingController extends BackendController
             ->with('success', 'Payment of ৳'.number_format($request->amount, 2).' recorded successfully.');
     }
 
+    public function verifyPayment(int $id, int $paymentId): RedirectResponse
+    {
+        $booking = TourBooking::findOrFail($id);
+
+        $this->bookingService->verifyPayment($booking, $paymentId);
+
+        return redirect()->back()
+            ->with('success', 'Payment verified successfully.');
+    }
+
     public function destroy(int $id): RedirectResponse
     {
         $booking = TourBooking::findOrFail($id);

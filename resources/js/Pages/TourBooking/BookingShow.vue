@@ -604,6 +604,16 @@
                                         <div v-if="payment.notes" class="border-neutral-4 text-neutral-11 mt-3 border-t pt-3 text-sm">
                                             <i class="ri-sticky-note-line mr-1"></i> {{ payment.notes }}
                                         </div>
+                                        
+                                        <!-- Verify Payment Button -->
+                                        <div v-if="payment.status === 'pending' && can('tour-booking-edit')" class="mt-3 border-t border-neutral-200 pt-3 dark:border-neutral-700">
+                                            <AppButton
+                                                class="btn btn-success btn-sm"
+                                                @click="openVerifyModal(payment)"
+                                            >
+                                                <i class="ri-check-double-line mr-1"></i> Verify Payment
+                                            </AppButton>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -965,6 +975,14 @@
                         >
                             50%
                         </button>
+                        <button
+                            v-if="booking.amount_due > 0"
+                            type="button"
+                            class="rounded bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                            @click="paymentForm.amount = (booking.amount_due / 4).toFixed(2)"
+                        >
+                            25%
+                        </button>
                     </div>
                 </div>
 
@@ -1024,6 +1042,62 @@
             </div>
         </template>
     </AppModal>
+
+    <!-- Verify Payment Confirmation Modal -->
+    <AppModal v-model="showVerifyModal" title="Verify Payment" max-width="sm">
+        <div class="space-y-4">
+            <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/50">
+                        <i class="ri-check-double-line text-xl text-emerald-600 dark:text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-emerald-700 dark:text-emerald-300">Confirm Payment Verification</p>
+                        <p class="text-sm text-emerald-600 dark:text-emerald-400">This action cannot be undone.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="paymentToVerify" class="rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <span class="text-neutral-500 dark:text-neutral-400">Amount</span>
+                        <p class="font-bold text-emerald-600 dark:text-emerald-400">৳{{ formatNumber(paymentToVerify.amount) }}</p>
+                    </div>
+                    <div>
+                        <span class="text-neutral-500 dark:text-neutral-400">Method</span>
+                        <p class="font-medium capitalize text-neutral-900 dark:text-neutral-100">{{ paymentToVerify.payment_method }}</p>
+                    </div>
+                    <div v-if="paymentToVerify.transaction_id" class="col-span-2">
+                        <span class="text-neutral-500 dark:text-neutral-400">Transaction ID</span>
+                        <p class="font-mono text-xs font-medium text-neutral-900 dark:text-neutral-100">{{ paymentToVerify.transaction_id }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                Are you sure you want to mark this payment as verified? The booking totals will be updated accordingly.
+            </p>
+        </div>
+        
+        <template #footer>
+            <div class="flex justify-end gap-3 border-t border-neutral-200 px-6 py-4 dark:border-neutral-700">
+                <AppButton
+                    class="btn btn-secondary"
+                    @click="closeVerifyModal"
+                >
+                    Cancel
+                </AppButton>
+                <AppButton
+                    class="btn btn-success"
+                    @click="confirmVerifyPayment"
+                    :loading="verifyingPaymentId !== null"
+                >
+                    <i class="ri-check-double-line mr-1"></i> Verify Payment
+                </AppButton>
+            </div>
+        </template>
+    </AppModal>
 </template>
 
 <script setup>
@@ -1055,6 +1129,9 @@ const cancelReason = ref('')
 const cancelReasonError = ref('')
 const newStatus = ref('')
 const statusNotes = ref('')
+const verifyingPaymentId = ref(null)
+const showVerifyModal = ref(false)
+const paymentToVerify = ref(null)
 
 // Payment form
 const paymentForm = useForm({
@@ -1245,6 +1322,37 @@ const submitPayment = () => {
             closePaymentModal()
         }
     })
+}
+
+const verifyPayment = (paymentId) => {
+    verifyingPaymentId.value = paymentId
+    router.patch(
+        route('tourBooking.verifyPayment', [props.booking.id, paymentId]),
+        {},
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                verifyingPaymentId.value = null
+                closeVerifyModal()
+            }
+        }
+    )
+}
+
+const openVerifyModal = (payment) => {
+    paymentToVerify.value = payment
+    showVerifyModal.value = true
+}
+
+const closeVerifyModal = () => {
+    showVerifyModal.value = false
+    paymentToVerify.value = null
+}
+
+const confirmVerifyPayment = () => {
+    if (paymentToVerify.value) {
+        verifyPayment(paymentToVerify.value.id)
+    }
 }
 </script>
 
