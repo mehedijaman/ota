@@ -624,138 +624,251 @@
                 </div>
             </template>
             <template #content>
-                <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    <!-- Pricing Summary -->
-                    <div class="lg:col-span-1">
-                        <div class="sticky top-4 overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-emerald-50/50 to-white shadow-lg shadow-emerald-500/10 dark:border-emerald-800 dark:from-emerald-900/30 dark:via-emerald-900/20 dark:to-slate-900">
-                            <div class="border-b border-emerald-200 bg-emerald-100/50 px-5 py-4 dark:border-emerald-800 dark:bg-emerald-900/50">
-                                <h4 class="flex items-center gap-2 font-semibold text-emerald-900 dark:text-emerald-100">
-                                    <i class="ri-file-list-3-line"></i>
-                                    Price Summary
-                                </h4>
+                <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                    <!-- Left Column: Adjustments -->
+                    <div class="space-y-6">
+                        <h4 class="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300">
+                            <i class="ri-settings-3-line text-primary-500"></i>
+                            Price Adjustments
+                        </h4>
+                        
+                        <!-- Custom Subtotal Override -->
+                        <div class="group rounded-xl border-2 p-5 transition-all" :class="useCustomSubtotal ? 'border-violet-300 bg-gradient-to-br from-violet-50 to-violet-100/50 shadow-md dark:border-violet-700 dark:from-violet-900/30 dark:to-violet-900/10' : 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50'">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl shadow" :class="useCustomSubtotal ? 'bg-violet-500 text-white' : 'bg-slate-300 text-slate-600 dark:bg-slate-600 dark:text-slate-300'">
+                                        <i class="ri-edit-2-line text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold" :class="useCustomSubtotal ? 'text-violet-700 dark:text-violet-300' : 'text-slate-700 dark:text-slate-300'">Custom Subtotal</p>
+                                        <p class="text-xs" :class="useCustomSubtotal ? 'text-violet-500 dark:text-violet-400' : 'text-slate-500 dark:text-slate-400'">Override calculated traveler price</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex cursor-pointer items-center">
+                                    <input type="checkbox" v-model="useCustomSubtotal" class="peer sr-only">
+                                    <div class="peer h-6 w-11 rounded-full bg-slate-300 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-violet-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-violet-300 dark:border-slate-600 dark:bg-slate-700 dark:peer-focus:ring-violet-800"></div>
+                                </label>
                             </div>
-                            <div class="p-5">
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between text-sm">
-                                        <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                                            <i class="ri-user-line text-primary-500"></i>
-                                            Subtotal
-                                        </span>
-                                        <span class="font-semibold text-slate-800 dark:text-slate-200">৳{{ formatNumber(calculatedSubtotal) }}</span>
+                            <transition enter-active-class="transition-all duration-300 ease-out" enter-from-class="max-h-0 opacity-0" enter-to-class="max-h-32 opacity-100" leave-active-class="transition-all duration-200 ease-in" leave-from-class="max-h-32 opacity-100" leave-to-class="max-h-0 opacity-0">
+                                <div v-if="useCustomSubtotal" class="mt-4 overflow-hidden">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-lg font-bold text-violet-600 dark:text-violet-400">৳</span>
+                                        <AppInputText
+                                            v-model.number="form.subtotal"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            placeholder="Enter custom subtotal"
+                                            class="flex-1 text-xl font-bold"
+                                        />
                                     </div>
-                                    <div class="flex items-center justify-between text-sm">
-                                        <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                                            <i class="ri-add-circle-line text-cyan-500"></i>
-                                            Extras ({{ form.extras.length }})
-                                        </span>
-                                        <span class="font-semibold text-slate-800 dark:text-slate-200">৳{{ formatNumber(calculatedExtrasTotal) }}</span>
-                                    </div>
-                                    <div v-if="form.discount_amount > 0" class="flex items-center justify-between text-sm">
-                                        <span class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                                            <i class="ri-discount-percent-line"></i>
-                                            Discount
-                                        </span>
-                                        <span class="font-semibold text-emerald-600 dark:text-emerald-400">-৳{{ formatNumber(form.discount_amount) }}</span>
-                                    </div>
-                                    <div class="flex items-center justify-between text-sm">
-                                        <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                                            <i class="ri-percent-line text-amber-500"></i>
-                                            Tax
-                                        </span>
-                                        <span class="font-semibold text-slate-800 dark:text-slate-200">৳{{ formatNumber(form.tax_amount) }}</span>
-                                    </div>
+                                    <p class="mt-2 flex items-center gap-1 text-xs text-violet-500 dark:text-violet-400">
+                                        <i class="ri-information-line"></i>
+                                        Package price: ৳{{ formatNumber(defaultSubtotal) }}
+                                    </p>
                                 </div>
-                                
-                                <div class="my-4 border-t-2 border-dashed border-emerald-200 dark:border-emerald-700"></div>
-                                
-                                <div class="rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 p-4 text-white shadow-lg">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-emerald-100">Total</span>
-                                        <span class="text-2xl font-bold">৳{{ formatNumber(calculatedTotal) }}</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-4 grid grid-cols-2 gap-3">
-                                    <div class="rounded-lg bg-emerald-100 p-3 text-center dark:bg-emerald-900/30">
-                                        <p class="text-xs text-emerald-600 dark:text-emerald-400">Paid</p>
-                                        <p class="text-lg font-bold text-emerald-700 dark:text-emerald-300">৳{{ formatNumber(form.amount_paid) }}</p>
-                                    </div>
-                                    <div class="rounded-lg bg-rose-100 p-3 text-center dark:bg-rose-900/30">
-                                        <p class="text-xs text-rose-600 dark:text-rose-400">Due</p>
-                                        <p class="text-lg font-bold text-rose-700 dark:text-rose-300">৳{{ formatNumber(calculatedTotal - form.amount_paid) }}</p>
-                                    </div>
-                                </div>
-                            </div>
+                            </transition>
                         </div>
-                    </div>
-                    
-                    <!-- Payment Details Form -->
-                    <div class="lg:col-span-2">
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20">
-                                <div class="mb-3 flex items-center gap-2">
-                                    <i class="ri-discount-percent-line text-emerald-500"></i>
-                                    <AppLabel for="discount_amount" class="mb-0">Discount Amount</AppLabel>
+
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <!-- Discount -->
+                            <div class="group rounded-xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 transition-all hover:border-emerald-300 hover:shadow-md dark:border-emerald-800 dark:from-emerald-900/30 dark:to-emerald-900/10 dark:hover:border-emerald-700">
+                                <div class="mb-3 flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 text-white shadow">
+                                            <i class="ri-discount-percent-line"></i>
+                                        </div>
+                                        <AppLabel for="discount_amount" class="mb-0 font-medium">Discount</AppLabel>
+                                    </div>
                                 </div>
                                 <AppInputText
                                     v-model.number="form.discount_amount"
                                     type="number"
                                     step="0.01"
+                                    min="0"
                                     :error="form.errors.discount_amount"
                                     placeholder="0.00"
+                                    class="text-lg font-semibold"
                                 />
+                                <p class="mt-2 text-xs text-emerald-600 dark:text-emerald-400">
+                                    <i class="ri-subtract-line mr-1"></i>
+                                    Amount to subtract from total
+                                </p>
                             </div>
 
-                            <div class="rounded-xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-800 dark:bg-violet-900/20">
-                                <div class="mb-3 flex items-center gap-2">
-                                    <i class="ri-coupon-line text-violet-500"></i>
-                                    <AppLabel for="discount_code" class="mb-0">Discount Code</AppLabel>
-                                </div>
-                                <AppInputText
-                                    v-model="form.discount_code"
-                                    :error="form.errors.discount_code"
-                                    placeholder="Enter promo code"
-                                />
-                            </div>
-
-                            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
-                                <div class="mb-3 flex items-center gap-2">
-                                    <i class="ri-percent-line text-amber-500"></i>
-                                    <AppLabel for="tax_amount" class="mb-0">Tax Amount</AppLabel>
+                            <!-- Tax -->
+                            <div class="group rounded-xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/50 p-5 transition-all hover:border-amber-300 hover:shadow-md dark:border-amber-800 dark:from-amber-900/30 dark:to-amber-900/10 dark:hover:border-amber-700">
+                                <div class="mb-3 flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-white shadow">
+                                            <i class="ri-percent-line"></i>
+                                        </div>
+                                        <AppLabel for="tax_amount" class="mb-0 font-medium">Tax</AppLabel>
+                                    </div>
                                 </div>
                                 <AppInputText
                                     v-model.number="form.tax_amount"
                                     type="number"
                                     step="0.01"
+                                    min="0"
                                     :error="form.errors.tax_amount"
                                     placeholder="0.00"
+                                    class="text-lg font-semibold"
                                 />
+                                <p class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                                    <i class="ri-add-line mr-1"></i>
+                                    Amount to add to total
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Price Breakdown Details -->
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800/50">
+                            <h5 class="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                <i class="ri-list-check-2 text-primary-500"></i>
+                                Price Breakdown
+                            </h5>
+                            
+                            <!-- Traveler Breakdown -->
+                            <div v-if="selectedPricing" class="mb-4 space-y-2">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                        <i class="ri-user-line text-blue-500"></i>
+                                        {{ form.adult_count }} Adult{{ form.adult_count > 1 ? 's' : '' }} × ৳{{ formatNumber(selectedPricing.adult_price) }}
+                                    </span>
+                                    <span class="font-medium text-slate-800 dark:text-slate-200">৳{{ formatNumber(form.adult_count * selectedPricing.adult_price) }}</span>
+                                </div>
+                                <div v-if="form.child_count > 0 && selectedPricing.child_price > 0" class="flex items-center justify-between text-sm">
+                                    <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                        <i class="ri-user-smile-line text-amber-500"></i>
+                                        {{ form.child_count }} Child{{ form.child_count > 1 ? 'ren' : '' }} × ৳{{ formatNumber(selectedPricing.child_price) }}
+                                    </span>
+                                    <span class="font-medium text-slate-800 dark:text-slate-200">৳{{ formatNumber(form.child_count * selectedPricing.child_price) }}</span>
+                                </div>
+                                <div v-if="form.infant_count > 0 && selectedPricing.infant_price > 0" class="flex items-center justify-between text-sm">
+                                    <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                        <i class="ri-heart-line text-emerald-500"></i>
+                                        {{ form.infant_count }} Infant{{ form.infant_count > 1 ? 's' : '' }} × ৳{{ formatNumber(selectedPricing.infant_price) }}
+                                    </span>
+                                    <span class="font-medium text-slate-800 dark:text-slate-200">৳{{ formatNumber(form.infant_count * selectedPricing.infant_price) }}</span>
+                                </div>
                             </div>
 
-                            <div class="rounded-xl border border-primary-200 bg-primary-50 p-4 dark:border-primary-800 dark:bg-primary-900/20">
-                                <div class="mb-3 flex items-center gap-2">
-                                    <i class="ri-money-dollar-circle-line text-primary-500"></i>
-                                    <AppLabel for="amount_paid" class="mb-0">Amount Paid</AppLabel>
+                            <!-- Extras Breakdown -->
+                            <div v-if="form.extras.length > 0" class="border-t border-slate-200 pt-3 dark:border-slate-700">
+                                <p class="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Extras</p>
+                                <div v-for="extra in form.extras" :key="extra.extra_id" class="flex items-center justify-between text-sm">
+                                    <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                        <i class="ri-add-circle-line text-cyan-500"></i>
+                                        {{ getExtraName(extra.extra_id) }} × {{ extra.quantity }}
+                                    </span>
+                                    <span class="font-medium text-slate-800 dark:text-slate-200">৳{{ formatNumber(getExtraTotal(extra.extra_id)) }}</span>
                                 </div>
-                                <AppInputText
-                                    v-model.number="form.amount_paid"
-                                    type="number"
-                                    step="0.01"
-                                    :error="form.errors.amount_paid"
-                                    placeholder="0.00"
-                                />
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: Summary -->
+                    <div>
+                        <div class="sticky top-4 overflow-hidden rounded-2xl border-2 border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
+                            <!-- Header -->
+                            <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-5 text-white dark:from-slate-900 dark:to-black">
+                                <h4 class="flex items-center gap-2 text-lg font-bold">
+                                    <i class="ri-calculator-line"></i>
+                                    Order Summary
+                                </h4>
+                                <p class="mt-1 text-sm text-slate-300">Final pricing calculation</p>
+                            </div>
+                            
+                            <!-- Body -->
+                            <div class="p-6">
+                                <!-- Line Items -->
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                            <i class="ri-group-line text-blue-500"></i>
+                                            Travelers Subtotal
+                                        </span>
+                                        <span class="text-lg font-semibold text-slate-800 dark:text-slate-200">৳{{ formatNumber(calculatedSubtotal) }}</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                            <i class="ri-add-circle-line text-cyan-500"></i>
+                                            Extras <span v-if="form.extras.length > 0" class="rounded-full bg-cyan-100 px-2 py-0.5 text-xs font-medium text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-300">{{ form.extras.length }}</span>
+                                        </span>
+                                        <span class="text-lg font-semibold text-slate-800 dark:text-slate-200">৳{{ formatNumber(calculatedExtrasTotal) }}</span>
+                                    </div>
 
-                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
-                                <div class="mb-3 flex items-center gap-2">
-                                    <i class="ri-currency-line text-slate-500"></i>
-                                    <AppLabel for="currency" class="mb-0">Currency</AppLabel>
+                                    <div class="border-t border-dashed border-slate-200 pt-4 dark:border-slate-700">
+                                        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                                            <span>Gross Total</span>
+                                            <span class="font-medium">৳{{ formatNumber(calculatedSubtotal + calculatedExtrasTotal) }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div v-if="form.discount_amount > 0" class="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
+                                        <span class="flex items-center gap-2">
+                                            <i class="ri-discount-percent-line"></i>
+                                            Discount
+                                        </span>
+                                        <span class="font-semibold">- ৳{{ formatNumber(form.discount_amount) }}</span>
+                                    </div>
+                                    
+                                    <div v-if="form.tax_amount > 0" class="flex items-center justify-between text-amber-600 dark:text-amber-400">
+                                        <span class="flex items-center gap-2">
+                                            <i class="ri-percent-line"></i>
+                                            Tax
+                                        </span>
+                                        <span class="font-semibold">+ ৳{{ formatNumber(form.tax_amount) }}</span>
+                                    </div>
                                 </div>
-                                <AppSelect
-                                    v-model="form.currency"
-                                    :options="currencyOptions"
-                                    :error="form.errors.currency"
-                                />
+                                
+                                <!-- Total -->
+                                <div class="my-5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 p-5 text-white shadow-lg shadow-emerald-500/25">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-emerald-100">Grand Total</p>
+                                            <p class="text-3xl font-bold">৳{{ formatNumber(calculatedTotal) }}</p>
+                                        </div>
+                                        <div class="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur">
+                                            <i class="ri-money-dollar-circle-line text-3xl"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Payment Status -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 p-4 dark:from-blue-900/30 dark:to-blue-900/10">
+                                        <div class="mb-2 flex items-center gap-2">
+                                            <i class="ri-checkbox-circle-fill text-blue-500"></i>
+                                            <span class="text-xs font-medium uppercase tracking-wide text-blue-600 dark:text-blue-400">Paid</span>
+                                        </div>
+                                        <p class="text-2xl font-bold text-blue-700 dark:text-blue-300">৳{{ formatNumber(form.amount_paid) }}</p>
+                                    </div>
+                                    <div class="rounded-xl bg-gradient-to-br from-rose-50 to-rose-100 p-4 dark:from-rose-900/30 dark:to-rose-900/10">
+                                        <div class="mb-2 flex items-center gap-2">
+                                            <i class="ri-time-line text-rose-500"></i>
+                                            <span class="text-xs font-medium uppercase tracking-wide text-rose-600 dark:text-rose-400">Due</span>
+                                        </div>
+                                        <p class="text-2xl font-bold text-rose-700 dark:text-rose-300">৳{{ formatNumber(calculatedAmountDue) }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Progress Bar -->
+                                <div v-if="calculatedTotal > 0" class="mt-5">
+                                    <div class="mb-2 flex items-center justify-between text-xs">
+                                        <span class="text-slate-500 dark:text-slate-400">Payment Progress</span>
+                                        <span class="font-semibold text-slate-700 dark:text-slate-300">{{ paymentPercentage }}%</span>
+                                    </div>
+                                    <div class="h-3 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                                        <div 
+                                            class="h-full rounded-full transition-all duration-500"
+                                            :class="paymentPercentage >= 100 ? 'bg-gradient-to-r from-emerald-500 to-green-500' : paymentPercentage > 0 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' : 'bg-slate-300'"
+                                            :style="{ width: Math.min(paymentPercentage, 100) + '%' }"
+                                        ></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -873,6 +986,9 @@ const breadCrumb = [
     { label: 'Tour Bookings', href: route('tourBooking.index') },
     { label: isEditing.value ? 'Edit Booking' : 'Create Booking', last: true }
 ]
+
+// Custom subtotal toggle - enabled if subtotal differs from calculated
+const useCustomSubtotal = ref(false)
 
 // Form initialization
 const form = useForm({
@@ -1016,7 +1132,7 @@ const selectedPricing = computed(() =>
     pricingOptions.value.find(p => p.id === form.pricing_id)
 )
 
-const calculatedSubtotal = computed(() => {
+const defaultSubtotal = computed(() => {
     if (!selectedPricing.value) return 0
     
     const adultTotal = form.adult_count * (selectedPricing.value.adult_price || 0)
@@ -1024,6 +1140,13 @@ const calculatedSubtotal = computed(() => {
     const infantTotal = form.infant_count * (selectedPricing.value.infant_price || 0)
     
     return adultTotal + childTotal + infantTotal
+})
+
+const calculatedSubtotal = computed(() => {
+    if (useCustomSubtotal.value && form.subtotal > 0) {
+        return parseFloat(form.subtotal)
+    }
+    return defaultSubtotal.value
 })
 
 const calculatedExtrasTotal = computed(() => {
@@ -1052,9 +1175,40 @@ const calculatedExtrasTotal = computed(() => {
 const calculatedTotal = computed(() => {
     return calculatedSubtotal.value + 
            calculatedExtrasTotal.value - 
-           form.discount_amount + 
-           form.tax_amount
+           parseFloat(form.discount_amount || 0) + 
+           parseFloat(form.tax_amount || 0)
 })
+
+const calculatedAmountDue = computed(() => {
+    return Math.max(0, calculatedTotal.value - form.amount_paid)
+})
+
+const paymentPercentage = computed(() => {
+    if (calculatedTotal.value <= 0) return 0
+    return Math.round((form.amount_paid / calculatedTotal.value) * 100)
+})
+
+// Helper methods for extras breakdown
+const getExtraName = (extraId) => {
+    const extra = tourExtras.value.find(e => e.id === extraId)
+    return extra?.name || 'Unknown Extra'
+}
+
+const getExtraTotal = (extraId) => {
+    const selectedExtra = form.extras.find(e => e.extra_id === extraId)
+    if (!selectedExtra) return 0
+    
+    const tourExtra = tourExtras.value.find(e => e.id === extraId)
+    if (!tourExtra) return 0
+    
+    const quantity = selectedExtra.quantity || 1
+    const price = tourExtra.price || 0
+    
+    if (tourExtra.price_type === 'per_person') {
+        return price * quantity * (form.adult_count + form.child_count)
+    }
+    return price * quantity
+}
 
 // Methods
 const formatNumber = (num) => new Intl.NumberFormat('en-BD').format(num || 0)
@@ -1285,4 +1439,26 @@ if (!isEditing.value || form.travelers.length === 0) {
 watch(() => form.pricing_id, () => {
     form.subtotal = calculatedSubtotal.value
 })
+
+// Clear custom subtotal when toggle is turned off
+watch(useCustomSubtotal, (enabled) => {
+    if (!enabled) {
+        form.subtotal = defaultSubtotal.value
+    }
+})
+
+// Initialize custom subtotal toggle based on existing data
+if (props.booking && props.booking.subtotal) {
+    // We'll check after pricing is loaded if subtotal differs from calculated
+    watch(() => selectedPricing.value, (pricing) => {
+        if (pricing && props.booking) {
+            const calculated = (props.booking.adult_count * (pricing.adult_price || 0)) +
+                              (props.booking.child_count * (pricing.child_price || 0)) +
+                              (props.booking.infant_count * (pricing.infant_price || 0))
+            if (Math.abs(props.booking.subtotal - calculated) > 0.01) {
+                useCustomSubtotal.value = true
+            }
+        }
+    }, { immediate: true })
+}
 </script>

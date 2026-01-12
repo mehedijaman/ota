@@ -28,6 +28,8 @@ class TourBookingValidate extends Request
             'medical_conditions' => ['nullable', 'string'],
             'discount_code' => ['nullable', 'string', 'max:50'],
             'discount_amount' => ['nullable', 'numeric', 'min:0'],
+            'tax_amount' => ['nullable', 'numeric', 'min:0'],
+            'subtotal' => ['nullable', 'numeric', 'min:0'],
             'booking_source' => ['nullable', Rule::in(['website', 'admin', 'agent', 'api'])],
             'internal_notes' => ['nullable', 'string'],
 

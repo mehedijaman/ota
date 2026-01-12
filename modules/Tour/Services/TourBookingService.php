@@ -280,7 +280,11 @@ class TourBookingService
             $infantPrice = $tour->infant_price ?? 0;
         }
 
-        $subtotal = ($adultsCount * $adultPrice) + ($childrenCount * $childPrice) + ($infantsCount * $infantPrice);
+        // Use custom subtotal if provided, otherwise calculate from pricing
+        $calculatedSubtotal = ($adultsCount * $adultPrice) + ($childrenCount * $childPrice) + ($infantsCount * $infantPrice);
+        $subtotal = ! empty($data['subtotal']) && $data['subtotal'] > 0
+            ? (float) $data['subtotal']
+            : $calculatedSubtotal;
 
         // Calculate extras total from extras array
         $extrasTotal = 0;

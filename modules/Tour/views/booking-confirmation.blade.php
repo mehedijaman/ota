@@ -188,6 +188,12 @@
                                 <span>- ৳ {{ number_format($booking->discount_amount, 2) }}</span>
                             </div>
                             @endif
+                            @if(($booking->tax_amount ?? 0) > 0)
+                            <div class="flex justify-between">
+                                <span class="text-slate-300">Tax</span>
+                                <span>৳ {{ number_format($booking->tax_amount, 2) }}</span>
+                            </div>
+                            @endif
                             <div class="flex justify-between pt-3 mt-3 border-t border-slate-600 text-lg font-bold">
                                 <span>Total Amount</span>
                                 <span class="text-orange-400">৳ {{ number_format($booking->total_amount, 2) }}</span>
