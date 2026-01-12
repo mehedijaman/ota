@@ -68,6 +68,22 @@ class TourService
             ]);
     }
 
+    /**
+     * Get tour statistics for dashboard.
+     *
+     * @return array<string, mixed>
+     */
+    public function getStats(): array
+    {
+        return [
+            'total' => Tour::count(),
+            'active' => Tour::where('is_active', true)->count(),
+            'inactive' => Tour::where('is_active', false)->count(),
+            'featured' => Tour::where('is_featured', true)->count(),
+            'bestseller' => Tour::where('is_bestseller', true)->count(),
+        ];
+    }
+
     public static function getFeaturedTours($limit = 5)
     {
         return Tour::query()

@@ -26,6 +26,7 @@ class TourController extends BackendController
     ): Response {
         return inertia('Tour/TourIndex', [
             'tours' => $this->tourService->getAll(),
+            'stats' => $this->tourService->getStats(),
             'categories' => $categoryOptions->get(),
             'destinations' => $destinationOptions->get(),
         ]);

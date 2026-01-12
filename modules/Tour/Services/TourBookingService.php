@@ -75,7 +75,9 @@ class TourBookingService
             'total' => TourBooking::count(),
             'pending' => TourBooking::where('status', 'pending')->count(),
             'confirmed' => TourBooking::where('status', 'confirmed')->count(),
-            'revenue' => TourBooking::whereIn('status', ['confirmed', 'completed'])->sum('amount_paid'),
+            'paid' => TourBooking::where('payment_status', 'paid')->count(),
+            'partial' => TourBooking::where('payment_status', 'partial')->count(),
+            'unpaid' => TourBooking::whereIn('payment_status', ['pending', 'unpaid'])->count(),
         ];
     }
 

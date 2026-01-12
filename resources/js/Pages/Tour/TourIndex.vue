@@ -24,6 +24,94 @@
         </template>
     </AppSectionHeader>
 
+    <!-- Stats Overview -->
+    <div v-if="stats" class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
+        <!-- Total Tours -->
+        <div 
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            :class="{ 'ring-2 ring-blue-500': !filterForm.status && !filterForm.is_featured && !filterForm.is_bestseller }"
+            @click="filterByStats('all')"
+        >
+            <div class="flex items-center gap-4 p-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/25">
+                    <i class="ri-map-pin-line text-xl text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-neutral-9 truncate text-sm font-medium">Total Tours</p>
+                    <p class="text-neutral-12 text-2xl font-bold">{{ stats.total || 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Tours -->
+        <div 
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            :class="{ 'ring-2 ring-emerald-500': filterForm.status === 'active' }"
+            @click="filterByStats('active')"
+        >
+            <div class="flex items-center gap-4 p-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
+                    <i class="ri-checkbox-circle-line text-xl text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-neutral-9 truncate text-sm font-medium">Active</p>
+                    <p class="text-neutral-12 text-2xl font-bold">{{ stats.active || 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inactive Tours -->
+        <div 
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            :class="{ 'ring-2 ring-red-500': filterForm.status === 'inactive' }"
+            @click="filterByStats('inactive')"
+        >
+            <div class="flex items-center gap-4 p-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/25">
+                    <i class="ri-close-circle-line text-xl text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-neutral-9 truncate text-sm font-medium">Inactive</p>
+                    <p class="text-neutral-12 text-2xl font-bold">{{ stats.inactive || 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Tours -->
+        <div 
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            :class="{ 'ring-2 ring-amber-500': filterForm.is_featured === 'yes' }"
+            @click="filterByStats('featured')"
+        >
+            <div class="flex items-center gap-4 p-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/25">
+                    <i class="ri-star-line text-xl text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-neutral-9 truncate text-sm font-medium">Featured</p>
+                    <p class="text-neutral-12 text-2xl font-bold">{{ stats.featured || 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bestseller Tours -->
+        <div 
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            :class="{ 'ring-2 ring-purple-500': filterForm.is_bestseller === 'yes' }"
+            @click="filterByStats('bestseller')"
+        >
+            <div class="flex items-center gap-4 p-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-500/25">
+                    <i class="ri-fire-line text-xl text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-neutral-9 truncate text-sm font-medium">Bestseller</p>
+                    <p class="text-neutral-12 text-2xl font-bold">{{ stats.bestseller || 0 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Filter Card -->
     <AppCard class="w-full" no-padding>
         <template #title>
@@ -450,6 +538,10 @@ const props = defineProps({
         type: Object,
         default: () => ({})
     },
+    stats: {
+        type: Object,
+        default: () => ({})
+    },
     categories: {
         type: Array,
         default: () => []
@@ -568,6 +660,29 @@ const resetFilters = () => {
         preserveState: true,
         replace: true
     })
+}
+
+const filterByStats = (type) => {
+    filterForm.category_id = null
+    filterForm.destination_id = null
+    filterForm.status = null
+    filterForm.is_featured = null
+    filterForm.is_bestseller = null
+    filterForm.duration = null
+    filterForm.valid_from = null
+    filterForm.valid_to = null
+
+    if (type === 'active') {
+        filterForm.status = 'active'
+    } else if (type === 'inactive') {
+        filterForm.status = 'inactive'
+    } else if (type === 'featured') {
+        filterForm.is_featured = 'yes'
+    } else if (type === 'bestseller') {
+        filterForm.is_bestseller = 'yes'
+    }
+
+    applyFilter()
 }
 
 const formatNumber = (num) => {

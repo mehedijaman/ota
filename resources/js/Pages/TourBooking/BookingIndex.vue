@@ -24,22 +24,30 @@
     </AppSectionHeader>
 
     <!-- Stats Overview -->
-    <div v-if="stats" class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div v-if="stats" class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-6">
         <!-- Total Bookings -->
-        <div class="border-neutral-6 bg-neutral-1 overflow-hidden rounded-xl border shadow-sm">
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md"
+            :class="{ 'ring-2 ring-blue-500': !filterForm.status && !filterForm.payment_status }"
+            @click="filterByStats('all')"
+        >
             <div class="flex items-center gap-4 p-4">
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/25">
                     <i class="ri-calendar-check-line text-xl text-white"></i>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-neutral-9 truncate text-sm font-medium">Total Bookings</p>
+                    <p class="text-neutral-9 truncate text-sm font-medium">Total</p>
                     <p class="text-neutral-12 text-2xl font-bold">{{ stats.total || 0 }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Pending -->
-        <div class="border-neutral-6 bg-neutral-1 overflow-hidden rounded-xl border shadow-sm">
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md"
+            :class="{ 'ring-2 ring-amber-500': filterForm.status === 'pending' }"
+            @click="filterByStats('pending')"
+        >
             <div class="flex items-center gap-4 p-4">
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/25">
                     <i class="ri-time-line text-xl text-white"></i>
@@ -52,7 +60,11 @@
         </div>
 
         <!-- Confirmed -->
-        <div class="border-neutral-6 bg-neutral-1 overflow-hidden rounded-xl border shadow-sm">
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md"
+            :class="{ 'ring-2 ring-teal-500': filterForm.status === 'confirmed' }"
+            @click="filterByStats('confirmed')"
+        >
             <div class="flex items-center gap-4 p-4">
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
                     <i class="ri-checkbox-circle-line text-xl text-white"></i>
@@ -64,15 +76,53 @@
             </div>
         </div>
 
-        <!-- Total Revenue -->
-        <div class="border-neutral-6 bg-neutral-1 overflow-hidden rounded-xl border shadow-sm">
+        <!-- Paid -->
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md"
+            :class="{ 'ring-2 ring-emerald-500': filterForm.payment_status === 'paid' }"
+            @click="filterByStats('paid')"
+        >
             <div class="flex items-center gap-4 p-4">
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-500/25">
-                    <i class="ri-money-dollar-circle-line text-xl text-white"></i>
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/25">
+                    <i class="ri-checkbox-circle-fill text-xl text-white"></i>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-neutral-9 truncate text-sm font-medium">Revenue</p>
-                    <p class="text-neutral-12 text-xl font-bold">৳{{ formatNumber(stats.revenue || 0) }}</p>
+                    <p class="text-neutral-9 truncate text-sm font-medium">Paid</p>
+                    <p class="text-neutral-12 text-2xl font-bold">{{ stats.paid || 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partial Paid -->
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md"
+            :class="{ 'ring-2 ring-blue-500': filterForm.payment_status === 'partial' }"
+            @click="filterByStats('partial')"
+        >
+            <div class="flex items-center gap-4 p-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
+                    <i class="ri-funds-line text-xl text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-neutral-9 truncate text-sm font-medium">Partial</p>
+                    <p class="text-neutral-12 text-2xl font-bold">{{ stats.partial || 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unpaid -->
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md"
+            :class="{ 'ring-2 ring-red-500': filterForm.payment_status === 'unpaid' }"
+            @click="filterByStats('unpaid')"
+        >
+            <div class="flex items-center gap-4 p-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/25">
+                    <i class="ri-close-circle-line text-xl text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-neutral-9 truncate text-sm font-medium">Unpaid</p>
+                    <p class="text-neutral-12 text-2xl font-bold">{{ stats.unpaid || 0 }}</p>
                 </div>
             </div>
         </div>
@@ -467,6 +517,28 @@ const resetFilters = () => {
         preserveState: true,
         replace: true
     })
+}
+
+const filterByStats = (type) => {
+    filterForm.search = null
+    filterForm.status = null
+    filterForm.payment_status = null
+    filterForm.travel_from = null
+    filterForm.travel_to = null
+
+    if (type === 'pending') {
+        filterForm.status = 'pending'
+    } else if (type === 'confirmed') {
+        filterForm.status = 'confirmed'
+    } else if (type === 'paid') {
+        filterForm.payment_status = 'paid'
+    } else if (type === 'partial') {
+        filterForm.payment_status = 'partial'
+    } else if (type === 'unpaid') {
+        filterForm.payment_status = 'unpaid'
+    }
+
+    applyFilters()
 }
 
 const formatNumber = (num) => new Intl.NumberFormat('en-BD').format(num || 0)
