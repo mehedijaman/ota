@@ -232,3 +232,182 @@ describe('Tour Booking Traveler Model', function () {
         expect($traveler->booking)->toBeInstanceOf(TourBooking::class);
     });
 });
+
+describe('Tour Review Model', function () {
+    it('can create a review', function () {
+        $tour = Tour::factory()->create();
+
+        $review = \Modules\Tour\Models\TourReview::factory()->create([
+            'tour_id' => $tour->id,
+            'title' => 'Great Tour',
+            'rating' => 4.5,
+            'content' => 'This was an amazing experience!',
+        ]);
+
+        expect($review->tour_id)->toBe($tour->id)
+            ->and($review->title)->toBe('Great Tour')
+            ->and((float) $review->rating)->toBe(4.5)
+            ->and($review->content)->toBe('This was an amazing experience!');
+    });
+
+    it('belongs to a tour', function () {
+        $tour = Tour::factory()->create();
+        $review = \Modules\Tour\Models\TourReview::factory()->create(['tour_id' => $tour->id]);
+
+        expect($review->tour)->toBeInstanceOf(Tour::class);
+    });
+
+    it('can be approved', function () {
+        $tour = Tour::factory()->create();
+        $review = \Modules\Tour\Models\TourReview::factory()->create([
+            'tour_id' => $tour->id,
+            'is_approved' => false,
+        ]);
+
+        $review->update([
+            'is_approved' => true,
+            'approved_at' => now(),
+        ]);
+
+        expect($review->is_approved)->toBeTrue()
+            ->and($review->approved_at)->not->toBeNull();
+    });
+
+    it('can be featured', function () {
+        $tour = Tour::factory()->create();
+        $review = \Modules\Tour\Models\TourReview::factory()->create([
+            'tour_id' => $tour->id,
+            'is_featured' => false,
+        ]);
+
+        $review->update(['is_featured' => true]);
+
+        expect($review->is_featured)->toBeTrue();
+    });
+
+    it('has pros and cons as arrays', function () {
+        $tour = Tour::factory()->create();
+        $review = \Modules\Tour\Models\TourReview::factory()->create([
+            'tour_id' => $tour->id,
+            'pros' => ['Good guide', 'Nice food', 'Scenic views'],
+            'cons' => ['Long journey'],
+        ]);
+
+        expect($review->pros)->toBeArray()
+            ->and($review->pros)->toHaveCount(3)
+            ->and($review->cons)->toBeArray()
+            ->and($review->cons)->toHaveCount(1);
+    });
+
+    it('can be verified', function () {
+        $tour = Tour::factory()->create();
+        $review = \Modules\Tour\Models\TourReview::factory()->verified()->create([
+            'tour_id' => $tour->id,
+        ]);
+
+        expect($review->is_verified)->toBeTrue();
+    });
+
+    it('uses soft deletes', function () {
+        $tour = Tour::factory()->create();
+        $review = \Modules\Tour\Models\TourReview::factory()->create(['tour_id' => $tour->id]);
+
+        $review->delete();
+
+        expect(\Modules\Tour\Models\TourReview::find($review->id))->toBeNull()
+            ->and(\Modules\Tour\Models\TourReview::withTrashed()->find($review->id))->not->toBeNull();
+    });
+
+    it('scopes approved reviews', function () {
+        $tour = Tour::factory()->create();
+        \Modules\Tour\Models\TourReview::factory()->create([
+            'tour_id' => $tour->id,
+            'is_approved' => true,
+        ]);
+        \Modules\Tour\Models\TourReview::factory()->create([
+            'tour_id' => $tour->id,
+            'is_approved' => false,
+        ]);
+
+        $approved = \Modules\Tour\Models\TourReview::approved()->get();
+
+        expect($approved)->toHaveCount(1);
+    });
+
+    it('scopes featured reviews', function () {
+        $tour = Tour::factory()->create();
+        \Modules\Tour\Models\TourReview::factory()->create([
+            'tour_id' => $tour->id,
+            'is_featured' => true,
+        ]);
+        \Modules\Tour\Models\TourReview::factory()->count(2)->create([
+            'tour_id' => $tour->id,
+            'is_featured' => false,
+        ]);
+
+        $featured = \Modules\Tour\Models\TourReview::featured()->get();
+
+        expect($featured)->toHaveCount(1);
+    });
+});
+
+describe('Tour Category Model', function () {
+    it('can create a category', function () {
+        $category = \Modules\Tour\Models\TourCategory::factory()->create([
+            'name' => 'Beach Tours',
+            'slug' => 'beach-tours',
+        ]);
+
+        expect($category->name)->toBe('Beach Tours')
+            ->and($category->slug)->toBe('beach-tours');
+    });
+
+    it('has tours relationship', function () {
+        $category = \Modules\Tour\Models\TourCategory::factory()->create();
+        Tour::factory()->count(3)->create(['category_id' => $category->id]);
+
+        expect($category->tours)->toHaveCount(3);
+    });
+
+    it('uses soft deletes', function () {
+        $category = \Modules\Tour\Models\TourCategory::factory()->create();
+        $category->delete();
+
+        expect(\Modules\Tour\Models\TourCategory::find($category->id))->toBeNull()
+            ->and(\Modules\Tour\Models\TourCategory::withTrashed()->find($category->id))->not->toBeNull();
+    });
+});
+
+describe('Tour Destination Model', function () {
+    it('can create a destination', function () {
+        $destination = \Modules\Tour\Models\TourDestination::factory()->create([
+            'name' => "Cox's Bazar",
+            'slug' => 'coxs-bazar',
+            'country' => 'Bangladesh',
+        ]);
+
+        expect($destination->name)->toBe("Cox's Bazar")
+            ->and($destination->country)->toBe('Bangladesh');
+    });
+
+    it('has tours relationship', function () {
+        $destination = \Modules\Tour\Models\TourDestination::factory()->create();
+        Tour::factory()->count(2)->create(['destination_id' => $destination->id]);
+
+        expect($destination->tours)->toHaveCount(2);
+    });
+
+    it('can be featured', function () {
+        $destination = \Modules\Tour\Models\TourDestination::factory()->featured()->create();
+
+        expect($destination->is_featured)->toBeTrue();
+    });
+
+    it('uses soft deletes', function () {
+        $destination = \Modules\Tour\Models\TourDestination::factory()->create();
+        $destination->delete();
+
+        expect(\Modules\Tour\Models\TourDestination::find($destination->id))->toBeNull()
+            ->and(\Modules\Tour\Models\TourDestination::withTrashed()->find($destination->id))->not->toBeNull();
+    });
+});

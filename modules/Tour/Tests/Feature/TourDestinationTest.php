@@ -114,3 +114,115 @@ it('can delete tour destination', function () {
 
     $this->assertSoftDeleted('tour_destinations', ['id' => $destination->id]);
 })->group('tour', 'tour-destination');
+
+it('cannot delete destination with associated tours', function () {
+    $this->user = \App\Models\User::factory()->create();
+    \Illuminate\Support\Facades\Gate::define('tour-destination-delete', fn () => true);
+    $this->actingAs($this->user);
+
+    $destination = TourDestination::factory()->create();
+    \Modules\Tour\Models\Tour::factory()->create(['destination_id' => $destination->id]);
+
+    $response = delete(route('tourDestination.destroy', $destination->id));
+
+    $response->assertRedirect(route('tourDestination.index'));
+    $response->assertSessionHas('error');
+
+    $this->assertDatabaseHas('tour_destinations', ['id' => $destination->id, 'deleted_at' => null]);
+})->group('tour', 'tour-destination');
+
+describe('Tour Destination Recycle Bin', function () {
+    beforeEach(function () {
+        $this->user = \App\Models\User::factory()->create();
+        \Illuminate\Support\Facades\Gate::define('tour-destination-delete', fn () => true);
+        $this->actingAs($this->user);
+    });
+
+    it('can view recycle bin', function () {
+        $destination = TourDestination::factory()->create();
+        $destination->delete();
+
+        $response = get(route('tourDestination.recycleBin'));
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('TourDestination/DestinationRecycleBin')
+                ->has('destinations.data', 1)
+            );
+    })->group('tour', 'tour-destination', 'recycle-bin');
+
+    it('can restore deleted destination', function () {
+        $destination = TourDestination::factory()->create();
+        $destination->delete();
+
+        $response = post(route('tourDestination.restore', $destination->id));
+
+        $response->assertRedirect(route('tourDestination.recycleBin'));
+
+        $this->assertDatabaseHas('tour_destinations', [
+            'id' => $destination->id,
+            'deleted_at' => null,
+        ]);
+    })->group('tour', 'tour-destination', 'recycle-bin');
+
+    it('can permanently delete destination', function () {
+        $destination = TourDestination::factory()->create();
+        $destination->delete();
+
+        $response = delete(route('tourDestination.destroyForce', $destination->id));
+
+        $response->assertRedirect(route('tourDestination.recycleBin'));
+
+        $this->assertDatabaseMissing('tour_destinations', ['id' => $destination->id]);
+    })->group('tour', 'tour-destination', 'recycle-bin');
+
+    it('can empty recycle bin', function () {
+        TourDestination::factory()->count(3)->create()->each->delete();
+
+        $response = delete(route('tourDestination.emptyRecycleBin'));
+
+        $response->assertRedirect(route('tourDestination.recycleBin'));
+
+        expect(TourDestination::onlyTrashed()->count())->toBe(0);
+    })->group('tour', 'tour-destination', 'recycle-bin');
+
+    it('can restore all destinations', function () {
+        TourDestination::factory()->count(3)->create()->each->delete();
+
+        $response = post(route('tourDestination.restoreRecycleBin'));
+
+        $response->assertRedirect(route('tourDestination.recycleBin'));
+
+        expect(TourDestination::onlyTrashed()->count())->toBe(0);
+        expect(TourDestination::count())->toBe(3);
+    })->group('tour', 'tour-destination', 'recycle-bin');
+});
+
+describe('Tour Destination Validation', function () {
+    beforeEach(function () {
+        $this->user = \App\Models\User::factory()->create();
+        \Illuminate\Support\Facades\Gate::define('tour-destination-create', fn () => true);
+        $this->actingAs($this->user);
+    });
+
+    it('requires name when creating destination', function () {
+        $response = post(route('tourDestination.store'), [
+            'slug' => 'test-slug',
+            'is_active' => true,
+        ]);
+
+        $response->assertSessionHasErrors('name');
+    })->group('tour', 'tour-destination', 'validation');
+
+    it('requires unique slug', function () {
+        TourDestination::factory()->create(['slug' => 'existing-slug']);
+
+        $response = post(route('tourDestination.store'), [
+            'name' => 'New Destination',
+            'slug' => 'existing-slug',
+            'is_active' => true,
+        ]);
+
+        $response->assertSessionHasErrors('slug');
+    })->group('tour', 'tour-destination', 'validation');
+});

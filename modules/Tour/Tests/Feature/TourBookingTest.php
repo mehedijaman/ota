@@ -481,3 +481,207 @@ describe('Booking Confirmation', function () {
         $response->assertForbidden();
     });
 });
+
+describe('Admin Booking Management', function () {
+    beforeEach(function () {
+        $this->adminUser = User::factory()->create();
+        \Illuminate\Support\Facades\Gate::define('tour-booking-list', fn () => true);
+        \Illuminate\Support\Facades\Gate::define('tour-booking-view', fn () => true);
+        \Illuminate\Support\Facades\Gate::define('tour-booking-create', fn () => true);
+        \Illuminate\Support\Facades\Gate::define('tour-booking-edit', fn () => true);
+        \Illuminate\Support\Facades\Gate::define('tour-booking-delete', fn () => true);
+    });
+
+    it('can view admin booking index', function () {
+        TourBooking::factory()->count(3)->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->get(route('tourBooking.index'));
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('TourBooking/BookingIndex')
+                ->has('bookings.data', 3)
+            );
+    });
+
+    it('can view booking details in admin', function () {
+        $booking = TourBooking::factory()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->get(route('tourBooking.show', $booking->id));
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('TourBooking/BookingShow')
+                ->has('booking')
+            );
+    });
+
+    it('can view create booking form', function () {
+        $response = $this->actingAs($this->adminUser)
+            ->get(route('tourBooking.create'));
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('TourBooking/BookingForm')
+                ->has('tours')
+                ->has('customers')
+            );
+    });
+
+    it('can update booking status', function () {
+        $booking = TourBooking::factory()->pending()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->patch(route('tourBooking.updateStatus', [$booking->id, 'confirmed']));
+
+        $response->assertRedirect();
+
+        $booking->refresh();
+        expect($booking->status)->toBe('confirmed');
+    });
+
+    it('can add payment to booking', function () {
+        $booking = TourBooking::factory()->pending()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+            'total_amount' => 10000,
+            'amount_paid' => 0,
+            'amount_due' => 10000,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->post(route('tourBooking.addPayment', $booking->id), [
+                'amount' => 5000,
+                'payment_method' => 'cash',
+                'notes' => 'Partial payment received',
+            ]);
+
+        $response->assertRedirect();
+
+        $booking->refresh();
+        expect((float) $booking->amount_paid)->toBe(5000.0)
+            ->and($booking->payment_status)->toBe('partial')
+            ->and($booking->payments)->toHaveCount(1);
+    });
+
+    it('can delete booking (soft delete)', function () {
+        $booking = TourBooking::factory()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->delete(route('tourBooking.destroy', $booking->id));
+
+        $response->assertRedirect(route('tourBooking.index'));
+
+        $this->assertSoftDeleted('tour_bookings', ['id' => $booking->id]);
+    });
+});
+
+describe('Admin Booking Recycle Bin', function () {
+    beforeEach(function () {
+        $this->adminUser = User::factory()->create();
+        \Illuminate\Support\Facades\Gate::define('tour-booking-delete', fn () => true);
+    });
+
+    it('can view booking recycle bin', function () {
+        $booking = TourBooking::factory()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+        ]);
+        $booking->delete();
+
+        $response = $this->actingAs($this->adminUser)
+            ->get(route('tourBooking.recycleBin'));
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('TourBooking/BookingRecycleBin')
+                ->has('bookings.data', 1)
+            );
+    });
+
+    it('can restore deleted booking', function () {
+        $booking = TourBooking::factory()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+        ]);
+        $booking->delete();
+
+        $response = $this->actingAs($this->adminUser)
+            ->post(route('tourBooking.restore', $booking->id));
+
+        $response->assertRedirect(route('tourBooking.recycleBin'));
+
+        $this->assertDatabaseHas('tour_bookings', [
+            'id' => $booking->id,
+            'deleted_at' => null,
+        ]);
+    });
+
+    it('can permanently delete booking', function () {
+        $booking = TourBooking::factory()->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+        ]);
+        $booking->delete();
+
+        $response = $this->actingAs($this->adminUser)
+            ->delete(route('tourBooking.destroyForce', $booking->id));
+
+        $response->assertRedirect(route('tourBooking.recycleBin'));
+
+        $this->assertDatabaseMissing('tour_bookings', ['id' => $booking->id]);
+    });
+
+    it('can empty recycle bin', function () {
+        TourBooking::factory()->count(3)->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+        ])->each->delete();
+
+        $response = $this->actingAs($this->adminUser)
+            ->delete(route('tourBooking.emptyRecycleBin'));
+
+        $response->assertRedirect(route('tourBooking.recycleBin'));
+
+        expect(TourBooking::onlyTrashed()->count())->toBe(0);
+    });
+
+    it('can restore all bookings', function () {
+        TourBooking::factory()->count(3)->create([
+            'tour_id' => $this->tour->id,
+            'pricing_id' => $this->pricing->id,
+            'customer_id' => $this->customer->id,
+        ])->each->delete();
+
+        $response = $this->actingAs($this->adminUser)
+            ->post(route('tourBooking.restoreRecycleBin'));
+
+        $response->assertRedirect(route('tourBooking.recycleBin'));
+
+        expect(TourBooking::onlyTrashed()->count())->toBe(0);
+        expect(TourBooking::count())->toBe(3);
+    });
+});

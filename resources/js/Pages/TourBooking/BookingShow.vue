@@ -53,15 +53,15 @@
     <!-- Booking Hero Card -->
     <div class="border-neutral-6 bg-neutral-1 relative mb-6 overflow-hidden rounded-2xl border shadow-lg print:shadow-none">
         <!-- Background Pattern -->
-        <div class="absolute inset-0 bg-gradient-to-br from-primary-500/5 via-transparent to-purple-500/5"></div>
-        <div class="absolute right-0 top-0 h-64 w-64 translate-x-1/3 -translate-y-1/3 rounded-full bg-gradient-to-br from-primary-500/10 to-purple-500/10 blur-3xl"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5"></div>
+        <div class="absolute right-0 top-0 h-64 w-64 translate-x-1/3 -translate-y-1/3 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 blur-3xl"></div>
         
         <div class="relative p-6 lg:p-8">
             <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <!-- Left: Tour Info -->
                 <div class="flex items-start gap-5">
-                    <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 shadow-xl shadow-primary-500/30 ring-4 ring-white dark:ring-neutral-800">
-                        <i class="ri-plane-line text-4xl text-white"></i>
+                    <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/30 ring-4 ring-white dark:ring-neutral-800">
+                        <i class="ri-ticket-line text-4xl text-white"></i>
                     </div>
                     <div>
                         <div class="mb-2 flex flex-wrap items-center gap-2">
@@ -95,7 +95,7 @@
                 <!-- Right: Booking Number & QR Placeholder -->
                 <div class="bg-neutral-2 flex flex-col items-center rounded-xl border border-dashed border-neutral-300 p-4 text-center dark:border-neutral-700">
                     <p class="text-neutral-9 mb-1 text-xs font-medium uppercase tracking-wider">Booking Reference</p>
-                    <p class="font-mono text-2xl font-bold tracking-wide text-primary-600 dark:text-primary-400">{{ booking.booking_number }}</p>
+                    <p class="font-mono text-2xl font-bold tracking-wide text-blue-600 dark:text-blue-400">{{ booking.booking_number }}</p>
                     <p class="text-neutral-9 mt-2 text-xs">{{ formatDateTime(booking.created_at) }}</p>
                 </div>
             </div>
@@ -106,15 +106,15 @@
     <div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <!-- Total Amount -->
         <div class="group border-neutral-6 bg-neutral-1 relative overflow-hidden rounded-xl border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-            <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 to-primary-600/5 transition-opacity group-hover:opacity-75"></div>
-            <div class="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary-500/10 blur-2xl transition-all group-hover:scale-150"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-blue-600/5 transition-opacity group-hover:opacity-75"></div>
+            <div class="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-blue-500/10 blur-2xl transition-all group-hover:scale-150"></div>
             <div class="relative flex items-center gap-4 p-5">
-                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-500/30 transition-transform group-hover:scale-110">
+                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30 transition-transform group-hover:scale-110">
                     <i class="ri-money-dollar-circle-line text-2xl text-white"></i>
                 </div>
                 <div class="min-w-0">
                     <p class="text-neutral-9 text-sm font-medium">Total Amount</p>
-                    <p class="text-primary-11 mt-1 text-2xl font-bold">৳{{ formatNumber(booking.total_amount) }}</p>
+                    <p class="text-blue-11 mt-1 text-2xl font-bold">৳{{ formatNumber(booking.total_amount) }}</p>
                 </div>
             </div>
         </div>
@@ -173,7 +173,7 @@
             <div class="border-neutral-6 bg-neutral-1 overflow-hidden rounded-xl border shadow-sm">
                 <div class="border-neutral-6 flex items-center justify-between border-b px-5 py-4">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-500/25">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/25">
                             <i class="ri-map-pin-line text-lg text-white"></i>
                         </div>
                         <div>
@@ -185,8 +185,8 @@
                 <div class="p-5">
                     <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                         <div class="bg-neutral-2 group rounded-xl p-4 transition-all hover:bg-neutral-3">
-                            <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 transition-transform group-hover:scale-110 dark:bg-primary-900/30">
-                                <i class="ri-calendar-line text-lg text-primary-600 dark:text-primary-400"></i>
+                            <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 transition-transform group-hover:scale-110 dark:bg-blue-900/30">
+                                <i class="ri-calendar-line text-lg text-blue-600 dark:text-blue-400"></i>
                             </div>
                             <label class="text-neutral-9 text-xs font-medium uppercase tracking-wide">Travel Date</label>
                             <p class="text-neutral-12 mt-0.5 font-semibold">{{ formatDate(booking.travel_date) }}</p>
@@ -268,12 +268,12 @@
                     <!-- Primary Contact -->
                     <div class="bg-neutral-2 mb-4 rounded-xl p-4">
                         <div class="mb-3 flex items-center gap-2">
-                            <i class="ri-user-line text-primary-600 dark:text-primary-400"></i>
+                            <i class="ri-user-line text-blue-600 dark:text-blue-400"></i>
                             <span class="text-neutral-9 text-sm font-medium">Primary Contact</span>
                         </div>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div class="flex items-center gap-3">
-                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-sm font-bold text-white shadow-md">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-sm font-bold text-white shadow-md">
                                     {{ booking.contact_name?.charAt(0)?.toUpperCase() }}
                                 </div>
                                 <div class="min-w-0 flex-1">
@@ -686,7 +686,7 @@
                 </div>
                 <div class="p-5">
                     <!-- Current Status -->
-                    <div class="mb-4 flex items-center justify-between rounded-xl bg-gradient-to-r from-primary-50 to-purple-50 p-4 dark:from-primary-900/20 dark:to-purple-900/20">
+                    <div class="mb-4 flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 p-4 dark:from-blue-900/20 dark:to-purple-900/20">
                         <div>
                             <p class="text-neutral-9 mb-1 text-xs font-medium uppercase tracking-wider">Current Status</p>
                             <span :class="[getStatusClass(booking.status), getStatusRing(booking.status)]" class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold ring-1 ring-inset">
@@ -704,11 +704,11 @@
 
                     <!-- Timeline -->
                     <div class="relative space-y-4">
-                        <div class="absolute bottom-4 left-3 top-4 w-0.5 bg-gradient-to-b from-primary-500 via-emerald-500 to-neutral-300 dark:to-neutral-700"></div>
+                        <div class="absolute bottom-4 left-3 top-4 w-0.5 bg-gradient-to-b from-blue-500 via-emerald-500 to-neutral-300 dark:to-neutral-700"></div>
                         
                         <!-- Booked -->
                         <div class="relative flex items-start gap-4">
-                            <div class="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-primary-500 text-white shadow-md ring-4 ring-white dark:ring-neutral-900">
+                            <div class="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-blue-500 text-white shadow-md ring-4 ring-white dark:ring-neutral-900">
                                 <i class="ri-add-circle-line text-xs"></i>
                             </div>
                             <div class="flex-1 pb-2">
@@ -791,10 +791,10 @@
                     
                     <div class="border-neutral-4 my-4 border-t"></div>
                     
-                    <div class="rounded-xl bg-gradient-to-r from-primary-50 to-purple-50 p-4 dark:from-primary-900/20 dark:to-purple-900/20">
+                    <div class="rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 p-4 dark:from-blue-900/20 dark:to-purple-900/20">
                         <div class="flex items-center justify-between">
                             <span class="text-neutral-12 text-lg font-bold">Total</span>
-                            <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">৳{{ formatNumber(booking.total_amount) }}</span>
+                            <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">৳{{ formatNumber(booking.total_amount) }}</span>
                         </div>
                     </div>
                     
@@ -1370,7 +1370,7 @@ const confirmVerifyPayment = () => {
     
     /* Force light mode colors for printing */
     .dark\:bg-neutral-900\/30,
-    .dark\:bg-primary-900\/20 {
+    .dark\:bg-blue-900\/20 {
         background: #f9fafb !important;
     }
     

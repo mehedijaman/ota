@@ -151,3 +151,114 @@ it('can view tour details', function () {
             ->has('tour')
         );
 })->group('tour');
+
+describe('Tour Recycle Bin', function () {
+    beforeEach(function () {
+        $this->user = \App\Models\User::factory()->create();
+        \Illuminate\Support\Facades\Gate::define('tour-delete', fn () => true);
+        $this->actingAs($this->user);
+        TourCategory::factory()->create();
+        TourDestination::factory()->create();
+    });
+
+    it('can view recycle bin', function () {
+        $tour = Tour::factory()->create();
+        $tour->delete();
+
+        $response = get(route('tour.recycleBin'));
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Tour/TourRecycleBin')
+                ->has('tours.data', 1)
+            );
+    })->group('tour', 'recycle-bin');
+
+    it('can restore deleted tour', function () {
+        $tour = Tour::factory()->create();
+        $tour->delete();
+
+        $response = post(route('tour.restore', $tour->id));
+
+        $response->assertRedirect(route('tour.recycleBin'));
+
+        $this->assertDatabaseHas('tours', [
+            'id' => $tour->id,
+            'deleted_at' => null,
+        ]);
+    })->group('tour', 'recycle-bin');
+
+    it('can permanently delete tour', function () {
+        $tour = Tour::factory()->create();
+        $tour->delete();
+
+        $response = delete(route('tour.destroyForce', $tour->id));
+
+        $response->assertRedirect(route('tour.recycleBin'));
+
+        $this->assertDatabaseMissing('tours', ['id' => $tour->id]);
+    })->group('tour', 'recycle-bin');
+
+    it('can empty recycle bin', function () {
+        Tour::factory()->count(3)->create()->each->delete();
+
+        $response = delete(route('tour.emptyRecycleBin'));
+
+        $response->assertRedirect(route('tour.recycleBin'));
+
+        expect(Tour::onlyTrashed()->count())->toBe(0);
+    })->group('tour', 'recycle-bin');
+
+    it('can restore all tours', function () {
+        Tour::factory()->count(3)->create()->each->delete();
+
+        $response = post(route('tour.restoreRecycleBin'));
+
+        $response->assertRedirect(route('tour.recycleBin'));
+
+        expect(Tour::onlyTrashed()->count())->toBe(0);
+        expect(Tour::count())->toBe(3);
+    })->group('tour', 'recycle-bin');
+});
+
+describe('Tour Validation', function () {
+    beforeEach(function () {
+        $this->user = \App\Models\User::factory()->create();
+        \Illuminate\Support\Facades\Gate::define('tour-create', fn () => true);
+        $this->actingAs($this->user);
+        TourCategory::factory()->create();
+        TourDestination::factory()->create();
+    });
+
+    it('requires name when creating tour', function () {
+        $response = post(route('tour.store'), [
+            'slug' => 'test-slug',
+            'is_active' => true,
+        ]);
+
+        $response->assertSessionHasErrors('name');
+    })->group('tour', 'validation');
+
+    it('requires unique slug', function () {
+        Tour::factory()->create(['slug' => 'existing-slug']);
+
+        $response = post(route('tour.store'), [
+            'name' => 'New Tour',
+            'slug' => 'existing-slug',
+            'is_active' => true,
+        ]);
+
+        $response->assertSessionHasErrors('slug');
+    })->group('tour', 'validation');
+
+    it('validates duration days is positive', function () {
+        $response = post(route('tour.store'), [
+            'name' => 'Test Tour',
+            'slug' => 'test-tour',
+            'duration_days' => -1,
+            'is_active' => true,
+        ]);
+
+        $response->assertSessionHasErrors('duration_days');
+    })->group('tour', 'validation');
+});

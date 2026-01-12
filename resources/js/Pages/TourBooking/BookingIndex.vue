@@ -255,7 +255,7 @@
                     <!-- Booking Number -->
                     <AppDataTableData>
                         <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 shadow-md shadow-primary-500/25">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-md shadow-blue-500/25">
                                 <i class="ri-ticket-line text-lg text-white"></i>
                             </div>
                             <div class="min-w-0">
