@@ -12,10 +12,10 @@ class IndexController extends SiteController
 {
     public function index($slug = null)
     {
-        if (is_null($slug)) {
+        if ($slug === null) {
             $topTestimonials = TestimonialService::getTopTestimonials(3);
             $latestPosts = PostService::getLatestPosts(3);
-            $featuredTours = TourService::getFeaturedTours(5);
+            $featuredTours = TourService::getFeaturedTours();
 
             return view('index::index', [
                 'topTestimonials' => $topTestimonials,
@@ -26,7 +26,7 @@ class IndexController extends SiteController
 
         $page = Page::where('slug', $slug)->first();
 
-        if (is_null($page)) {
+        if ($page === null) {
             abort(404);
         }
 

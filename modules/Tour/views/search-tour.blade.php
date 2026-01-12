@@ -31,7 +31,8 @@
                         'duration' => $tour->duration,
                         'destination_name' => $tour->destination->name ?? null,
                         'discount_price' => $tour->discount_price,
-                        'base_price' => $tour->base_price
+                        'base_price' => $tour->base_price,
+                        'min_price' => $tour->pricings_min_adult_price
                     ]) }}"></tour-card>
                 @endforeach
             </div>

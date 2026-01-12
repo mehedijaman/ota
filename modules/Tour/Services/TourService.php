@@ -90,6 +90,7 @@ class TourService
             ->active()
             ->featured()
             ->with(['category', 'destination'])
+            ->withMin('pricings', 'adult_price')
             ->take($limit)
             ->get();
     }

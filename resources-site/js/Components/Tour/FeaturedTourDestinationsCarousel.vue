@@ -3,7 +3,7 @@
         <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
             <div>
                 <h2 class="text-3xl font-bold text-slate-800">Popular Destinations</h2>
-                <p class="text-slate-500 mt-2">Explore Bangladesh's most beautiful places</p>
+                <p class="text-slate-500 mt-2">Explore the world's most beautiful places</p>
             </div>
         </div>
 

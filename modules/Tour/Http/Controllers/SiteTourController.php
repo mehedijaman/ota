@@ -13,6 +13,7 @@ use Modules\Tour\Models\TourBooking;
 use Modules\Tour\Models\TourBookingPayment;
 use Modules\Tour\Models\TourCategory;
 use Modules\Tour\Models\TourDestination;
+use Modules\Tour\Services\TourService;
 use Modules\Tour\Services\TourBookingService;
 use Raziul\Sslcommerz\Facades\Sslcommerz;
 
@@ -38,11 +39,7 @@ class SiteTourController extends SiteController
 
     public function index(): View
     {
-        $featuredTours = Tour::query()
-            ->active()
-            ->featured()
-            ->with(['category', 'destination', 'media'])
-            ->get();
+        $featuredTours = TourService::getFeaturedTours();
 
         $categories = TourCategory::query()
             ->active()
@@ -66,7 +63,8 @@ class SiteTourController extends SiteController
     {
         $query = Tour::query()
             ->active()
-            ->with(['category', 'destination']);
+            ->with(['category', 'destination'])
+            ->withMin('pricings', 'adult_price');
 
         // Filter by category
         if (request('category')) {

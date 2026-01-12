@@ -36,6 +36,7 @@
             'destination_name' => $tour->destination->name ?? null,
             'discount_price' => $tour->discount_price,
             'base_price' => $tour->base_price,
+            'min_price' => $tour->pricings_min_adult_price,
             'excerpt' => $tour->excerpt ?: Str::limit(strip_tags($tour->description), 80)
         ];
     })) }}"></featured-tours-carousel>
