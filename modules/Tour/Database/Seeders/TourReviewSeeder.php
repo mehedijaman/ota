@@ -22,9 +22,9 @@ class TourReviewSeeder extends Seeder
             return;
         }
 
-        $this->command->info('Creating 10 tour reviews...');
+        $this->command->info('Creating 50 tour reviews...');
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 50; $i++) {
             $tour = $tours->random();
             $user = $users->isNotEmpty() ? $users->random() : null;
             $booking = $bookings->where('tour_id', $tour->id)->first();
@@ -40,9 +40,9 @@ class TourReviewSeeder extends Seeder
                 ])
                 ->create();
 
-            $this->command->line("  Created review for: {$tour->name} - Rating: {$review->rating}");
+            $this->command->line("  Created review #{$i}: {$tour->name} - Rating: {$review->rating}");
         }
 
-        $this->command->info('Tour reviews created successfully!');
+        $this->command->info('50 tour reviews created successfully!');
     }
 }

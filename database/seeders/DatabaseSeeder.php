@@ -26,6 +26,8 @@ use Modules\Slider\Database\Seeders\SliderSeeder;
 use Modules\Testimonial\Database\Seeders\TestimonialAclSeeder;
 use Modules\Testimonial\Database\Seeders\TestimonialSeeder;
 use Modules\Tour\Database\Seeders\TourAclSeeder;
+use Modules\Tour\Database\Seeders\TourBookingSeeder;
+use Modules\Tour\Database\Seeders\TourReviewSeeder;
 use Modules\Tour\Database\Seeders\TourSeeder;
 use Modules\User\Database\Seeders\UserSeeder;
 
@@ -69,6 +71,8 @@ class DatabaseSeeder extends Seeder
             AreaSeeder::class,
             EmployeeSeeder::class,
             TourSeeder::class,
+            TourBookingSeeder::class,
+            TourReviewSeeder::class,
         ]);
     }
 }
