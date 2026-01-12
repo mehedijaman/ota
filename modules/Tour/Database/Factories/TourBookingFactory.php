@@ -3,10 +3,10 @@
 namespace Modules\Tour\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Modules\Tour\Models\TourBooking;
-use Modules\Tour\Models\Tour;
-use Modules\Tour\Models\TourPricing;
 use Modules\Customer\Models\Customer;
+use Modules\Tour\Models\Tour;
+use Modules\Tour\Models\TourBooking;
+use Modules\Tour\Models\TourPricing;
 
 class TourBookingFactory extends Factory
 {

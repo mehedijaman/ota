@@ -12,7 +12,7 @@ class TourCategoryFactory extends Factory
 
     public function definition(): array
     {
-        $name = 'Category ' . \Illuminate\Support\Str::uuid();
+        $name = 'Category '.\Illuminate\Support\Str::uuid();
 
         return [
             'name' => $name,

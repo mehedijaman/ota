@@ -12,7 +12,7 @@ uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::cla
 
 beforeEach(function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-category-list', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-category-list', fn () => true);
     $this->actingAs($this->user);
 });
 
@@ -30,7 +30,7 @@ it('can view tour category index', function () {
 
 it('can view create tour category form', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-category-create', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-category-create', fn () => true);
     $this->actingAs($this->user);
 
     $response = get(route('tourCategory.create'));
@@ -43,7 +43,7 @@ it('can view create tour category form', function () {
 
 it('can create tour category', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-category-create', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-category-create', fn () => true);
     $this->actingAs($this->user);
 
     $categoryData = [
@@ -64,7 +64,7 @@ it('can create tour category', function () {
 
 it('can view edit tour category form', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-category-edit', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-category-edit', fn () => true);
     $this->actingAs($this->user);
 
     $category = TourCategory::factory()->create();
@@ -80,7 +80,7 @@ it('can view edit tour category form', function () {
 
 it('can update tour category', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-category-edit', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-category-edit', fn () => true);
     $this->actingAs($this->user);
 
     $category = TourCategory::factory()->create();
@@ -101,7 +101,7 @@ it('can update tour category', function () {
 
 it('can delete tour category', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-category-delete', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-category-delete', fn () => true);
     $this->actingAs($this->user);
 
     $category = TourCategory::factory()->create();

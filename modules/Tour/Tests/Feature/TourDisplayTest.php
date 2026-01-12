@@ -1,12 +1,12 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Tour\Models\Tour;
 use Modules\Tour\Models\TourCategory;
 use Modules\Tour\Models\TourDestination;
 use Modules\Tour\Models\TourPricing;
-use App\Models\User;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
@@ -30,14 +30,14 @@ describe('Tour Listing', function () {
             'name' => 'Active Tour',
             'is_active' => true,
         ]);
-        
+
         $inactiveTour = Tour::factory()->create([
             'name' => 'Inactive Tour',
             'is_active' => false,
         ]);
 
         $response = $this->get(route('site.tour.search'));
-            
+
         $response->assertSee('Active Tour')
             ->assertDontSee('Inactive Tour');
     });
@@ -151,13 +151,13 @@ describe('Tour Detail Page', function () {
 
     it('displays tour pricings', function () {
         $tour = Tour::factory()->create(['is_active' => true]);
-        
+
         TourPricing::factory()->create([
             'tour_id' => $tour->id,
             'name' => 'Budget Package',
             'adult_price' => 3000,
         ]);
-        
+
         TourPricing::factory()->create([
             'tour_id' => $tour->id,
             'name' => 'Premium Package',
@@ -174,13 +174,13 @@ describe('Tour Detail Page', function () {
 
     it('displays tour extras', function () {
         $tour = Tour::factory()->create(['is_active' => true]);
-        
+
         $tour->extras()->create([
             'name' => 'Airport Transfer',
             'description' => 'Pick up and drop off',
             'price' => 1000,
         ]);
-        
+
         $tour->extras()->create([
             'name' => 'Travel Insurance',
             'description' => 'Full coverage',

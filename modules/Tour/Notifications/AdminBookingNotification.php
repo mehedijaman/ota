@@ -23,21 +23,21 @@ class AdminBookingNotification extends Notification
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('New Tour Booking - ' . $this->booking->booking_number)
+            ->subject('New Tour Booking - '.$this->booking->booking_number)
             ->greeting('New Booking Received!')
             ->line('A new tour booking has been submitted and requires your attention.')
             ->line('**Booking Details:**')
-            ->line('Booking Number: **' . $this->booking->booking_number . '**')
-            ->line('Tour: **' . $this->booking->tour->name . '**')
-            ->line('Travel Date: **' . $this->booking->travel_date->format('d M, Y') . '**')
-            ->line('Customer: **' . $this->booking->contact_name . '**')
-            ->line('Email: **' . $this->booking->contact_email . '**')
-            ->line('Phone: **' . $this->booking->contact_phone . '**')
-            ->line('Total Travelers: **' . $this->booking->total_travelers . '**')
-            ->line('Adults: ' . $this->booking->adults_count . ' | Children: ' . $this->booking->children_count . ' | Infants: ' . $this->booking->infants_count)
-            ->line('Total Amount: **৳ ' . number_format($this->booking->total_amount, 2) . '**')
-            ->line('Payment Method: **' . ucfirst($this->booking->payment_method) . '**')
-            ->action('View Booking', url('/app/tour/bookings/' . $this->booking->id))
+            ->line('Booking Number: **'.$this->booking->booking_number.'**')
+            ->line('Tour: **'.$this->booking->tour->name.'**')
+            ->line('Travel Date: **'.$this->booking->travel_date->format('d M, Y').'**')
+            ->line('Customer: **'.$this->booking->contact_name.'**')
+            ->line('Email: **'.$this->booking->contact_email.'**')
+            ->line('Phone: **'.$this->booking->contact_phone.'**')
+            ->line('Total Travelers: **'.$this->booking->total_travelers.'**')
+            ->line('Adults: '.$this->booking->adults_count.' | Children: '.$this->booking->children_count.' | Infants: '.$this->booking->infants_count)
+            ->line('Total Amount: **৳ '.number_format($this->booking->total_amount, 2).'**')
+            ->line('Payment Method: **'.ucfirst($this->booking->payment_method).'**')
+            ->action('View Booking', url('/app/tour/bookings/'.$this->booking->id))
             ->line('Please review and approve this booking.');
     }
 

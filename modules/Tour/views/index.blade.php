@@ -49,7 +49,8 @@
                     'url' => route('site.tour.search', ['category' => $category->id]),
                     'name' => $category->name,
                     'tours_count' => $category->tours_count,
-                    'icon' => $category->icon
+                    'icon' => $category->icon,
+                    'image_url' => $category->image_url
                 ];
             })) }}"></featured-tour-categories-carousel>
     @endif

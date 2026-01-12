@@ -13,8 +13,8 @@ use Modules\Tour\Models\TourBooking;
 use Modules\Tour\Models\TourBookingPayment;
 use Modules\Tour\Models\TourCategory;
 use Modules\Tour\Models\TourDestination;
-use Modules\Tour\Services\TourService;
 use Modules\Tour\Services\TourBookingService;
+use Modules\Tour\Services\TourService;
 use Raziul\Sslcommerz\Facades\Sslcommerz;
 
 class SiteTourController extends SiteController
@@ -44,12 +44,14 @@ class SiteTourController extends SiteController
         $categories = TourCategory::query()
             ->active()
             ->withCount('tours')
+            ->with(['media'])
             ->orderBy('sort_order')
             ->get();
 
         $destinations = TourDestination::query()
             ->active()
             ->featured()
+            ->withCount('tours')
             ->get();
 
         return view('tour::index', [
@@ -127,10 +129,14 @@ class SiteTourController extends SiteController
                 'destination',
                 'itineraries' => fn ($q) => $q->orderBy('day_number'),
                 'inclusions',
+                'extras',
+                'cancellationPolicies',
                 'faqs',
                 'highlights',
+                'media',
                 'reviews' => fn ($q) => $q->approved()->latest()->take(5),
             ])
+            ->withMin('pricings', 'adult_price')
             ->firstOrFail();
 
         // Related tours
@@ -144,7 +150,7 @@ class SiteTourController extends SiteController
             ->take(4)
             ->get();
 
-        return view('tour::show-tour', [
+        return view('tour::tour-show', [
             'tour' => $tour,
             'relatedTours' => $relatedTours,
         ]);

@@ -1,14 +1,14 @@
 <?php
 
-use Modules\Tour\Models\Tour;
-use Modules\Tour\Models\TourPricing;
-use Modules\Tour\Models\TourExtra;
-use Modules\Tour\Models\TourBooking;
-use Modules\Tour\Models\TourBookingTraveler;
-use Modules\Tour\Models\TourBookingExtra;
 use App\Models\User;
-use Modules\Customer\Models\Customer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Customer\Models\Customer;
+use Modules\Tour\Models\Tour;
+use Modules\Tour\Models\TourBooking;
+use Modules\Tour\Models\TourBookingExtra;
+use Modules\Tour\Models\TourBookingTraveler;
+use Modules\Tour\Models\TourExtra;
+use Modules\Tour\Models\TourPricing;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -53,10 +53,7 @@ describe('Tour Model', function () {
         expect($tour->bookings)->toHaveCount(2);
     });
 
-// ...
-
-
-
+    // ...
 
     it('can get active tours', function () {
         Tour::factory()->create(['is_active' => true]);
@@ -79,7 +76,7 @@ describe('Tour Pricing Model', function () {
 
         expect($pricing->tour_id)->toBe($tour->id)
             ->and($pricing->name)->toBe('Standard Package')
-            ->and((float)$pricing->adult_price)->toBe(5000.0);
+            ->and((float) $pricing->adult_price)->toBe(5000.0);
     });
 
     it('belongs to a tour', function () {
@@ -102,7 +99,7 @@ describe('Tour Extra Model', function () {
 
         expect($extra->tour_id)->toBe($tour->id)
             ->and($extra->name)->toBe('Airport Transfer')
-            ->and((float)$extra->price)->toBe(1000.0);
+            ->and((float) $extra->price)->toBe(1000.0);
     });
 
     it('belongs to a tour', function () {
@@ -129,7 +126,7 @@ describe('Tour Booking Model', function () {
 
         expect($booking->tour_id)->toBe($tour->id)
             ->and($booking->adult_count)->toBe(2)
-            ->and((float)$booking->total_amount)->toBe(10000.0);
+            ->and((float) $booking->total_amount)->toBe(10000.0);
     });
 
     it('generates unique booking number', function () {

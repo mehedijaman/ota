@@ -13,7 +13,7 @@ class TourDestinationFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->city . ' ' . uniqid(),
+            'name' => $this->faker->city.' '.uniqid(),
             'slug' => fn (array $attributes) => Str::slug($attributes['name']),
             'country' => $this->faker->country,
             'city' => $this->faker->city,

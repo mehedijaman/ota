@@ -12,7 +12,7 @@ uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::cla
 
 beforeEach(function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-destination-list', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-destination-list', fn () => true);
     $this->actingAs($this->user);
 });
 
@@ -30,7 +30,7 @@ it('can view tour destination index', function () {
 
 it('can view create tour destination form', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-destination-create', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-destination-create', fn () => true);
     $this->actingAs($this->user);
 
     $response = get(route('tourDestination.create'));
@@ -43,7 +43,7 @@ it('can view create tour destination form', function () {
 
 it('can create tour destination', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-destination-create', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-destination-create', fn () => true);
     $this->actingAs($this->user);
 
     $destinationData = [
@@ -66,7 +66,7 @@ it('can create tour destination', function () {
 
 it('can view edit tour destination form', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-destination-edit', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-destination-edit', fn () => true);
     $this->actingAs($this->user);
 
     $destination = TourDestination::factory()->create();
@@ -82,7 +82,7 @@ it('can view edit tour destination form', function () {
 
 it('can update tour destination', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-destination-edit', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-destination-edit', fn () => true);
     $this->actingAs($this->user);
 
     $destination = TourDestination::factory()->create();
@@ -103,7 +103,7 @@ it('can update tour destination', function () {
 
 it('can delete tour destination', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-destination-delete', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-destination-delete', fn () => true);
     $this->actingAs($this->user);
 
     $destination = TourDestination::factory()->create();

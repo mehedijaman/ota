@@ -47,6 +47,14 @@ class TourCategory extends BaseModel implements HasMedia
     }
 
     /**
+     * Get image URL attribute.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl('image') ?: null;
+    }
+
+    /**
      * Register media collections.
      */
     public function registerMediaCollections(): void

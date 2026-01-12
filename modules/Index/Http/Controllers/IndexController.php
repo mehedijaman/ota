@@ -2,11 +2,11 @@
 
 namespace Modules\Index\Http\Controllers;
 
-use Modules\Page\Models\Page;
 use Modules\Blog\Services\PostService;
-use Modules\Tour\Services\TourService;
+use Modules\Page\Models\Page;
 use Modules\Support\Http\Controllers\SiteController;
 use Modules\Testimonial\Services\TestimonialService;
+use Modules\Tour\Services\TourService;
 
 class IndexController extends SiteController
 {

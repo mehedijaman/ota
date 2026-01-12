@@ -14,7 +14,7 @@ uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::cla
 
 beforeEach(function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-list', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-list', fn () => true);
     $this->actingAs($this->user);
     TourCategory::factory()->create();
     TourDestination::factory()->create();
@@ -34,7 +34,7 @@ it('can view tour index', function () {
 
 it('can view create tour form', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-create', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-create', fn () => true);
     $this->actingAs($this->user);
 
     $response = get(route('tour.create'));
@@ -49,7 +49,7 @@ it('can view create tour form', function () {
 
 it('can create tour', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-create', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-create', fn () => true);
     $this->actingAs($this->user);
 
     $category = TourCategory::first();
@@ -80,7 +80,7 @@ it('can create tour', function () {
 
 it('can view edit tour form', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-edit', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-edit', fn () => true);
     $this->actingAs($this->user);
 
     $tour = Tour::factory()->create();
@@ -98,7 +98,7 @@ it('can view edit tour form', function () {
 
 it('can update tour', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-edit', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-edit', fn () => true);
     $this->actingAs($this->user);
 
     $tour = Tour::factory()->create();
@@ -124,7 +124,7 @@ it('can update tour', function () {
 
 it('can delete tour', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-delete', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-delete', fn () => true);
     $this->actingAs($this->user);
 
     $tour = Tour::factory()->create();
@@ -138,7 +138,7 @@ it('can delete tour', function () {
 
 it('can view tour details', function () {
     $this->user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Gate::define('tour-view', fn() => true);
+    \Illuminate\Support\Facades\Gate::define('tour-view', fn () => true);
     $this->actingAs($this->user);
 
     $tour = Tour::factory()->create();

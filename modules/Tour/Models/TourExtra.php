@@ -2,11 +2,10 @@
 
 namespace Modules\Tour\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Support\Models\BaseModel;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Tour\Database\Factories\TourExtraFactory;
 
 class TourExtra extends BaseModel
