@@ -8,9 +8,56 @@
         </template>
     </AppSectionHeader>
 
-    <form @submit.prevent="submit" class="space-y-8">
-        <!-- Tour Selection & Basic Info -->
-        <AppCard>
+    <form @submit.prevent="submit">
+        <!-- Tab Navigation -->
+        <div class="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
+            <div class="overflow-x-auto p-4">
+                <nav class="flex min-w-max gap-2">
+                    <button
+                        v-for="tab in tabs"
+                        :key="tab.id"
+                        type="button"
+                        @click="activeTab = tab.id"
+                        :class="[
+                            'flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all',
+                            activeTab === tab.id
+                                ? 'bg-gradient-to-r from-primary-600 to-purple-600 text-white shadow-lg shadow-primary-500/25'
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600 dark:hover:text-white'
+                        ]"
+                    >
+                        <i :class="[tab.icon, activeTab === tab.id ? 'text-white' : 'text-slate-500 dark:text-slate-400']"></i>
+                        <span class="hidden sm:inline">{{ tab.label }}</span>
+                        <span v-if="tab.badge" class="ml-1 rounded-full px-2 py-0.5 text-xs font-bold" :class="activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'">
+                            {{ tab.badge }}
+                        </span>
+                    </button>
+                </nav>
+            </div>
+            
+            <!-- Quick Summary Bar -->
+            <div class="flex flex-wrap items-center gap-4 border-t border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-800/50">
+                <div v-if="selectedTour" class="flex items-center gap-2">
+                    <i class="ri-map-pin-line text-primary-500"></i>
+                    <span class="font-medium text-slate-700 dark:text-slate-300">{{ selectedTour.name }}</span>
+                </div>
+                <div v-if="form.travel_date" class="flex items-center gap-2">
+                    <i class="ri-calendar-line text-amber-500"></i>
+                    <span class="text-slate-600 dark:text-slate-400">{{ formatDisplayDate(form.travel_date) }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="ri-group-line text-blue-500"></i>
+                    <span class="text-slate-600 dark:text-slate-400">{{ totalTravelers }} Traveler{{ totalTravelers > 1 ? 's' : '' }}</span>
+                </div>
+                <div class="ml-auto flex items-center gap-2 rounded-lg bg-emerald-100 px-3 py-1 dark:bg-emerald-900/30">
+                    <i class="ri-money-dollar-circle-line text-emerald-600 dark:text-emerald-400"></i>
+                    <span class="font-bold text-emerald-700 dark:text-emerald-300">৳{{ formatNumber(calculatedTotal) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Tour & Travelers -->
+        <div v-show="activeTab === 'tour'" class="space-y-6">
+            <AppCard>
             <template #title>
                 <div class="flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-500/25">
@@ -146,7 +193,10 @@
                 </div>
             </template>
         </AppCard>
+        </div>
 
+        <!-- Tab: Contact -->
+        <div v-show="activeTab === 'contact'" class="space-y-6">
         <!-- Customer & Agent Selection -->
         <AppCard>
             <template #title>
@@ -289,7 +339,10 @@
                 </div>
             </template>
         </AppCard>
+        </div>
 
+        <!-- Tab: Travelers -->
+        <div v-show="activeTab === 'travelers'" class="space-y-6">
         <!-- Travelers -->
         <AppCard>
             <template #title>
@@ -459,7 +512,10 @@
                 </div>
             </template>
         </AppCard>
+        </div>
 
+        <!-- Tab: Extras -->
+        <div v-show="activeTab === 'extras'" class="space-y-6">
         <!-- Special Requirements -->
         <AppCard>
             <template #title>
@@ -609,7 +665,10 @@
                 </div>
             </template>
         </AppCard>
+        </div>
 
+        <!-- Tab: Payment -->
+        <div v-show="activeTab === 'payment'" class="space-y-6">
         <!-- Pricing & Payment -->
         <AppCard>
             <template #title>
@@ -933,14 +992,34 @@
                 </div>
             </template>
         </AppCard>
+        </div>
 
         <!-- Form Actions -->
         <div class="sticky bottom-0 -mx-4 border-t border-slate-200 bg-white/95 px-4 py-4 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95 md:-mx-6 md:px-6">
             <div class="flex items-center justify-between gap-4">
-                <p class="hidden text-sm text-slate-500 dark:text-slate-400 sm:block">
-                    <i class="ri-information-line mr-1"></i>
-                    All fields marked with <span class="text-red-500">*</span> are required
-                </p>
+                <!-- Left: Navigation -->
+                <div class="flex items-center gap-2">
+                    <AppButton
+                        v-if="activeTab !== 'tour'"
+                        type="button"
+                        class="btn btn-secondary group"
+                        @click="goToPreviousTab"
+                    >
+                        <i class="ri-arrow-left-line mr-1.5 transition-transform group-hover:-translate-x-0.5"></i>
+                        Previous
+                    </AppButton>
+                    <AppButton
+                        v-if="activeTab !== 'payment'"
+                        type="button"
+                        class="btn btn-secondary group"
+                        @click="goToNextTab"
+                    >
+                        Next
+                        <i class="ri-arrow-right-line ml-1.5 transition-transform group-hover:translate-x-0.5"></i>
+                    </AppButton>
+                </div>
+                
+                <!-- Right: Actions -->
                 <div class="flex gap-3">
                     <AppButton
                         type="button"
@@ -987,8 +1066,34 @@ const breadCrumb = [
     { label: isEditing.value ? 'Edit Booking' : 'Create Booking', last: true }
 ]
 
+// Tab navigation
+const activeTab = ref('tour')
+
 // Custom subtotal toggle - enabled if subtotal differs from calculated
 const useCustomSubtotal = ref(false)
+
+// Helper to format date for input field (YYYY-MM-DD format)
+const formatDateForInput = (date) => {
+    if (!date) return ''
+    // If it's already a string in YYYY-MM-DD format, return it
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return date
+    }
+    // If it's a date string with time (e.g., "2026-01-15T00:00:00.000000Z"), extract just the date
+    if (typeof date === 'string' && date.includes('T')) {
+        return date.split('T')[0]
+    }
+    // If it's a Date object, format it
+    if (date instanceof Date) {
+        return date.toISOString().split('T')[0]
+    }
+    // Otherwise try to parse and format
+    const parsed = new Date(date)
+    if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString().split('T')[0]
+    }
+    return ''
+}
 
 // Form initialization
 const form = useForm({
@@ -996,7 +1101,7 @@ const form = useForm({
     pricing_id: props.booking?.pricing_id || null,
     customer_id: props.booking?.customer_id || null,
     agent_id: props.booking?.agent_id || null,
-    travel_date: props.booking?.travel_date || '',
+    travel_date: formatDateForInput(props.booking?.travel_date),
     status: props.booking?.status || 'pending',
     payment_status: props.booking?.payment_status || 'unpaid',
     adult_count: props.booking?.adult_count || 1,
@@ -1128,6 +1233,15 @@ const totalTravelers = computed(() =>
     form.adult_count + form.child_count + form.infant_count
 )
 
+// Tabs configuration (after totalTravelers is defined)
+const tabs = computed(() => [
+    { id: 'tour', label: 'Tour Details', icon: 'ri-map-pin-line' },
+    { id: 'contact', label: 'Contact Info', icon: 'ri-contacts-book-line' },
+    { id: 'travelers', label: 'Travelers', icon: 'ri-group-line', badge: totalTravelers.value },
+    { id: 'extras', label: 'Extras', icon: 'ri-add-circle-line', badge: form.extras.length > 0 ? form.extras.length : null },
+    { id: 'payment', label: 'Payment', icon: 'ri-money-dollar-circle-line' },
+])
+
 const selectedPricing = computed(() => 
     pricingOptions.value.find(p => p.id === form.pricing_id)
 )
@@ -1212,6 +1326,13 @@ const getExtraTotal = (extraId) => {
 
 // Methods
 const formatNumber = (num) => new Intl.NumberFormat('en-BD').format(num || 0)
+
+const formatDisplayDate = (dateStr) => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return dateStr
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+}
 
 const getTravelerTypeBadge = (type) => {
     const badges = {
@@ -1413,6 +1534,23 @@ const updateLeadTraveler = (index) => {
                 traveler.is_lead = false
             }
         })
+    }
+}
+
+// Tab navigation methods
+const tabOrder = ['tour', 'contact', 'travelers', 'extras', 'payment']
+
+const goToNextTab = () => {
+    const currentIndex = tabOrder.indexOf(activeTab.value)
+    if (currentIndex < tabOrder.length - 1) {
+        activeTab.value = tabOrder[currentIndex + 1]
+    }
+}
+
+const goToPreviousTab = () => {
+    const currentIndex = tabOrder.indexOf(activeTab.value)
+    if (currentIndex > 0) {
+        activeTab.value = tabOrder[currentIndex - 1]
     }
 }
 
