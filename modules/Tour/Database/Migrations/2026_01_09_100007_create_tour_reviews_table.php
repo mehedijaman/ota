@@ -25,6 +25,7 @@ return new class extends Migration
             $table->json('cons')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->boolean('is_approved')->default(false);
+            $table->timestamp('approved_at')->nullable();
             $table->boolean('is_featured')->default(false);
             $table->date('travel_date')->nullable();
             $table->unsignedInteger('helpful_count')->default(0);
