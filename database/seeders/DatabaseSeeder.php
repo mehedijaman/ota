@@ -6,8 +6,10 @@ use Illuminate\Database\Seeder;
 use Modules\Acl\Database\Seeders\AclModelHasRolesSeeder;
 use Modules\Acl\Database\Seeders\AclPermissionSeeder;
 use Modules\Acl\Database\Seeders\AclRoleSeeder;
+use Modules\Agent\Database\Seeders\AgentSeeder;
 use Modules\Blog\Database\Seeders\BlogAclSeeder;
 use Modules\Blog\Database\Seeders\BlogSeeder;
+use Modules\Customer\Database\Seeders\CustomerSeeder;
 use Modules\Dashboard\Database\Seeders\DashboardAclSeeder;
 use Modules\Employee\Database\Seeders\AreaSeeder;
 use Modules\Employee\Database\Seeders\DepartmentSeeder;
@@ -70,6 +72,8 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             AreaSeeder::class,
             EmployeeSeeder::class,
+            CustomerSeeder::class,
+            AgentSeeder::class,
             TourSeeder::class,
             TourBookingSeeder::class,
             TourReviewSeeder::class,
