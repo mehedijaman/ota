@@ -9,7 +9,7 @@ export default {
         },
 
         {
-            label: 'Tours',
+            label: 'Tour Management',
             permission: 'tour',
             icon: 'ri-compass-3-line',
             children: [
