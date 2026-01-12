@@ -3,16 +3,23 @@
 namespace Modules\Tour\Models;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Support\Models\BaseModel;
 use Modules\Support\Traits\Searchable;
+use Modules\Tour\Database\Factories\TourReviewFactory;
 
 class TourReview extends BaseModel
 {
-    use Searchable, SoftDeletes;
+    use HasFactory, Searchable, SoftDeletes;
 
     protected $table = 'tour_reviews';
+
+    protected static function newFactory()
+    {
+        return TourReviewFactory::new();
+    }
 
     protected function casts(): array
     {

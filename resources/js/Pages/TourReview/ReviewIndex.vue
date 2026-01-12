@@ -1,6 +1,16 @@
 <template>
     <Head :title="title"></Head>
     <AppSectionHeader :title="title" :bread-crumb="breadCrumb">
+        <template #right>
+            <AppButton
+                v-if="can('tour-review-delete')"
+                class="btn btn-secondary"
+                @click="$inertia.visit(route('tourReview.recycleBin'))"
+            >
+                <i class="ri-delete-bin-line mr-1"></i>
+                Recycle Bin
+            </AppButton>
+        </template>
     </AppSectionHeader>
 
     <AppDataSearch
@@ -125,7 +135,9 @@
 import { ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
+import useAuthCan from '@/Composables/useAuthCan'
 
+const { can } = useAuthCan()
 const { title } = useTitle('Tour Reviews')
 
 defineProps({

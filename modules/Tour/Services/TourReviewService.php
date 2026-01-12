@@ -83,4 +83,47 @@ class TourReviewService
     {
         return $review->delete();
     }
+
+    public function getTrashed()
+    {
+        return TourReview::onlyTrashed()
+            ->with(['tour', 'user'])
+            ->orderBy('deleted_at', 'desc')
+            ->search(request('searchContext'), request('searchTerm'))
+            ->paginate(request('rowsPerPage', 15))
+            ->withQueryString()
+            ->through(fn ($review) => [
+                'id' => $review->id,
+                'tour' => $review->tour?->name,
+                'user' => $review->user?->name,
+                'reviewer_name' => $review->reviewer_name,
+                'rating' => $review->rating,
+                'is_verified' => $review->is_verified,
+                'is_approved' => $review->is_approved,
+                'deleted_at' => $review->deleted_at,
+            ]);
+    }
+
+    public function restore(TourReview $review): bool
+    {
+        return $review->restore();
+    }
+
+    public function restoreAll(): int
+    {
+        return TourReview::onlyTrashed()->restore();
+    }
+
+    public function forceDelete(TourReview $review): bool
+    {
+        return $review->forceDelete();
+    }
+
+    public function emptyRecycleBin(): int
+    {
+        $count = TourReview::onlyTrashed()->count();
+        TourReview::onlyTrashed()->forceDelete();
+
+        return $count;
+    }
 }

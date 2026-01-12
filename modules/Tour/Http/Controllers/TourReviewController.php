@@ -67,4 +67,47 @@ class TourReviewController extends BackendController
         return redirect()->route('tourReview.index')
             ->with('success', 'Review deleted successfully.');
     }
+
+    public function recycleBin(): Response
+    {
+        return inertia('TourReview/ReviewRecycleBin', [
+            'reviews' => $this->reviewService->getTrashed(),
+        ]);
+    }
+
+    public function restore(int $id): RedirectResponse
+    {
+        $review = TourReview::onlyTrashed()->findOrFail($id);
+
+        $this->reviewService->restore($review);
+
+        return redirect()->back()
+            ->with('success', 'Review restored successfully.');
+    }
+
+    public function restoreRecycleBin(): RedirectResponse
+    {
+        $this->reviewService->restoreAll();
+
+        return redirect()->back()
+            ->with('success', 'All reviews restored successfully.');
+    }
+
+    public function destroyForce(int $id): RedirectResponse
+    {
+        $review = TourReview::onlyTrashed()->findOrFail($id);
+
+        $this->reviewService->forceDelete($review);
+
+        return redirect()->back()
+            ->with('success', 'Review permanently deleted.');
+    }
+
+    public function emptyRecycleBin(): RedirectResponse
+    {
+        $this->reviewService->emptyRecycleBin();
+
+        return redirect()->back()
+            ->with('success', 'Recycle bin emptied successfully.');
+    }
 }

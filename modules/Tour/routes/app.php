@@ -89,10 +89,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Tour Reviews
     Route::prefix('tour-reviews')->controller(TourReviewController::class)->name('tourReview.')->group(function () {
         Route::get('/', 'index')->name('index')->can('tour-review-list');
+        Route::get('recycle-bin', 'recycleBin')->name('recycleBin')->can('tour-review-delete');
+        Route::post('recycle-bin/restore', 'restoreRecycleBin')->name('restoreRecycleBin')->can('tour-review-delete');
+        Route::delete('recycle-bin/empty', 'emptyRecycleBin')->name('emptyRecycleBin')->can('tour-review-delete');
         Route::get('{id}', 'show')->name('show')->can('tour-review-view');
         Route::patch('{id}/approve', 'approve')->name('approve')->can('tour-review-edit');
         Route::patch('{id}/reject', 'reject')->name('reject')->can('tour-review-edit');
         Route::patch('{id}/toggle-featured', 'toggleFeatured')->name('toggleFeatured')->can('tour-review-edit');
+        Route::post('{id}/restore', 'restore')->name('restore')->can('tour-review-delete');
+        Route::delete('{id}/force', 'destroyForce')->name('destroyForce')->can('tour-review-delete');
         Route::delete('{id}', 'destroy')->name('destroy')->can('tour-review-delete');
     });
 

@@ -22,11 +22,37 @@ class TourAclSeeder extends Seeder
     private function getPermissions(): array
     {
         return [
+            'tour',
+
             'tour-list',
             'tour-view',
             'tour-create',
             'tour-edit',
             'tour-delete',
+
+            'tour-category-list',
+            'tour-category-view',
+            'tour-category-create',
+            'tour-category-edit',
+            'tour-category-delete',
+
+            'tour-destination-list',
+            'tour-destination-view',
+            'tour-destination-create',
+            'tour-destination-edit',
+            'tour-destination-delete',
+
+            'tour-review-list',
+            'tour-review-view',
+            'tour-review-create',
+            'tour-review-edit',
+            'tour-review-delete',
+
+            'tour-booking-list',
+            'tour-booking-view',
+            'tour-booking-create',
+            'tour-booking-edit',
+            'tour-booking-delete',
         ];
     }
 }
