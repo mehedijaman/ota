@@ -5,7 +5,7 @@
     >
         <!-- Logo Image or Icon -->
         <div
-            v-if="siteSettings?.site_logo"
+            v-if="siteSettings?.site_logo && variant !== 'light'"
             class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl shadow-lg transition-transform duration-200 group-hover:scale-105"
         >
             <img
@@ -16,10 +16,18 @@
         </div>
         <div
             v-else
-            class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-9 shadow-lg shadow-primary-9/25 transition-transform duration-200 group-hover:scale-105"
+            :class="[
+                'flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105',
+                variant === 'light' 
+                    ? 'bg-white/20 shadow-lg shadow-white/10' 
+                    : 'bg-primary-9 shadow-lg shadow-primary-9/25'
+            ]"
         >
             <svg
-                class="h-5 w-5 text-white"
+                :class="[
+                    'h-5 w-5',
+                    variant === 'light' ? 'text-white' : 'text-white'
+                ]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -34,7 +42,12 @@
         </div>
         
         <!-- Site Name -->
-        <span class="text-xl font-bold tracking-tight text-neutral-12">
+        <span 
+            :class="[
+                'text-xl font-bold tracking-tight',
+                variant === 'light' ? 'text-white' : 'text-neutral-12'
+            ]"
+        >
             {{ siteSettings?.site_name || 'App' }}
         </span>
     </a>
@@ -43,6 +56,13 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
+
+defineProps({
+    variant: {
+        type: String,
+        default: 'default'
+    }
+})
 
 const page = usePage()
 const siteSettings = computed(() => page.props.siteSettings)

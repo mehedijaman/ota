@@ -3,9 +3,10 @@
     <AppAuthShell>
         <!-- Header -->
         <div class="mb-8 text-center">
-            <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-9/10">
+            <!-- Icon -->
+            <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
                 <svg
-                    class="h-8 w-8 text-primary-9"
+                    class="h-6 w-6 text-primary-600 dark:text-primary-400"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -18,55 +19,40 @@
                     />
                 </svg>
             </div>
-            <h1
-                class="text-2xl font-bold tracking-tight text-neutral-12 md:text-3xl"
-            >
-                {{ __('Verify your email') }}
+            <h1 class="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-white">
+                {{ __('Check your email') }}
             </h1>
-            <p class="mt-2 text-neutral-11">
-                {{
-                    __(
-                        'Thanks for signing up! Before getting started, please verify your email address by clicking the link we sent to your email.'
-                    )
-                }}
+            <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+                {{ __('We sent a verification link to your email address.') }}
             </p>
         </div>
 
         <!-- Success message -->
-        <div
-            v-if="verificationLinkSent"
-            class="mb-6 rounded-lg border border-green-6 bg-green-2 p-4 dark:border-green-7 dark:bg-green-3"
+        <Transition
+            enter-active-class="transition duration-300 ease-out"
+            enter-from-class="translate-y-2 opacity-0 scale-95"
+            enter-to-class="translate-y-0 opacity-100 scale-100"
         >
-            <div class="flex items-center gap-3">
-                <svg
-                    class="h-5 w-5 shrink-0 text-green-9"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                </svg>
-                <p class="text-sm font-medium text-green-11">
+            <div
+                v-if="verificationLinkSent"
+                class="mb-6 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/30"
+            >
+                <p class="text-center text-sm font-medium text-green-700 dark:text-green-300">
                     {{ __('A new verification link has been sent!') }}
                 </p>
             </div>
-        </div>
+        </Transition>
 
         <!-- Resend button -->
-        <form @submit.prevent="resendVerification">
-            <AppButton
-                class="flex h-12 w-full items-center justify-center rounded-lg bg-primary-9 text-base font-semibold text-white shadow-lg shadow-primary-9/25 transition-all duration-200 hover:bg-primary-10 hover:shadow-xl hover:shadow-primary-9/30 focus:outline-none focus:ring-2 focus:ring-primary-9 focus:ring-offset-2 disabled:opacity-50"
+        <form @submit.prevent="resendVerification" class="space-y-3">
+            <button
+                class="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary-600 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-primary-600 dark:hover:bg-primary-500 dark:focus:ring-offset-neutral-900"
                 type="submit"
                 :disabled="form.processing"
             >
                 <span v-if="form.processing" class="flex items-center gap-2">
                     <svg
-                        class="h-5 w-5 animate-spin"
+                        class="h-4 w-4 animate-spin"
                         fill="none"
                         viewBox="0 0 24 24"
                     >
@@ -86,18 +72,23 @@
                     </svg>
                     {{ __('Sending...') }}
                 </span>
-                <span v-else>{{ __('Resend verification email') }}</span>
-            </AppButton>
-        </form>
+                <span v-else>
+                    {{ __('Resend verification email') }}
+                </span>
+            </button>
 
-        <!-- Logout link -->
-        <p class="mt-6 text-center text-sm text-neutral-11">
+            <!-- Logout link -->
             <AppLink
                 :href="route('auth.logout')"
-                class="font-medium text-primary-9 transition-colors hover:text-primary-11"
+                class="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-neutral-300 bg-white text-sm font-medium text-neutral-700 transition-all duration-200 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
             >
-                {{ __('Log out') }}
+                {{ __('Sign out') }}
             </AppLink>
+        </form>
+
+        <!-- Help text -->
+        <p class="mt-6 text-center text-xs text-neutral-400 dark:text-neutral-500">
+            {{ __('Didn\'t receive the email? Check your spam folder.') }}
         </p>
     </AppAuthShell>
 </template>
