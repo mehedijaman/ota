@@ -41,21 +41,18 @@ class SiteTourController extends SiteController
         $featuredTours = Tour::query()
             ->active()
             ->featured()
-            ->with(['category', 'destination'])
-            ->take(8)
+            ->with(['category', 'destination', 'media'])
             ->get();
 
         $categories = TourCategory::query()
             ->active()
             ->withCount('tours')
             ->orderBy('sort_order')
-            ->take(8)
             ->get();
 
         $destinations = TourDestination::query()
             ->active()
             ->featured()
-            ->take(6)
             ->get();
 
         return view('tour::index', [
