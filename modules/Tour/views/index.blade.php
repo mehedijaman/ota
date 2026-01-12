@@ -8,22 +8,21 @@
 
     <x-tour-search-form :categories="$categories" :destinations="$destinations" />
 
-
     <!-- Featured Destinations -->
     @if($destinations->count())
-        <featured-tour-destinations-carousel :destinations="{{ json_encode($destinations->map(function($destination) {
-            return [
-                'id' => $destination->id,
-                'url' => route('site.tour.search', ['destination' => $destination->id]),
-                'image_url' => $destination->image_url,
-                'name' => $destination->name,
-                'tours_count' => $destination->tours_count ?? 0
-            ];
-        })) }}"></featured-tour-destinations-carousel>
+        <featured-tour-destinations-carousel :destinations="{{ json_encode($destinations->map(function ($destination) {
+                return [
+                    'id' => $destination->id,
+                    'url' => route('site.tour.search', ['destination' => $destination->id]),
+                    'image_url' => $destination->image_url,
+                    'name' => $destination->name,
+                    'tours_count' => $destination->tours_count ?? 0
+                ];
+            })) }}"></featured-tour-destinations-carousel>
     @endif
 
     <!-- Featured Tours -->
-    <featured-tours-carousel :tours="{{ json_encode($featuredTours->map(function($tour) {
+    <featured-tours-carousel :tours="{{ json_encode($featuredTours->map(function ($tour) {
         return [
             'id' => $tour->id,
             'url' => route('site.tour.show', $tour->slug),
@@ -43,15 +42,15 @@
 
     <!-- Categories -->
     @if($categories->count())
-        <featured-tour-categories-carousel :categories="{{ json_encode($categories->map(function($category) {
-            return [
-                'id' => $category->id,
-                'url' => route('site.tour.search', ['category' => $category->id]),
-                'name' => $category->name,
-                'tours_count' => $category->tours_count,
-                'icon' => $category->icon
-            ];
-        })) }}"></featured-tour-categories-carousel>
+        <featured-tour-categories-carousel :categories="{{ json_encode($categories->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'url' => route('site.tour.search', ['category' => $category->id]),
+                    'name' => $category->name,
+                    'tours_count' => $category->tours_count,
+                    'icon' => $category->icon
+                ];
+            })) }}"></featured-tour-categories-carousel>
     @endif
 
     <!-- CTA Section -->
