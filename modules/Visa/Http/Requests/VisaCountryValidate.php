@@ -16,6 +16,8 @@ class VisaCountryValidate extends Request
             'code' => ['required', 'string', 'max:3', Rule::unique('visa_countries', 'code')->ignore($id)],
             'slug' => ['required', 'string', 'max:255', Rule::unique('visa_countries', 'slug')->ignore($id)],
             'continent' => ['nullable', 'string', 'max:50'],
+            'region' => ['nullable', 'string', 'max:50'],
+            'flag_icon' => ['nullable', 'string', 'max:10'],
             'capital' => ['nullable', 'string', 'max:100'],
             'timezone' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string'],

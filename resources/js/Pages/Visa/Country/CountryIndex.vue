@@ -25,8 +25,13 @@
     </AppSectionHeader>
 
     <div v-if="stats" class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="border-neutral-6 bg-neutral-1 rounded-xl border p-4 shadow-sm">
-            <div class="flex items-center gap-4">
+        <!-- Total Countries -->
+        <div 
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            :class="{ 'ring-2 ring-blue-500': !filterForm.status && !filterForm.is_popular }"
+            @click="filterByStats('all')"
+        >
+            <div class="flex items-center gap-4 p-4">
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/25">
                     <i class="ri-flag-line text-xl text-white"></i>
                 </div>
@@ -37,8 +42,13 @@
             </div>
         </div>
         
-        <div class="border-neutral-6 bg-neutral-1 rounded-xl border p-4 shadow-sm">
-            <div class="flex items-center gap-4">
+        <!-- Active Countries -->
+        <div 
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            :class="{ 'ring-2 ring-emerald-500': filterForm.status === 'active' }"
+            @click="filterByStats('active')"
+        >
+            <div class="flex items-center gap-4 p-4">
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
                     <i class="ri-checkbox-circle-line text-xl text-white"></i>
                 </div>
@@ -49,8 +59,30 @@
             </div>
         </div>
 
-        <div class="border-neutral-6 bg-neutral-1 rounded-xl border p-4 shadow-sm">
-            <div class="flex items-center gap-4">
+        <!-- Inactive -->
+        <div 
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            :class="{ 'ring-2 ring-red-500': filterForm.status === 'inactive' }"
+            @click="filterByStats('inactive')"
+        >
+            <div class="flex items-center gap-4 p-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/25">
+                    <i class="ri-close-circle-line text-xl text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-neutral-9 truncate text-sm font-medium">Inactive</p>
+                    <p class="text-neutral-12 text-2xl font-bold">{{ stats.inactive || 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular -->
+        <div 
+            class="border-neutral-6 bg-neutral-1 cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            :class="{ 'ring-2 ring-amber-500': filterForm.is_popular === 'yes' }"
+            @click="filterByStats('popular')"
+        >
+            <div class="flex items-center gap-4 p-4">
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/25">
                     <i class="ri-star-line text-xl text-white"></i>
                 </div>
@@ -62,7 +94,90 @@
         </div>
     </div>
 
+    <!-- Filter Card -->
+    <AppCard class="w-full" no-padding>
+        <template #title>
+            <div
+                class="hover:bg-neutral-3/50 -mx-2 -my-1 flex w-full cursor-pointer select-none items-center justify-between rounded-lg px-2 py-1 transition-colors"
+                @click="showFilters = !showFilters"
+            >
+                <div class="flex items-center gap-3">
+                    <div class="bg-primary-2 flex h-8 w-8 items-center justify-center rounded-lg">
+                        <i class="ri-filter-line text-primary-9"></i>
+                    </div>
+                    <span>Filter Countries</span>
+                    <span
+                        v-if="hasActiveFilters"
+                        class="bg-primary-9 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-bold text-white"
+                    >
+                        {{ activeFilterCount }}
+                    </span>
+                </div>
+                <div class="text-neutral-11 flex items-center gap-1 text-sm">
+                    <span class="hidden sm:inline">{{ showFilters ? 'Hide' : 'Show' }}</span>
+                    <i
+                        class="text-xl transition-transform duration-200"
+                        :class="showFilters ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"
+                    ></i>
+                </div>
+            </div>
+        </template>
+        <template #content>
+            <div v-show="showFilters" class="p-4 sm:p-5">
+                <form class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <!-- Continent Filter -->
+                    <div>
+                        <AppLabel for="continent">Continent</AppLabel>
+                        <AppCombobox
+                            class="w-full"
+                            v-model="filterForm.continent"
+                            :options="continentOptions"
+                            combo-label="All Continents"
+                            emit-value
+                        />
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div>
+                        <AppLabel for="status">Status</AppLabel>
+                        <AppCombobox
+                            class="w-full"
+                            v-model="filterForm.status"
+                            :options="statusOptions"
+                            combo-label="All Status"
+                            emit-value
+                        />
+                    </div>
+
+                    <!-- Popular Filter -->
+                    <div>
+                        <AppLabel for="is_popular">Popular</AppLabel>
+                        <AppCombobox
+                            class="w-full"
+                            v-model="filterForm.is_popular"
+                            :options="yesNoOptions"
+                            combo-label="All"
+                            emit-value
+                        />
+                    </div>
+                </form>
+
+                <div class="mt-4 flex justify-end gap-2">
+                    <AppButton class="btn btn-secondary" @click="resetFilters">
+                        <i class="ri-refresh-line mr-1"></i>
+                        Reset
+                    </AppButton>
+                    <AppButton class="btn btn-primary" @click="applyFilter">
+                        <i class="ri-filter-line mr-1"></i>
+                        Apply
+                    </AppButton>
+                </div>
+            </div>
+        </template>
+    </AppCard>
+
     <AppDataSearch
+        class="mt-4"
         v-if="countries.data.length || route().params.searchTerm"
         :url="route('visaCountry.index')"
         fields-to-search="name,code"
@@ -84,14 +199,14 @@
                         <div class="flex items-center gap-3">
                             <div class="shrink-0">
                                 <img
-                                    v-if="item.thumbnail_url"
-                                    :src="item.thumbnail_url"
+                                    v-if="item.flag_url"
+                                    :src="item.flag_url"
                                     :alt="item.name"
                                     class="ring-neutral-3 h-10 w-16 rounded-lg object-cover ring-1"
                                 />
                                 <div
                                     v-else
-                                    class="ring-neutral-3 flex h-10 w-16 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 text-white ring-1"
+                                    class="ring-neutral-3 flex h-10 w-16 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-cyan-600 text-white ring-1"
                                 >
                                     <span v-if="item.flag_icon" class="text-xl">{{ item.flag_icon }}</span>
                                     <i v-else class="ri-flag-line text-lg"></i>
@@ -208,8 +323,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { Head, router } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useAuthCan from '@/Composables/useAuthCan'
 import AppEmptyState from '@/Components/Misc/AppEmptyState.vue'
@@ -225,6 +340,10 @@ const props = defineProps({
     stats: {
         type: Object,
         default: () => ({})
+    },
+    filters: {
+        type: Object,
+        default: () => ({})
     }
 })
 
@@ -235,6 +354,75 @@ const breadCrumb = [
 ]
 
 const headers = ['#', 'Country', 'Continent', 'Visas', 'Status', 'Actions']
+
+// Filters
+const showFilters = ref(false)
+const filterForm = ref({
+    status: props.filters?.status ?? '',
+    is_popular: props.filters?.is_popular ?? '',
+    continent: props.filters?.continent ?? ''
+})
+
+const continentOptions = [
+    { label: 'Asia', value: 'Asia' },
+    { label: 'Europe', value: 'Europe' },
+    { label: 'Africa', value: 'Africa' },
+    { label: 'North America', value: 'North America' },
+    { label: 'South America', value: 'South America' },
+    { label: 'Oceania', value: 'Oceania' },
+    { label: 'Antarctica', value: 'Antarctica' }
+]
+
+const statusOptions = [
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inactive' }
+]
+
+const yesNoOptions = [
+    { label: 'Yes', value: 'yes' },
+    { label: 'No', value: 'no' }
+]
+
+const hasActiveFilters = computed(() => {
+    return Object.values(filterForm.value).some((val) => val !== '' && val !== null)
+})
+
+const activeFilterCount = computed(() => {
+    return Object.values(filterForm.value).filter((val) => val !== '' && val !== null).length
+})
+
+const applyFilter = () => {
+    router.visit(route('visaCountry.index'), {
+        data: filterForm.value,
+        preserveState: true,
+        preserveScroll: true
+    })
+}
+
+const resetFilters = () => {
+    filterForm.value = {
+        status: '',
+        is_popular: '',
+        continent: ''
+    }
+    applyFilter()
+}
+
+const filterByStats = (type) => {
+    resetFilters()
+    switch (type) {
+        case 'active':
+            filterForm.value.status = 'active'
+            break
+        case 'inactive':
+            filterForm.value.status = 'inactive'
+            break
+        case 'popular':
+            filterForm.value.is_popular = 'yes'
+            break
+    }
+    applyFilter()
+}
 
 const confirmDialogRef = ref(null)
 const confirmDelete = (deleteRoute) => {

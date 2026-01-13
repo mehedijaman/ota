@@ -24,7 +24,7 @@
                         :class="[
                             'flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all',
                             activeTab === tab.id
-                                ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg shadow-blue-500/25'
+                                ? 'bg-linear-to-r from-blue-600 to-teal-600 text-white shadow-lg shadow-blue-500/25'
                                 : 'bg-neutral-3 text-neutral-11 hover:bg-neutral-4 hover:text-neutral-12'
                         ]"
                     >
@@ -86,11 +86,12 @@
                                 </div>
                                 <div>
                                     <AppLabel for="continent">Continent</AppLabel>
-                                    <AppInputText
+                                    <AppCombobox
                                         id="continent"
                                         v-model="form.continent"
-                                        type="text"
-                                        placeholder="e.g. North America"
+                                        :options="continentOptions"
+                                        placeholder="Select Continent"
+                                        emit-value
                                     />
                                 </div>
                                 <div>
@@ -125,49 +126,133 @@
                     </AppCard>
 
                     <AppCard class="mb-4">
-                        <template #title> Settings </template>
+                        <template #title> Settings & Ranking </template>
                         <template #content>
-                            <div class="flex flex-wrap gap-6">
-                                <label class="flex cursor-pointer items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        v-model="form.is_active"
-                                        class="h-4 w-4 rounded text-primary-600"
+                            <div class="flex flex-col gap-4">
+                                <div class="flex flex-wrap gap-6">
+                                    <label class="flex cursor-pointer items-center gap-2">
+                                        <AppCheckbox v-model="form.is_active" />
+                                        <span class="text-neutral-12 font-medium">Active</span>
+                                    </label>
+                                    <label class="flex cursor-pointer items-center gap-2">
+                                        <AppCheckbox v-model="form.is_popular" />
+                                        <span class="text-neutral-12 font-medium">Popular Destination</span>
+                                    </label>
+                                </div>
+                                <div class="w-full md:w-1/3">
+                                    <AppLabel for="sort_order">Sort Order</AppLabel>
+                                    <AppInputText
+                                        id="sort_order"
+                                        v-model="form.sort_order"
+                                        type="number"
+                                        min="0"
                                     />
-                                    <span class="text-neutral-12 font-medium">Active</span>
-                                </label>
-                                <label class="flex cursor-pointer items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        v-model="form.is_popular"
-                                        class="h-4 w-4 rounded text-amber-500"
-                                    />
-                                    <span class="text-neutral-12 font-medium">Popular Destination</span>
-                                </label>
-                            </div>
-                            <div class="mt-4">
-                                <AppLabel for="sort_order">Sort Order</AppLabel>
-                                <AppInputText
-                                    id="sort_order"
-                                    v-model="form.sort_order"
-                                    type="number"
-                                    min="0"
-                                    class="w-full md:w-1/3"
-                                />
+                                </div>
                             </div>
                         </template>
                     </AppCard>
                 </div>
 
-                <div class="lg:col-span-1">
+                <div class="lg:col-span-1 space-y-6">
                     <AppCard>
-                        <template #title> Flag / Image </template>
+                        <template #title> Flag / Thumbnail </template>
                         <template #content>
-                             <AppImage
-                                v-model="form.thumbnail"
-                                :image-url="imageUrl"
-                                label="Country Image"
-                            />
+                            <div class="flex flex-col gap-4">
+                                <div class="shrink-0">
+                                    <div v-if="flagPreview || props.country?.flag_url" class="relative">
+                                        <img
+                                            :src="flagPreview || props.country?.flag_url"
+                                            class="border-neutral-5 h-48 w-full rounded-xl border-2 object-cover shadow-lg"
+                                            alt="Flag preview"
+                                        />
+                                        <button
+                                            type="button"
+                                            @click="removeFlag"
+                                            class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-colors hover:bg-red-600"
+                                        >
+                                            <i class="ri-close-line"></i>
+                                        </button>
+                                    </div>
+                                    <div
+                                        v-else
+                                        class="border-neutral-5 flex h-48 w-full items-center justify-center rounded-xl border-2 border-dashed bg-linear-to-br from-blue-50 to-cyan-50"
+                                    >
+                                        <div class="text-center">
+                                            <i class="ri-image-add-line text-neutral-7 text-4xl"></i>
+                                            <p class="text-neutral-9 mt-2 text-sm">No flag selected</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-3">
+                                    <label class="cursor-pointer">
+                                        <span class="btn btn-secondary w-full justify-center">
+                                            <i class="ri-upload-2-line mr-2"></i>
+                                            {{ flagPreview || props.country?.flag_url ? 'Change Flag' : 'Upload Flag' }}
+                                        </span>
+                                        <input
+                                            type="file"
+                                            class="hidden"
+                                            accept="image/*"
+                                            @change="handleFlagChange"
+                                        />
+                                    </label>
+                                    <p class="text-neutral-9 text-xs text-center">
+                                        <i class="ri-information-line mr-1"></i>
+                                        Recommended: 400x300 pixels
+                                    </p>
+                                </div>
+                            </div>
+                        </template>
+                    </AppCard>
+
+                    <AppCard>
+                        <template #title> Banner Image </template>
+                        <template #content>
+                            <div class="flex flex-col gap-4">
+                                <div class="shrink-0">
+                                    <div v-if="bannerPreview || props.country?.banner_url" class="relative">
+                                        <img
+                                            :src="bannerPreview || props.country?.banner_url"
+                                            class="border-neutral-5 h-32 w-full rounded-xl border-2 object-cover shadow-lg"
+                                            alt="Banner preview"
+                                        />
+                                        <button
+                                            type="button"
+                                            @click="removeBanner"
+                                            class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-colors hover:bg-red-600"
+                                        >
+                                            <i class="ri-close-line"></i>
+                                        </button>
+                                    </div>
+                                    <div
+                                        v-else
+                                        class="border-neutral-5 flex h-32 w-full items-center justify-center rounded-xl border-2 border-dashed bg-linear-to-br from-indigo-50 to-violet-50"
+                                    >
+                                        <div class="text-center">
+                                            <i class="ri-image-add-line text-neutral-7 text-4xl"></i>
+                                            <p class="text-neutral-9 mt-2 text-sm">No banner selected</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-3">
+                                    <label class="cursor-pointer">
+                                        <span class="btn btn-secondary w-full justify-center">
+                                            <i class="ri-upload-2-line mr-2"></i>
+                                            {{ bannerPreview || props.country?.banner_url ? 'Change Banner' : 'Upload Banner' }}
+                                        </span>
+                                        <input
+                                            type="file"
+                                            class="hidden"
+                                            accept="image/*"
+                                            @change="handleBannerChange"
+                                        />
+                                    </label>
+                                    <p class="text-neutral-9 text-xs text-center">
+                                        <i class="ri-information-line mr-1"></i>
+                                        Recommended: 1200x400 pixels
+                                    </p>
+                                </div>
+                            </div>
                         </template>
                     </AppCard>
                 </div>
@@ -185,7 +270,7 @@
                             <AppTextArea
                                 id="description"
                                 v-model="form.description"
-                                rows="3"
+                                row="3"
                                 placeholder="Brief overview of the country"
                             />
                         </div>
@@ -197,7 +282,6 @@
                                 rows="10"
                                 placeholder="Detailed visa policy information..."
                             />
-                            <!-- Could use a rich text editor here if available -->
                         </div>
                     </div>
                 </template>
@@ -206,95 +290,134 @@
 
         <!-- Embassy Tab -->
         <div v-show="activeTab === 'embassy'">
-            <AppCard class="mb-4">
-                <template #title> Embassy Details </template>
-                <template #content>
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div class="md:col-span-2">
-                            <AppLabel for="embassy_name">Embassy Name</AppLabel>
-                            <AppInputText
-                                id="embassy_name"
-                                v-model="form.embassy_name"
-                                type="text"
-                                placeholder="e.g. Embassy of the United States"
-                            />
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                 <AppCard class="h-full">
+                    <template #title> Embassy Details </template>
+                    <template #content>
+                        <div class="space-y-4">
+                             <div>
+                                <AppLabel for="embassy_name">Embassy Name</AppLabel>
+                                <AppInputText
+                                    id="embassy_name"
+                                    v-model="form.embassy_name"
+                                    type="text"
+                                    placeholder="e.g. Embassy of the United States"
+                                />
+                            </div>
+                            <div>
+                                <AppLabel for="embassy_address">Address</AppLabel>
+                                <AppTextArea
+                                    id="embassy_address"
+                                    v-model="form.embassy_address"
+                                    rows="3"
+                                    placeholder="Full address"
+                                />
+                            </div>
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <AppLabel for="embassy_phone">Phone</AppLabel>
+                                    <AppInputText
+                                        id="embassy_phone"
+                                        v-model="form.embassy_phone"
+                                        type="text"
+                                    />
+                                </div>
+                                <div>
+                                    <AppLabel for="embassy_email">Email</AppLabel>
+                                    <AppInputText
+                                        id="embassy_email"
+                                        v-model="form.embassy_email"
+                                        type="email"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <AppLabel for="embassy_website">Website</AppLabel>
+                                <AppInputText
+                                    id="embassy_website"
+                                    v-model="form.embassy_website"
+                                    type="url"
+                                />
+                            </div>
+                             <div>
+                                <AppLabel>Working Hours</AppLabel>
+                                <div class="space-y-3">
+                                    <div v-for="(item, index) in form.embassy_working_hours" :key="index" class="flex gap-2">
+                                        <div class="flex-1">
+                                            <AppInputText
+                                                v-model="item.day"
+                                                placeholder="Day (e.g. Mon-Fri)"
+                                            />
+                                        </div>
+                                        <div class="flex-1">
+                                            <AppInputText
+                                                v-model="item.hours"
+                                                placeholder="Hours (e.g. 9AM - 5PM)"
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            @click="removeWorkingHour(index)"
+                                            class="text-neutral-500 hover:text-red-500"
+                                        >
+                                            <i class="ri-delete-bin-line text-lg"></i>
+                                        </button>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        @click="addWorkingHour"
+                                        class="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center gap-1"
+                                    >
+                                        <i class="ri-add-line"></i> Add Working Hours
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="md:col-span-2">
-                            <AppLabel for="embassy_address">Address</AppLabel>
-                            <AppTextArea
-                                id="embassy_address"
-                                v-model="form.embassy_address"
-                                rows="2"
-                                placeholder="Full address"
-                            />
-                        </div>
-                        <div>
-                            <AppLabel for="embassy_phone">Phone</AppLabel>
-                            <AppInputText
-                                id="embassy_phone"
-                                v-model="form.embassy_phone"
-                                type="text"
-                            />
-                        </div>
-                        <div>
-                            <AppLabel for="embassy_email">Email</AppLabel>
-                            <AppInputText
-                                id="embassy_email"
-                                v-model="form.embassy_email"
-                                type="email"
-                            />
-                        </div>
-                        <div>
-                            <AppLabel for="embassy_website">Website</AppLabel>
-                            <AppInputText
-                                id="embassy_website"
-                                v-model="form.embassy_website"
-                                type="url"
-                            />
-                        </div>
-                    </div>
-                </template>
-            </AppCard>
+                    </template>
+                </AppCard>
 
-            <AppCard class="mb-4">
-                <template #title> Consulate Details </template>
-                <template #content>
-                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div class="md:col-span-2">
-                            <AppLabel for="consulate_name">Consulate Name</AppLabel>
-                            <AppInputText
-                                id="consulate_name"
-                                v-model="form.consulate_name"
-                                type="text"
-                            />
+                <AppCard class="h-full">
+                    <template #title> Consulate Details </template>
+                    <template #content>
+                         <div class="space-y-4">
+                             <div>
+                                <AppLabel for="consulate_name">Consulate Name</AppLabel>
+                                <AppInputText
+                                    id="consulate_name"
+                                    v-model="form.consulate_name"
+                                    type="text"
+                                />
+                            </div>
+                            <div>
+                                <AppLabel for="consulate_address">Address</AppLabel>
+                                <AppTextArea
+                                    id="consulate_address"
+                                    v-model="form.consulate_address"
+                                    rows="3"
+                                />
+                            </div>
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <AppLabel for="consulate_phone">Phone</AppLabel>
+                                    <AppInputText
+                                        id="consulate_phone"
+                                        v-model="form.consulate_phone"
+                                        type="text"
+                                    />
+                                </div>
+                                <div>
+                                    <AppLabel for="consulate_email">Email</AppLabel>
+                                    <AppInputText
+                                        id="consulate_email"
+                                        v-model="form.consulate_email"
+                                        type="email"
+                                    />
+                                </div>
+                            </div>
                         </div>
-                        <div class="md:col-span-2">
-                            <AppLabel for="consulate_address">Address</AppLabel>
-                            <AppTextArea
-                                id="consulate_address"
-                                v-model="form.consulate_address"
-                                rows="2"
-                            />
-                        </div>
-                        <div>
-                            <AppLabel for="consulate_phone">Phone</AppLabel>
-                            <AppInputText
-                                id="consulate_phone"
-                                v-model="form.consulate_phone"
-                                type="text"
-                            />
-                        </div>
-                        <div>
-                            <AppLabel for="consulate_email">Email</AppLabel>
-                            <AppInputText
-                                id="consulate_email"
-                                v-model="form.consulate_email"
-                                type="email"
-                            />
-                        </div>
-                    </div>
-                </template>
-            </AppCard>
+                    </template>
+                </AppCard>
+            </div>
         </div>
 
         <!-- SEO Tab -->
@@ -343,11 +466,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useFormContext from '@/Composables/useFormContext'
 import useFormErrors from '@/Composables/useFormErrors'
+import AppCheckbox from '@/Components/Form/AppCheckbox.vue'
 
 const { isCreate, isEdit } = useFormContext()
 const { title } = useTitle(isCreate.value ? 'Create Country' : 'Edit Country')
@@ -370,7 +494,7 @@ const form = useForm({
     name: props.country?.name ?? '',
     slug: props.country?.slug ?? '',
     code: props.country?.code ?? '',
-    flag_icon: props.country?.flag_icon ?? '',
+    flag_icon: props.country?.flag_icon ?? '', // Emoji
     continent: props.country?.continent ?? '',
     region: props.country?.region ?? '',
     capital: props.country?.capital ?? '',
@@ -383,6 +507,7 @@ const form = useForm({
     embassy_phone: props.country?.embassy_phone ?? '',
     embassy_email: props.country?.embassy_email ?? '',
     embassy_website: props.country?.embassy_website ?? '',
+    embassy_working_hours: Array.isArray(props.country?.embassy_working_hours) ? props.country.embassy_working_hours : [],
     
     consulate_name: props.country?.consulate_name ?? '',
     consulate_address: props.country?.consulate_address ?? '',
@@ -397,11 +522,16 @@ const form = useForm({
     meta_description: props.country?.meta_description ?? '',
     meta_keywords: props.country?.meta_keywords ?? '',
     
-    thumbnail: null,
+    flag: null,
+    banner: null,
+    remove_flag: false,
+    remove_banner: false,
     _method: isEdit.value ? 'PUT' : 'POST'
 })
+// Media Handling
+const flagPreview = ref(null)
+const bannerPreview = ref(null)
 
-const imageUrl = computed(() => props.country?.thumbnail_url)
 const { errorsFields } = useFormErrors()
 
 const activeTab = ref('basic')
@@ -413,17 +543,72 @@ const tabs = [
     { id: 'seo', label: 'SEO', icon: 'ri-search-line' }
 ]
 
+const continentOptions = [
+    { label: 'Asia', value: 'Asia' },
+    { label: 'Europe', value: 'Europe' },
+    { label: 'Africa', value: 'Africa' },
+    { label: 'North America', value: 'North America' },
+    { label: 'South America', value: 'South America' },
+    { label: 'Oceania', value: 'Oceania' },
+    { label: 'Antarctica', value: 'Antarctica' }
+]
+
 const generateSlug = () => {
     if (isCreate.value && form.name) {
         form.slug = form.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
     }
 }
 
+const handleFlagChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        form.flag = file
+        form.remove_flag = false
+        flagPreview.value = URL.createObjectURL(file)
+    }
+}
+
+const removeFlag = () => {
+    form.flag = null
+    form.remove_flag = true
+    flagPreview.value = null
+}
+
+const handleBannerChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        form.banner = file
+        form.remove_banner = false
+        bannerPreview.value = URL.createObjectURL(file)
+    }
+}
+
+const removeBanner = () => {
+    form.banner = null
+    form.remove_banner = true
+    bannerPreview.value = null
+}
+
+const addWorkingHour = () => {
+    if (!Array.isArray(form.embassy_working_hours)) {
+        form.embassy_working_hours = []
+    }
+    form.embassy_working_hours.push({ day: '', hours: '' })
+}
+
+const removeWorkingHour = (index) => {
+    form.embassy_working_hours.splice(index, 1)
+}
+
 const submitForm = () => {
     if (isCreate.value) {
-        form.post(route('visaCountry.store'))
+        form.post(route('visaCountry.store'), {
+            forceFormData: true
+        })
     } else {
-        form.post(route('visaCountry.update', props.country.id))
+        form.post(route('visaCountry.update', props.country.id), {
+            forceFormData: true
+        })
     }
 }
 </script>
