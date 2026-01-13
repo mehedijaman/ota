@@ -1,131 +1,231 @@
 <template>
-    <div
-        class="bg-neutral-2 text-neutral-11 sticky top-0 z-40 flex h-16 shrink-0 justify-between py-3 pr-9 pl-3 shadow-xs"
+    <header
+        class="no-print sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-neutral-4 bg-neutral-1/95 px-4 backdrop-blur-sm"
     >
-        <div class="flex items-center">
-            <AppButton
-                class="btn btn-icon hover:bg-neutral-4"
-                @click="$emit('sidebar:toggle')"
-            >
-                <i class="ri-menu-line"></i>
-            </AppButton>
-
-            <h1 class="flex items-center">{{ title }}</h1>
-        </div>
-
-        <div class="flex items-center gap-2">
-            <AppButton
-                @click="openSite"
-                class="btn btn-icon hover:bg-neutral-4"
-            >
-                <i class="ri-global-line"></i>
-        </AppButton>
-
-            <!-- Fullscreen -->
-            <AppButton
+        <!-- Left Section -->
+        <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Menu Toggle -->
+            <button
                 type="button"
-                @click="toggleFullscreen"
-                class="btn btn-icon hover:bg-neutral-4"
-                :title="isFullscreen ? __('Exit Fullscreen') : __('Fullscreen')"
+                @click="$emit('sidebar:toggle')"
+                class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-11 transition-colors hover:bg-neutral-3 hover:text-neutral-12"
             >
-                <i
-                    :class="iconFullscreenClass"
-                    class="transition-transform duration-300"
-                    :style="{ transform: isFullscreen ? 'rotate(180deg)' : 'rotate(0deg)' }"
-                ></i>
-            </AppButton>
+                <i class="ri-menu-line "></i>
+            </button>
 
-            <AppButton
-                href="#"
-                class="btn btn-icon hover:bg-neutral-4"
-                @click="toggleTheme"
-            >
-                <i :class="iconThemeClass"></i>
-            </AppButton>
+            <!-- Divider -->
+            <div class="hidden h-6 w-px bg-neutral-4 sm:block"></div>
 
-            <!-- User Profile Dropdown -->
-            <div class="relative" v-click-outside="closeDropdown">
+            <!-- + New Button -->
+            <div class="relative">
                 <button
-                    @click="toggleDropdown"
-                    class="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-neutral-4 transition-colors"
+                    type="button"
+                    @click="toggleMenu"
+                    class="flex h-9 items-center gap-1.5 rounded-lg border border-neutral-5 bg-neutral-2 px-3 text-sm font-medium text-neutral-11 transition-all hover:border-neutral-6 hover:bg-neutral-3 hover:text-neutral-12"
                 >
-                    <!-- User Avatar -->
-                    <div class="h-8 w-8 rounded-full overflow-hidden bg-primary-9 flex items-center justify-center text-white font-semibold">
-                        <img
-                            v-if="$page.props.auth.user?.avatar"
-                            :src="$page.props.auth.user.avatar"
-                            :alt="$page.props.auth.user?.name"
-                            class="h-full w-full object-cover"
-                        />
-                        <span v-else class="text-sm">
-                            {{ getInitials($page.props.auth.user?.name) }}
-                        </span>
-                    </div>
-                    <i class="ri-arrow-down-s-line text-sm"></i>
+                    <i class="ri-add-line"></i>
+                    <span class="hidden sm:inline">{{ __('New') }}</span>
                 </button>
-
-                <!-- Dropdown Menu -->
-                <transition
-                    enter-active-class="transition ease-out duration-100"
-                    enter-from-class="transform opacity-0 scale-95"
-                    enter-to-class="transform opacity-100 scale-100"
-                    leave-active-class="transition ease-in duration-75"
-                    leave-from-class="transform opacity-100 scale-100"
-                    leave-to-class="transform opacity-0 scale-95"
-                >
-                    <div
-                        v-show="isDropdownOpen"
-                        class="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-white dark:bg-neutral-3 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                    >
-                        <div class="py-1">
-                            <!-- User Info -->
-                            <div class="px-4 py-3 border-b border-neutral-6 dark:border-neutral-7">
-                                <p class="text-sm font-medium text-neutral-12">{{ $page.props.auth.user?.name }}</p>
-                                <p class="text-xs text-neutral-10 truncate">{{ $page.props.auth.user?.email }}</p>
-                            </div>
-
-                            <!-- Edit Profile -->
-                            <AppLink
-                                :href="route('profile.edit')"
-                                class="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-11 hover:bg-neutral-4 dark:hover:bg-neutral-5 transition-colors"
-                                @click="closeDropdown"
-                            >
-                                <i class="ri-user-settings-line text-base"></i>
-                                <span>Edit Profile</span>
-                            </AppLink>
-
-                            <!-- Logout -->
-                            <button
-                                @click="logout"
-                                class="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                            >
-                                <i class="ri-logout-circle-r-line text-base"></i>
-                                <span>Logout</span>
-                            </button>
-                        </div>
-                    </div>
-                </transition>
+                <NewEntityMenu :open="showNewMenu" />
             </div>
         </div>
-    </div>
+
+        <!-- Right Section -->
+        <div class="flex items-center gap-1 sm:gap-2">
+            <!-- Desktop Actions -->
+            <div class="hidden items-center gap-1.5 md:flex">
+
+                <AppButton
+                    @click="openSite"
+                    class="btn btn-icon hover:bg-neutral-4"
+                >
+                    <i class="ri-global-line"></i>
+                </AppButton>
+
+                <!-- Fullscreen -->
+                <button
+                    type="button"
+                    @click="toggleFullscreen"
+                    class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-10 transition-all hover:bg-neutral-3 hover:text-neutral-12"
+                    :title="isFullscreen ? __('Exit Fullscreen') : __('Fullscreen')"
+                >
+                    <i
+                        :class="iconFullscreenClass"
+                        class=" transition-transform duration-300"
+                        :style="{ transform: isFullscreen ? 'rotate(180deg)' : 'rotate(0deg)' }"
+                    ></i>
+                </button>
+
+                <!-- Calculator -->
+                <button
+                    type="button"
+                    @click="showCalculator = true"
+                    class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-10 transition-colors hover:bg-neutral-3 hover:text-neutral-12"
+                    :title="__('Calculator')"
+                >
+                    <i class="ri-calculator-line "></i>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button
+                    type="button"
+                    @click="toggleTheme"
+                    class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-10 transition-colors hover:bg-neutral-3 hover:text-neutral-12"
+                    :title="__('Toggle Theme')"
+                >
+                    <i :class="iconThemeClass" class=""></i>
+                </button>
+
+                <!-- Language -->
+                <div class="inline-flex">
+                    <LanguageSelector button-class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-10 transition-colors hover:bg-neutral-3 hover:text-neutral-12" />
+                </div>
+            </div>
+
+            <!-- Mobile More Menu -->
+            <div class="md:hidden">
+                <AppDropdown placement="bottom-end">
+                    <template #trigger>
+                        <button
+                            type="button"
+                            class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-10 transition-colors hover:bg-neutral-3 hover:text-neutral-12"
+                        >
+                            <i class="ri-more-2-fill "></i>
+                        </button>
+                    </template>
+                    
+                    <div class="py-1">
+                        <AppDropdownItem @click="showCalculator = true">
+                            <i class="ri-calculator-line mr-2 text-neutral-9"></i>
+                            {{ __('Calculator') }}
+                        </AppDropdownItem>
+                        <AppDropdownItem @click="toggleTheme">
+                            <i :class="iconThemeClass" class="mr-2 text-neutral-9"></i>
+                            {{ __('Theme') }}
+                        </AppDropdownItem>
+                        <AppDropdownItem @click="toggleFullscreen">
+                            <i :class="iconFullscreenClass" class="mr-2 text-neutral-9"></i>
+                            {{ __('Fullscreen') }}
+                        </AppDropdownItem>
+                    </div>
+                </AppDropdown>
+            </div>
+
+            <!-- Divider -->
+            <div class="hidden h-6 w-px bg-neutral-4 sm:block"></div>
+
+            <!-- User Menu -->
+            <AppDropdown placement="bottom-end">
+                <template #trigger>
+                    <button
+                        type="button"
+                        class="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-neutral-3"
+                    >
+                        <div class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-4 text-sm font-bold text-primary-11 ring-2 ring-neutral-3">
+                            <img
+                                v-if="$page.props.auth.user?.avatar_url"
+                                :src="$page.props.auth.user.avatar_url"
+                                :alt="$page.props.auth.user.name"
+                                class="h-full w-full object-cover"
+                            />
+                            <span v-else>{{ $page.props.auth.user?.name?.charAt(0)?.toUpperCase() || 'U' }}</span>
+                        </div>
+                        <i class="ri-arrow-down-s-line text-neutral-9 hidden sm:block"></i>
+                    </button>
+                </template>
+
+                <!-- User Profile Header -->
+                <div class="border-b border-neutral-5 p-4">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary-4  font-bold text-primary-11">
+                            <img
+                                v-if="$page.props.auth.user?.avatar_url"
+                                :src="$page.props.auth.user.avatar_url"
+                                :alt="$page.props.auth.user.name"
+                                class="h-full w-full object-cover"
+                            />
+                            <span v-else>{{ $page.props.auth.user?.name?.charAt(0)?.toUpperCase() || 'U' }}</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-semibold text-neutral-12 truncate">{{ $page.props.auth.user?.name }}</p>
+                            <p class="text-xs text-neutral-10 truncate">{{ $page.props.auth.user?.email }}</p>
+                            <p class="text-xs text-emerald-700">{{ __('Online') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="py-1">
+                    <AppDropdownItem @click="$inertia.visit(route('profile.edit'))">
+                        <i class="ri-user-settings-line mr-2 text-neutral-9"></i>
+                        {{ __('Edit Profile') }}
+                    </AppDropdownItem>
+
+                    <div class="border-t border-neutral-4 my-1"></div>
+
+                    <AppDropdownItem 
+                        class="text-danger hover:bg-danger-light" 
+                        @click="$inertia.visit(route('adminAuth.logout'))"
+                    >
+                        <i class="ri-logout-box-r-line mr-2"></i>
+                        {{ __('Logout') }}
+                    </AppDropdownItem>
+                </div>
+            </AppDropdown>
+        </div>
+
+        <!-- Calculator Modal -->
+        <Teleport to="body">
+            <Transition name="modal">
+                <div
+                    v-if="showCalculator"
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                    @click.self="showCalculator = false"
+                >
+                    <div class="relative animate-in zoom-in-95 duration-200">
+                        <button
+                            type="button"
+                            @click="showCalculator = false"
+                            class="absolute -top-3 -right-3 flex h-8 w-8 items-center justify-center rounded-full bg-neutral-1 text-neutral-11 shadow-lg ring-1 ring-neutral-5 transition-colors hover:bg-neutral-2"
+                        >
+                            <i class="ri-close-line"></i>
+                        </button>
+                        <AppCalculator />
+                    </div>
+                </div>
+            </Transition>
+        </Teleport>
+    </header>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { ref, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
+import { Link } from '@inertiajs/vue3'
+import NewEntityMenu from '@/Components/App/NewEntityMenu.vue'
+import AppCalculator from '@/Components/Calculator/AppCalculator.vue'
+import LanguageSelector from '@/Components/Misc/LanguageSelector.vue'
 
-defineProps({
-    title: {
-        type: String,
-        default: ''
-    }
-})
+const __ = window.__ || ((key) => key)
 
 defineEmits(['sidebar:toggle'])
 
-const iconThemeClass = ref('ri-sun-line')
-const isDropdownOpen = ref(false)
+const showNewMenu = ref(false)
+const showCalculator = ref(false)
 
+const toggleMenu = () => {
+    showNewMenu.value = !showNewMenu.value
+}
+
+// Close menu when clicking outside
+const onClickOutside = (e) => {
+    if (!e.target.closest('.relative')) {
+        showNewMenu.value = false
+    }
+}
+onMounted(() => document.addEventListener('click', onClickOutside))
+onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
+
+// Theme toggle
+const iconThemeClass = ref('ri-sun-line')
 onMounted(() => {
     if (localStorage.getItem('modular-theme') === 'dark-theme') {
         document.documentElement.classList.add('dark-theme')
@@ -135,7 +235,6 @@ onMounted(() => {
         iconThemeClass.value = 'ri-moon-line'
     }
 })
-
 const toggleTheme = () => {
     if (document.documentElement.classList.contains('dark-theme')) {
         document.documentElement.classList.remove('dark-theme')
@@ -145,42 +244,6 @@ const toggleTheme = () => {
         localStorage.setItem('modular-theme', 'dark-theme')
         document.documentElement.classList.add('dark-theme')
         iconThemeClass.value = 'ri-sun-line'
-    }
-}
-
-const toggleDropdown = () => {
-    isDropdownOpen.value = !isDropdownOpen.value
-}
-
-const closeDropdown = () => {
-    isDropdownOpen.value = false
-}
-
-const logout = () => {
-    router.visit(route('auth.logout'))
-}
-
-const getInitials = (name) => {
-    if (!name) return 'U'
-    const parts = name.split(' ')
-    if (parts.length >= 2) {
-        return (parts[0][0] + parts[1][0]).toUpperCase()
-    }
-    return name.substring(0, 2).toUpperCase()
-}
-
-// Click outside directive
-const vClickOutside = {
-    mounted(el, binding) {
-        el.clickOutsideEvent = (event) => {
-            if (!(el === event.target || el.contains(event.target))) {
-                binding.value()
-            }
-        }
-        document.addEventListener('click', el.clickOutsideEvent)
-    },
-    unmounted(el) {
-        document.removeEventListener('click', el.clickOutsideEvent)
     }
 }
 
@@ -229,7 +292,42 @@ onUnmounted(() => {
     document.removeEventListener('fullscreenchange', updateFullscreenState)
 })
 
+// Close calculator with Escape key
+onMounted(() => {
+    const handleEscape = (e) => {
+        if (e.key === 'Escape' && showCalculator.value) {
+            showCalculator.value = false
+        }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+        document.removeEventListener('keydown', handleEscape)
+    }
+})
+
 const openSite = () => {
     window.open(route('site.index'), '_blank')
 }
 </script>
+
+<style scoped>
+.modal-enter-active,
+.modal-leave-active {
+    transition: opacity 0.2s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+    opacity: 0;
+}
+
+.modal-enter-active .relative,
+.modal-leave-active .relative {
+    transition: transform 0.2s ease;
+}
+
+.modal-enter-from .relative,
+.modal-leave-to .relative {
+    transform: scale(0.95);
+}
+</style>
