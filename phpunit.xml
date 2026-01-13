@@ -10,12 +10,14 @@
             <directory>modules/Employee/Tests/Unit</directory>
             <directory>modules/Agent/Tests/Unit</directory>
             <directory>modules/Tour/Tests/Unit</directory>
+            <directory>modules/Visa/Tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
             <directory>modules/Employee/Tests/Feature</directory>
             <directory>modules/Agent/Tests/Feature</directory>
             <directory>modules/Tour/Tests/Feature</directory>
+            <directory>modules/Visa/Tests/Feature</directory>
         </testsuite>
     </testsuites>
     <source>

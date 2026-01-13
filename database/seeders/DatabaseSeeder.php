@@ -32,6 +32,9 @@ use Modules\Tour\Database\Seeders\TourBookingSeeder;
 use Modules\Tour\Database\Seeders\TourReviewSeeder;
 use Modules\Tour\Database\Seeders\TourSeeder;
 use Modules\User\Database\Seeders\UserSeeder;
+use Modules\Visa\Database\Seeders\VisaAclSeeder;
+use Modules\Visa\Database\Seeders\VisaApplicationSeeder;
+use Modules\Visa\Database\Seeders\VisaSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -57,6 +60,7 @@ class DatabaseSeeder extends Seeder
             DashboardAclSeeder::class,
             EmployeeAclSeeder::class,
             TourAclSeeder::class,
+            VisaAclSeeder::class,
         ]);
 
         // Data Seeders
@@ -77,6 +81,9 @@ class DatabaseSeeder extends Seeder
             TourSeeder::class,
             TourBookingSeeder::class,
             TourReviewSeeder::class,
+            VisaSeeder::class,
+            VisaApplicationSeeder::class,
+
         ]);
     }
 }
