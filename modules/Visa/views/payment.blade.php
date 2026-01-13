@@ -262,9 +262,9 @@
                 <!-- Submit Button -->
                 <button type="submit"
                     class="w-full mt-8 bg-linear-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg shadow-purple-500/30 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    :disabled="!gateway">
+                    >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span x-text="gateway === 'manual' ? 'Submit Payment Details' : 'Proceed to Payment'">
+                    <span >
                         Pay ৳{{ number_format($application->total_amount, 2) }}
                     </span>
                 </button>

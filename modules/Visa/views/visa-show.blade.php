@@ -302,15 +302,10 @@
                         @endif
 
                         <!-- CTA Button -->
-                        @auth
                             <a href="{{ route('site.visa.apply', $visa->slug) }}" class="block w-full bg-linear-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white py-4 px-6 rounded-xl font-bold text-center shadow-lg shadow-purple-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
-                                Apply Now
+                                Start Application
                             </a>
-                        @else
-                            <a href="{{ route('login') }}?redirect={{ urlencode(route('site.visa.apply', $visa->slug)) }}" class="block w-full bg-linear-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white py-4 px-6 rounded-xl font-bold text-center shadow-lg shadow-purple-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
-                                Login to Apply
-                            </a>
-                        @endauth
+                        
 
                         <p class="text-center text-slate-500 text-xs mt-3">
                             No hidden fees • 99% Success Rate

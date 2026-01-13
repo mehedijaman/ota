@@ -16,7 +16,9 @@
             <h1 class="text-3xl font-bold text-white">Visa Application</h1>
         </div>
     </div>
+@endsection
 
+@section('alpine-content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" x-data="visaBookingForm()">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Booking Form -->
@@ -534,7 +536,7 @@
                     emergency_contact_name: '',
                     emergency_contact_phone: '',
                     emergency_contact_relationship: '',
-                    travelers: [this.createTraveler('adult', true)],
+                    travelers: [],
                     special_requests: '',
                     payment_method: 'instant',
                     terms_accepted: false
