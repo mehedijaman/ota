@@ -5,27 +5,27 @@
         <!-- Left Section -->
         <div class="flex items-center gap-2 sm:gap-3">
             <!-- Menu Toggle -->
-            <button
+            <AppButton
                 type="button"
                 @click="$emit('sidebar:toggle')"
                 class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-11 transition-colors hover:bg-neutral-3 hover:text-neutral-12"
             >
                 <i class="ri-menu-line "></i>
-            </button>
+            </AppButton>
 
             <!-- Divider -->
             <div class="hidden h-6 w-px bg-neutral-4 sm:block"></div>
 
             <!-- + New Button -->
             <div class="relative">
-                <button
+                <AppButton
                     type="button"
                     @click="toggleMenu"
                     class="flex h-9 items-center gap-1.5 rounded-lg border border-neutral-5 bg-neutral-2 px-3 text-sm font-medium text-neutral-11 transition-all hover:border-neutral-6 hover:bg-neutral-3 hover:text-neutral-12"
                 >
                     <i class="ri-add-line"></i>
                     <span class="hidden sm:inline">{{ __('New') }}</span>
-                </button>
+                </AppButton>
                 <NewEntityMenu :open="showNewMenu" />
             </div>
         </div>
@@ -43,10 +43,10 @@
                 </AppButton>
 
                 <!-- Fullscreen -->
-                <button
+                <AppButton
                     type="button"
                     @click="toggleFullscreen"
-                    class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-10 transition-all hover:bg-neutral-3 hover:text-neutral-12"
+                    class="btn btn-icon hover:bg-neutral-4"
                     :title="isFullscreen ? __('Exit Fullscreen') : __('Fullscreen')"
                 >
                     <i
@@ -54,44 +54,39 @@
                         class=" transition-transform duration-300"
                         :style="{ transform: isFullscreen ? 'rotate(180deg)' : 'rotate(0deg)' }"
                     ></i>
-                </button>
+                </AppButton>
 
                 <!-- Calculator -->
-                <button
+                <AppButton
                     type="button"
                     @click="showCalculator = true"
-                    class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-10 transition-colors hover:bg-neutral-3 hover:text-neutral-12"
+                    class="btn btn-icon hover:bg-neutral-4"
                     :title="__('Calculator')"
                 >
                     <i class="ri-calculator-line "></i>
-                </button>
+                </AppButton>
 
                 <!-- Theme Toggle -->
-                <button
+                <AppButton
                     type="button"
                     @click="toggleTheme"
-                    class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-10 transition-colors hover:bg-neutral-3 hover:text-neutral-12"
+                    class="btn btn-icon hover:bg-neutral-4"
                     :title="__('Toggle Theme')"
                 >
                     <i :class="iconThemeClass" class=""></i>
-                </button>
-
-                <!-- Language -->
-                <div class="inline-flex">
-                    <LanguageSelector button-class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-10 transition-colors hover:bg-neutral-3 hover:text-neutral-12" />
-                </div>
+                </AppButton>
             </div>
 
             <!-- Mobile More Menu -->
             <div class="md:hidden">
                 <AppDropdown placement="bottom-end">
                     <template #trigger>
-                        <button
+                        <AppButton
                             type="button"
-                            class="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-10 transition-colors hover:bg-neutral-3 hover:text-neutral-12"
+                            class="btn btn-icon hover:bg-neutral-4"
                         >
                             <i class="ri-more-2-fill "></i>
-                        </button>
+                        </AppButton>
                     </template>
                     
                     <div class="py-1">
@@ -117,7 +112,7 @@
             <!-- User Menu -->
             <AppDropdown placement="bottom-end">
                 <template #trigger>
-                    <button
+                    <AppButton
                         type="button"
                         class="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-neutral-3"
                     >
@@ -131,7 +126,7 @@
                             <span v-else>{{ $page.props.auth.user?.name?.charAt(0)?.toUpperCase() || 'U' }}</span>
                         </div>
                         <i class="ri-arrow-down-s-line text-neutral-9 hidden sm:block"></i>
-                    </button>
+                    </AppButton>
                 </template>
 
                 <!-- User Profile Header -->
@@ -182,13 +177,13 @@
                     @click.self="showCalculator = false"
                 >
                     <div class="relative animate-in zoom-in-95 duration-200">
-                        <button
+                        <AppButton
                             type="button"
                             @click="showCalculator = false"
                             class="absolute -top-3 -right-3 flex h-8 w-8 items-center justify-center rounded-full bg-neutral-1 text-neutral-11 shadow-lg ring-1 ring-neutral-5 transition-colors hover:bg-neutral-2"
                         >
                             <i class="ri-close-line"></i>
-                        </button>
+                        </AppButton>
                         <AppCalculator />
                     </div>
                 </div>
