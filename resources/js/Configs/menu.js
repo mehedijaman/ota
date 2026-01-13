@@ -43,12 +43,44 @@ export default {
                     icon: 'ri-road-map-line',
                     link: route('tourDestination.index')
                 },
-               
+
                 {
                     label: 'Tour Reviews',
                     permission: 'tour-review-list',
                     icon: 'ri-star-line',
                     link: route('tourReview.index')
+                }
+            ]
+        },
+
+        {
+            label: 'Visa Management',
+            permission: 'visa',
+            icon: 'ri-passport-line',
+            children: [
+                {
+                    label: 'Visa Applications',
+                    permission: 'visa-application-list',
+                    icon: 'ri-file-list-3-line',
+                    link: route('visaApplication.index')
+                },
+                {
+                    label: 'Visas',
+                    permission: 'visa-list',
+                    icon: 'ri-passport-fill',
+                    link: route('visa.index')
+                },
+                {
+                    label: 'Visa Categories',
+                    permission: 'visa-category-list',
+                    icon: 'ri-folders-line',
+                    link: route('visaCategory.index')
+                },
+                {
+                    label: 'Visa Countries',
+                    permission: 'visa-country-list',
+                    icon: 'ri-flag-line',
+                    link: route('visaCountry.index')
                 }
             ]
         },
@@ -94,7 +126,7 @@ export default {
             ]
         },
 
-        
+
         {
             label: 'Employee',
             permission: 'employee',
@@ -150,7 +182,7 @@ export default {
                     icon: 'ri-file-list-line',
                     link: route('menu.index')
                 },
-                
+
                 {
                     label: 'Sliders',
                     permission: 'website-slider-list',
@@ -171,7 +203,7 @@ export default {
                     icon: 'ri-questionnaire-line',
                     link: route('faq.index')
                 },
-                
+
                 {
                     label: 'Settings',
                     permission: 'website-setting-list',
