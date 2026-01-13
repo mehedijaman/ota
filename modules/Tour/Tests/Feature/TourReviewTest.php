@@ -8,11 +8,7 @@ use Modules\Tour\Models\TourDestination;
 use Modules\Tour\Models\TourReview;
 use Tests\TestCase;
 
-use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\delete;
 use function Pest\Laravel\get;
-use function Pest\Laravel\patch;
-use function Pest\Laravel\post;
 
 uses(TestCase::class, RefreshDatabase::class);
 
