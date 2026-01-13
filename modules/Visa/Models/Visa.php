@@ -217,6 +217,8 @@ class Visa extends BaseModel implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')->singleFile();
+        $this->addMediaCollection('thumbnail')->singleFile();
+        $this->addMediaCollection('banner')->singleFile();
         $this->addMediaCollection('gallery');
     }
 }

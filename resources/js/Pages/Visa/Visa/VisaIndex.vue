@@ -26,9 +26,12 @@
 
     <!-- Stats Overview -->
     <div v-if="stats" class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="border-neutral-6 bg-neutral-1 rounded-xl border p-4 shadow-sm">
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer rounded-xl border p-4 shadow-sm transition-all hover:border-blue-500 hover:shadow-md"
+            @click="filterByStats('total')"
+        >
             <div class="flex items-center gap-4">
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/25">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/25">
                     <i class="ri-passport-line text-xl text-white"></i>
                 </div>
                 <div class="min-w-0">
@@ -38,9 +41,12 @@
             </div>
         </div>
 
-        <div class="border-neutral-6 bg-neutral-1 rounded-xl border p-4 shadow-sm">
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer rounded-xl border p-4 shadow-sm transition-all hover:border-emerald-500 hover:shadow-md"
+            @click="filterByStats('active')"
+        >
             <div class="flex items-center gap-4">
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
                     <i class="ri-checkbox-circle-line text-xl text-white"></i>
                 </div>
                 <div class="min-w-0">
@@ -50,9 +56,12 @@
             </div>
         </div>
 
-        <div class="border-neutral-6 bg-neutral-1 rounded-xl border p-4 shadow-sm">
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer rounded-xl border p-4 shadow-sm transition-all hover:border-amber-500 hover:shadow-md"
+            @click="filterByStats('featured')"
+        >
             <div class="flex items-center gap-4">
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/25">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/25">
                     <i class="ri-star-line text-xl text-white"></i>
                 </div>
                 <div class="min-w-0">
@@ -62,9 +71,12 @@
             </div>
         </div>
 
-        <div class="border-neutral-6 bg-neutral-1 rounded-xl border p-4 shadow-sm">
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer rounded-xl border p-4 shadow-sm transition-all hover:border-purple-500 hover:shadow-md"
+            @click="filterByStats('popular')"
+        >
              <div class="flex items-center gap-4">
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-500/25">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-500/25">
                     <i class="ri-fire-line text-xl text-white"></i>
                 </div>
                 <div class="min-w-0">
@@ -197,7 +209,7 @@
                                 />
                                 <div
                                     v-else
-                                    class="ring-neutral-3 flex h-12 w-16 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 text-white ring-1"
+                                    class="ring-neutral-3 flex h-12 w-16 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-cyan-600 text-white ring-1"
                                 >
                                     <i class="ri-passport-line text-xl"></i>
                                 </div>
@@ -213,11 +225,11 @@
                         <div class="flex flex-col gap-0.5">
                             <span v-if="item.country" class="text-neutral-11 flex items-center gap-1.5 text-sm">
                                 <i class="ri-flag-line text-neutral-9"></i>
-                                {{ item.country.name }}
+                                {{ item.country }}
                             </span>
                             <span v-if="item.category" class="text-neutral-10 flex items-center gap-1.5 text-xs">
                                 <i class="ri-folder-line text-neutral-9"></i>
-                                {{ item.category.name }}
+                                {{ item.category }}
                             </span>
                         </div>
                     </AppDataTableData>
@@ -327,7 +339,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { Head, useForm } from '@inertiajs/vue3'
+import { Head, useForm, router } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useAuthCan from '@/Composables/useAuthCan'
 import AppDropdown from '@/Components/Form/AppDropdown.vue'
@@ -431,5 +443,18 @@ const formatNumber = (num) => {
 const confirmDialogRef = ref(null)
 const confirmDelete = (deleteRoute) => {
     confirmDialogRef.value.openModal(deleteRoute)
+}
+
+const filterByStats = (type) => {
+    const params = {}
+    if (type === 'active') params.status = 'active'
+    if (type === 'featured') params.is_featured = 'yes'
+    if (type === 'popular') params.is_popular = 'yes'
+    
+    router.visit(route('visa.index'), {
+        data: params,
+        preserveState: true,
+        preserveScroll: true
+    })
 }
 </script>

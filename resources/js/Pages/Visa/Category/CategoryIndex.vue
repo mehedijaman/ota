@@ -25,7 +25,10 @@
     </AppSectionHeader>
 
     <div v-if="stats" class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="border-neutral-6 bg-neutral-1 rounded-xl border p-4 shadow-sm">
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer rounded-xl border p-4 shadow-sm transition-all hover:border-blue-500 hover:shadow-md"
+            @click="filterByStats('total')"
+        >
             <div class="flex items-center gap-4">
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/25">
                     <i class="ri-folders-line text-xl text-white"></i>
@@ -36,8 +39,11 @@
                 </div>
             </div>
         </div>
-        
-        <div class="border-neutral-6 bg-neutral-1 rounded-xl border p-4 shadow-sm">
+
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer rounded-xl border p-4 shadow-sm transition-all hover:border-emerald-500 hover:shadow-md"
+            @click="filterByStats('active')"
+        >
             <div class="flex items-center gap-4">
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
                     <i class="ri-checkbox-circle-line text-xl text-white"></i>
@@ -49,7 +55,10 @@
             </div>
         </div>
 
-        <div class="border-neutral-6 bg-neutral-1 rounded-xl border p-4 shadow-sm">
+        <div
+            class="border-neutral-6 bg-neutral-1 cursor-pointer rounded-xl border p-4 shadow-sm transition-all hover:border-red-500 hover:shadow-md"
+            @click="filterByStats('inactive')"
+        >
             <div class="flex items-center gap-4">
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/25">
                     <i class="ri-close-circle-line text-xl text-white"></i>
@@ -187,7 +196,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useAuthCan from '@/Composables/useAuthCan'
 import AppEmptyState from '@/Components/Misc/AppEmptyState.vue'
@@ -217,5 +226,17 @@ const headers = ['#', 'Name', 'Slug', 'Visas', 'Status', 'Actions']
 const confirmDialogRef = ref(null)
 const confirmDelete = (deleteRoute) => {
     confirmDialogRef.value.openModal(deleteRoute)
+}
+
+const filterByStats = (type) => {
+    const params = {}
+    if (type === 'active') params.status = 'active'
+    if (type === 'inactive') params.status = 'inactive'
+    
+    router.visit(route('visaCategory.index'), {
+        data: params,
+        preserveState: true,
+        preserveScroll: true
+    })
 }
 </script>

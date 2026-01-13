@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('visa_id')->constrained('visas')->cascadeOnDelete();
             $table->string('name');
             $table->string('slug');
-            $table->enum('type', ['document', 'information', 'financial', 'other'])->default('document');
+            $table->enum('type', ['document', 'form', 'photo', 'biometric', 'financial', 'travel', 'personal', 'information', 'other'])->default('document');
             $table->text('description')->nullable();
             $table->text('instructions')->nullable()->comment('How to prepare/obtain this requirement');
             $table->text('sample_format')->nullable()->comment('Sample or template description');

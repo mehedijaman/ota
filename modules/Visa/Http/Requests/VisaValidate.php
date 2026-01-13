@@ -54,9 +54,11 @@ class VisaValidate extends Request
             'meta_description' => ['nullable', 'string'],
             'meta_keywords' => ['nullable', 'string'],
             'thumbnail' => ['nullable', 'image', 'max:2048'],
+            'banner' => ['nullable', 'image', 'max:5120'], // 5MB max
             'gallery' => ['nullable', 'array'],
             'gallery.*' => ['image', 'max:2048'],
             'remove_thumbnail' => ['nullable', 'boolean'],
+            'remove_banner' => ['nullable', 'boolean'],
             'remove_gallery_images' => ['nullable', 'array'],
             'remove_gallery_images.*' => ['integer'],
 
@@ -64,7 +66,7 @@ class VisaValidate extends Request
             'requirements' => ['nullable', 'array'],
             'requirements.*.name' => ['required', 'string', 'max:255'],
             'requirements.*.slug' => ['required', 'string', 'max:255'],
-            'requirements.*.type' => ['required', Rule::in(['document', 'form', 'photo', 'biometric', 'financial', 'travel', 'personal', 'other'])],
+            'requirements.*.type' => ['required', Rule::in(['document', 'form', 'photo', 'biometric', 'financial', 'travel', 'personal', 'information', 'other'])],
             'requirements.*.description' => ['nullable', 'string'],
             'requirements.*.instructions' => ['nullable', 'string'],
             'requirements.*.is_mandatory' => ['boolean'],

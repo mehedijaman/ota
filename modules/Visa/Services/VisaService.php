@@ -41,6 +41,8 @@ class VisaService
                 'validity_days' => $visa->validity_days,
                 'stay_days' => $visa->stay_days,
                 'processing_days' => $visa->processing_days_min.'-'.$visa->processing_days_max,
+                'base_price' => $visa->base_price,
+                'service_fee' => $visa->service_fee,
                 'total_price' => $visa->total_price,
                 'success_rate' => $visa->success_rate,
                 'is_featured' => $visa->is_featured,
@@ -122,6 +124,7 @@ class VisaService
             'meta_description' => $visa->meta_description,
             'meta_keywords' => $visa->meta_keywords,
             'thumbnail_url' => $visa->getFirstMediaUrl('thumbnail'),
+            'banner_url' => $visa->getFirstMediaUrl('banner'),
             'gallery' => $visa->getMedia('gallery')->map(fn ($media) => [
                 'id' => $media->id,
                 'url' => $media->getUrl(),
@@ -292,6 +295,15 @@ class VisaService
         if (isset($data['thumbnail']) && $data['thumbnail'] instanceof UploadedFile) {
             $visa->clearMediaCollection('thumbnail');
             $visa->addMedia($data['thumbnail'])->toMediaCollection('thumbnail');
+        }
+
+        if (! empty($data['remove_banner'])) {
+            $visa->clearMediaCollection('banner');
+        }
+
+        if (isset($data['banner']) && $data['banner'] instanceof UploadedFile) {
+            $visa->clearMediaCollection('banner');
+            $visa->addMedia($data['banner'])->toMediaCollection('banner');
         }
 
         if (isset($data['gallery']) && is_array($data['gallery'])) {

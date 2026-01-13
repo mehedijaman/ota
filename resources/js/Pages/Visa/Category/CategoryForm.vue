@@ -80,11 +80,51 @@
                 <template #title> Thumbnail </template>
                 <template #content>
                     <div class="space-y-4">
-                        <AppImage
-                            v-model="form.thumbnail"
-                            :image-url="imageUrl"
-                            label="Category Thumbnail"
-                        />
+                    <div class="flex flex-col gap-4">
+                        <div class="shrink-0">
+                            <div v-if="imagePreview || props.category?.image_url" class="relative">
+                                <img
+                                    :src="imagePreview || props.category?.image_url"
+                                    class="border-neutral-5 h-48 w-full rounded-xl border-2 object-cover shadow-lg"
+                                    alt="Category image"
+                                />
+                                <button
+                                    type="button"
+                                    @click="removeImage"
+                                    class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-colors hover:bg-red-600"
+                                >
+                                    <i class="ri-close-line"></i>
+                                </button>
+                            </div>
+                            <div
+                                v-else
+                                class="border-neutral-5 flex h-48 w-full items-center justify-center rounded-xl border-2 border-dashed bg-linear-to-br from-blue-50 to-cyan-50"
+                            >
+                                <div class="text-center">
+                                    <i class="ri-image-add-line text-neutral-7 text-4xl"></i>
+                                    <p class="text-neutral-9 mt-2 text-sm">No image selected</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <label class="cursor-pointer">
+                                <span class="btn btn-secondary w-full justify-center">
+                                    <i class="ri-upload-2-line mr-2"></i>
+                                    {{ imagePreview || props.category?.image_url ? 'Change Image' : 'Upload Image' }}
+                                </span>
+                                <input
+                                    type="file"
+                                    class="hidden"
+                                    accept="image/*"
+                                    @change="handleImageChange"
+                                />
+                            </label>
+                            <p class="text-neutral-9 text-xs text-center">
+                                <i class="ri-information-line mr-1"></i>
+                                Recommended: 800x600 pixels
+                            </p>
+                        </div>
+                    </div>
                     </div>
                 </template>
             </AppCard>
@@ -93,7 +133,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useFormContext from '@/Composables/useFormContext'
@@ -121,19 +161,41 @@ const form = useForm({
     slug: props.category?.slug ?? '',
     description: props.category?.description ?? '',
     is_active: props.category?.is_active ?? true,
-    thumbnail: null,
+    image: null,
+    remove_image: false,
     _method: isEdit.value ? 'PUT' : 'POST'
 })
 
-const imageUrl = computed(() => props.category?.thumbnail_url)
+const imagePreview = ref(null)
 
 const { errorsFields } = useFormErrors()
 
+const handleImageChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        form.image = file
+        form.remove_image = false
+        imagePreview.value = URL.createObjectURL(file)
+    }
+}
+
+const removeImage = () => {
+    form.image = null
+    form.remove_image = true
+    imagePreview.value = null
+}
+
+
+
 const submitForm = () => {
     if (isCreate.value) {
-        form.post(route('visaCategory.store'))
+        form.post(route('visaCategory.store'), {
+            forceFormData: true
+        })
     } else {
-        form.post(route('visaCategory.update', props.category.id))
+        form.post(route('visaCategory.update', props.category.id), {
+            forceFormData: true
+        })
     }
 }
 </script>

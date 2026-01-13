@@ -13,7 +13,7 @@ class VisaCategoryValidate extends Request
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:20', Rule::unique('visa_categories', 'code')->ignore($id)],
+            'code' => ['nullable', 'string', 'max:20', Rule::unique('visa_categories', 'code')->ignore($id)],
             'slug' => ['required', 'string', 'max:255', Rule::unique('visa_categories', 'slug')->ignore($id)],
             'description' => ['nullable', 'string'],
             'icon' => ['nullable', 'string', 'max:50'],

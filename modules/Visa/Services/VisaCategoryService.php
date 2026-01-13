@@ -27,6 +27,7 @@ class VisaCategoryService
                 'slug' => $category->slug,
                 'icon' => $category->icon,
                 'color' => $category->color,
+                'thumbnail_url' => $category->getFirstMediaUrl('image'),
                 'visas_count' => $category->visas_count,
                 'is_active' => $category->is_active,
                 'sort_order' => $category->sort_order,

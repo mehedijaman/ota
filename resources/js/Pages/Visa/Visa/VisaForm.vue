@@ -24,7 +24,7 @@
                         :class="[
                             'flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all',
                             activeTab === tab.id
-                                ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg shadow-blue-500/25'
+                                ? 'bg-linear-to-r from-blue-600 to-teal-600 text-white shadow-lg shadow-blue-500/25'
                                 : 'bg-neutral-3 text-neutral-11 hover:bg-neutral-4 hover:text-neutral-12'
                         ]"
                     >
@@ -60,7 +60,7 @@
                                     <AppLabel for="country_id">Country <span class="text-red-500">*</span></AppLabel>
                                     <AppCombobox
                                         v-model="form.country_id"
-                                        :options="countries"
+                                        :options="countryOptions"
                                         combo-label="Select Country"
                                         emit-value
                                         :class="{ 'input-error': errorsFields.includes('country_id') }"
@@ -71,7 +71,7 @@
                                     <AppLabel for="category_id">Category</AppLabel>
                                     <AppCombobox
                                         v-model="form.category_id"
-                                        :options="categories"
+                                        :options="categoryOptions"
                                         combo-label="Select Category"
                                         emit-value
                                     />
@@ -115,10 +115,10 @@
                                 </div>
                                 <div>
                                     <AppLabel for="description">Full Description</AppLabel>
-                                    <AppRichTextEditor
+                                    <AppTipTapEditor
                                         id="description"
                                         v-model="form.description"
-                                        height="300px"
+                                        editor-id="description"
                                     />
                                 </div>
                             </div>
@@ -159,14 +159,77 @@
                         </template>
                     </AppCard>
 
-                    <AppCard>
+                    <AppCard class="mb-4">
                         <template #title> Thumbnail </template>
                         <template #content>
-                             <AppImage
-                                v-model="form.thumbnail"
-                                :image-url="imageUrl"
-                                label="Visa Thumbnail"
+                            <input
+                                type="file"
+                                @change="handleThumbnailChange"
+                                class="hidden"
+                                ref="thumbnailInput"
+                                accept="image/*"
                             />
+
+                            <div v-if="thumbnailPreview || imageUrl" class="relative mb-3 h-48 w-full overflow-hidden rounded-lg">
+                                <img
+                                    :src="thumbnailPreview || imageUrl"
+                                    alt="Thumbnail Preview"
+                                    class="h-full w-full object-cover"
+                                />
+                                <button
+                                    type="button"
+                                    @click="removeThumbnail"
+                                    class="bg-neutral-10/50 absolute top-2 right-2 rounded-full p-1 text-white transition-colors hover:bg-red-500"
+                                >
+                                    <i class="ri-close-line text-lg"></i>
+                                </button>
+                            </div>
+
+                            <AppButton
+                                type="button"
+                                class="btn btn-secondary w-full"
+                                @click="$refs.thumbnailInput.click()"
+                            >
+                                <i class="ri-upload-2-line mr-2"></i>
+                                {{ thumbnailPreview || imageUrl ? 'Change Thumbnail' : 'Upload Thumbnail' }}
+                            </AppButton>
+                        </template>
+                    </AppCard>
+
+                    <AppCard>
+                        <template #title> Banner </template>
+                        <template #content>
+                            <input
+                                type="file"
+                                @change="handleBannerChange"
+                                class="hidden"
+                                ref="bannerInput"
+                                accept="image/*"
+                            />
+
+                            <div v-if="bannerPreview || bannerUrl" class="relative mb-3 h-32 w-full overflow-hidden rounded-lg">
+                                <img
+                                    :src="bannerPreview || bannerUrl"
+                                    alt="Banner Preview"
+                                    class="h-full w-full object-cover"
+                                />
+                                <button
+                                    type="button"
+                                    @click="removeBanner"
+                                    class="bg-neutral-10/50 absolute top-2 right-2 rounded-full p-1 text-white transition-colors hover:bg-red-500"
+                                >
+                                    <i class="ri-close-line text-lg"></i>
+                                </button>
+                            </div>
+
+                            <AppButton
+                                type="button"
+                                class="btn btn-secondary w-full"
+                                @click="$refs.bannerInput.click()"
+                            >
+                                <i class="ri-upload-2-line mr-2"></i>
+                                {{ bannerPreview || bannerUrl ? 'Change Banner' : 'Upload Banner' }}
+                            </AppButton>
                         </template>
                     </AppCard>
                 </div>
@@ -264,6 +327,179 @@
                             <input type="checkbox" v-model="form.is_hotel_booking_required" class="h-4 w-4 rounded text-blue-600" />
                             <span class="text-neutral-12">Hotel Booking Required</span>
                         </label>
+                    </div>
+                </template>
+            </AppCard>
+            
+            <AppCard class="mb-4">
+                <template #title> Processing Times </template>
+                <template #content>
+                    <div class="space-y-4">
+                        <div v-for="(item, index) in form.processing_times" :key="index" class="border-neutral-5 bg-neutral-2 relative rounded-lg border p-4">
+                            <button
+                                type="button"
+                                @click="removeProcessingTime(index)"
+                                class="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                            >
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <AppLabel>Name</AppLabel>
+                                    <AppInputText v-model="item.name" placeholder="e.g. Express Service" />
+                                </div>
+                                <div>
+                                    <AppLabel>Type</AppLabel>
+                                    <AppCombobox
+                                        v-model="item.type"
+                                        :options="[
+                                            { label: 'Normal', value: 'normal' },
+                                            { label: 'Express', value: 'express' },
+                                            { label: 'Urgent', value: 'urgent' },
+                                            { label: 'Super Urgent', value: 'super_urgent' }
+                                        ]"
+                                        emit-value
+                                    />
+                                </div>
+                                <div>
+                                    <AppLabel>Processing Days (Min - Max)</AppLabel>
+                                    <div class="flex gap-2">
+                                        <AppInputText v-model="item.processing_days_min" type="number" placeholder="Min" />
+                                        <AppInputText v-model="item.processing_days_max" type="number" placeholder="Max" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <AppLabel>Additional Fee</AppLabel>
+                                    <AppInputText v-model="item.additional_fee" type="number" step="0.01" />
+                                </div>
+                                <div class="md:col-span-2">
+                                    <AppLabel>Description</AppLabel>
+                                    <AppInputText v-model="item.description" placeholder="Optional details" />
+                                </div>
+                            </div>
+                        </div>
+                        <AppButton type="button" class="btn btn-secondary w-full" @click="addProcessingTime">
+                            <i class="ri-add-line mr-1"></i> Add Processing Option
+                        </AppButton>
+                    </div>
+                </template>
+            </AppCard>
+
+            <AppCard class="mb-4">
+                <template #title> Visa Requirements </template>
+                <template #content>
+                    <div class="space-y-4">
+                        <div v-for="(item, index) in form.requirements" :key="index" class="border-neutral-5 bg-neutral-2 relative rounded-lg border p-4">
+                            <button
+                                type="button"
+                                @click="removeRequirement(index)"
+                                class="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                            >
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <AppLabel>Requirement Name</AppLabel>
+                                    <AppInputText v-model="item.name" @input="generateRequirementSlug(index)" placeholder="e.g. Passport" />
+                                </div>
+                                <div>
+                                    <AppLabel>Slug</AppLabel>
+                                    <AppInputText v-model="item.slug" placeholder="auto-generated" />
+                                </div>
+                                <div>
+                                    <AppLabel>Type</AppLabel>
+                                    <AppCombobox
+                                        v-model="item.type"
+                                        :options="[
+                                            { label: 'Document', value: 'document' },
+                                            { label: 'Information', value: 'information' },
+                                            { label: 'Form', value: 'form' },
+                                            { label: 'Photo', value: 'photo' },
+                                            { label: 'Biometric', value: 'biometric' },
+                                            { label: 'Financial', value: 'financial' },
+                                            { label: 'Travel', value: 'travel' },
+                                            { label: 'Personal', value: 'personal' },
+                                            { label: 'Other', value: 'other' }
+                                        ]"
+                                        emit-value
+                                    />
+                                </div>
+                                <div class="flex items-center gap-4 pt-6">
+                                    <label class="flex cursor-pointer items-center gap-2">
+                                        <input type="checkbox" v-model="item.is_mandatory" class="h-4 w-4 rounded text-blue-600" />
+                                        <span class="text-neutral-12">Mandatory</span>
+                                    </label>
+                                    <label class="flex cursor-pointer items-center gap-2">
+                                        <input type="checkbox" v-model="item.needs_upload" class="h-4 w-4 rounded text-blue-600" />
+                                        <span class="text-neutral-12">Needs Upload</span>
+                                    </label>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <AppLabel>Description</AppLabel>
+                                    <AppTextArea v-model="item.description" rows="2" />
+                                </div>
+                            </div>
+                        </div>
+                        <AppButton type="button" class="btn btn-secondary w-full" @click="addRequirement">
+                            <i class="ri-add-line mr-1"></i> Add Requirement
+                        </AppButton>
+                    </div>
+                </template>
+            </AppCard>
+
+            <AppCard class="mb-4">
+                <template #title> Visa Fees </template>
+                <template #content>
+                    <div class="space-y-4">
+                        <div v-for="(item, index) in form.fees" :key="index" class="border-neutral-5 bg-neutral-2 relative rounded-lg border p-4">
+                            <button
+                                type="button"
+                                @click="removeFee(index)"
+                                class="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                            >
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <AppLabel>Fee Name</AppLabel>
+                                    <AppInputText v-model="item.name" placeholder="e.g. Courier Fee" />
+                                </div>
+                                <div>
+                                    <AppLabel>Type</AppLabel>
+                                    <AppCombobox
+                                        v-model="item.fee_type"
+                                        :options="[
+                                            { label: 'Embassy', value: 'embassy' },
+                                            { label: 'Service', value: 'service' },
+                                            { label: 'VFS', value: 'vfs' },
+                                            { label: 'Courier', value: 'courier' },
+                                            { label: 'Insurance', value: 'insurance' },
+                                            { label: 'Translation', value: 'translation' },
+                                            { label: 'Express', value: 'express' },
+                                            { label: 'Other', value: 'other' }
+                                        ]"
+                                        emit-value
+                                    />
+                                </div>
+                                <div>
+                                    <AppLabel>Amount</AppLabel>
+                                    <AppInputText v-model="item.amount" type="number" step="0.01" />
+                                </div>
+                                <div class="flex items-center gap-4 pt-6">
+                                    <label class="flex cursor-pointer items-center gap-2">
+                                        <input type="checkbox" v-model="item.is_per_person" class="h-4 w-4 rounded text-blue-600" />
+                                        <span class="text-neutral-12">Per Person</span>
+                                    </label>
+                                    <label class="flex cursor-pointer items-center gap-2">
+                                        <input type="checkbox" v-model="item.is_optional" class="h-4 w-4 rounded text-blue-600" />
+                                        <span class="text-neutral-12">Optional</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <AppButton type="button" class="btn btn-secondary w-full" @click="addFee">
+                            <i class="ri-add-line mr-1"></i> Add Fee
+                        </AppButton>
                     </div>
                 </template>
             </AppCard>
@@ -404,6 +640,39 @@
              </div>
         </div>
 
+        <!-- FAQs -->
+        <div v-show="activeTab === 'faqs'">
+             <AppCard>
+                <template #title> Frequently Asked Questions </template>
+                <template #content>
+                    <div class="space-y-4">
+                        <div v-for="(item, index) in form.faqs" :key="index" class="border-neutral-5 bg-neutral-2 relative rounded-lg border p-4">
+                            <button
+                                type="button"
+                                @click="removeFaq(index)"
+                                class="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                            >
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                            <div class="space-y-4">
+                                <div>
+                                    <AppLabel>Question</AppLabel>
+                                    <AppInputText v-model="item.question" placeholder="e.g. How long does it take?" />
+                                </div>
+                                <div>
+                                    <AppLabel>Answer</AppLabel>
+                                    <AppTextArea v-model="item.answer" rows="2" />
+                                </div>
+                            </div>
+                        </div>
+                        <AppButton type="button" class="btn btn-secondary w-full" @click="addFaq">
+                            <i class="ri-add-line mr-1"></i> Add FAQ
+                        </AppButton>
+                    </div>
+                </template>
+            </AppCard>
+        </div>
+
         <!-- SEO -->
         <div v-show="activeTab === 'seo'">
             <AppCard>
@@ -456,7 +725,7 @@ import useTitle from '@/Composables/useTitle'
 import useFormContext from '@/Composables/useFormContext'
 import useFormErrors from '@/Composables/useFormErrors'
 import AppCombobox from '@/Components/Form/AppCombobox.vue'
-import AppRichTextEditor from '@/Components/Form/AppRichTextEditor.vue'
+import AppTipTapEditor from '@/Components/Form/AppTipTapEditor.vue'
 
 const { isCreate, isEdit } = useFormContext()
 const { title } = useTitle(isCreate.value ? 'Create Visa' : 'Edit Visa')
@@ -466,6 +735,9 @@ const props = defineProps({
     countries: { type: Array, default: () => [] },
     categories: { type: Array, default: () => [] }
 })
+
+const countryOptions = computed(() => props.countries.map(c => ({ value: c.id, label: c.name })))
+const categoryOptions = computed(() => props.categories.map(c => ({ value: c.id, label: c.name })))
 
 const breadCrumb = [
     { label: 'Home', href: route('dashboard.index') },
@@ -518,19 +790,34 @@ const form = useForm({
     meta_keywords: props.visa?.meta_keywords ?? '',
     
     thumbnail: null,
+    banner: null,
+    remove_thumbnail: false,
+    remove_banner: false,
+    
+    // Arrays
+    processing_times: props.visa?.processing_times ?? [],
+    requirements: props.visa?.requirements ?? [],
+    fees: props.visa?.fees ?? [],
+    faqs: props.visa?.faqs ?? [],
+    
     _method: isEdit.value ? 'PUT' : 'POST'
 })
 
 const imageUrl = computed(() => props.visa?.thumbnail_url)
+const bannerUrl = computed(() => props.visa?.banner_url)
 const { errorsFields } = useFormErrors()
 
 const activeTab = ref('basic')
+
+const thumbnailPreview = ref(null)
+const bannerPreview = ref(null)
 
 const tabs = [
     { id: 'basic', label: 'Basic Info', icon: 'ri-information-line' },
     { id: 'details', label: 'Details', icon: 'ri-file-text-line' },
     { id: 'pricing', label: 'Pricing', icon: 'ri-money-dollar-circle-line' },
     { id: 'services', label: 'Services', icon: 'ri-list-check' },
+    { id: 'faqs', label: 'FAQs', icon: 'ri-question-line' },
     { id: 'seo', label: 'SEO', icon: 'ri-search-line' }
 ]
 
@@ -546,17 +833,79 @@ const generateSlug = () => {
     }
 }
 
+const generateRequirementSlug = (index) => {
+    if (form.requirements[index].name) {
+        form.requirements[index].slug = form.requirements[index].name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
+    }
+}
+
 const addIncluded = () => form.included_services.push('')
 const removeIncluded = (index) => form.included_services.splice(index, 1)
 
 const addExcluded = () => form.excluded_services.push('')
 const removeExcluded = (index) => form.excluded_services.splice(index, 1)
 
+// Repeaters
+const addProcessingTime = () => {
+    form.processing_times.push({
+        name: '', type: 'normal', processing_days_min: 1, processing_days_max: 1, additional_fee: 0, description: ''
+    })
+}
+const removeProcessingTime = (index) => form.processing_times.splice(index, 1)
+
+const addRequirement = () => {
+    form.requirements.push({
+        name: '', slug: '', type: 'document', description: '', is_mandatory: true, needs_upload: true
+    })
+}
+const removeRequirement = (index) => form.requirements.splice(index, 1)
+
+const addFee = () => {
+    form.fees.push({
+        name: '', fee_type: 'service', amount: 0, is_per_person: true, is_optional: false
+    })
+}
+const removeFee = (index) => form.fees.splice(index, 1)
+
+const addFaq = () => form.faqs.push({ question: '', answer: '' })
+const removeFaq = (index) => form.faqs.splice(index, 1)
+
+// Image Handlers
+const handleThumbnailChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        form.thumbnail = file
+        thumbnailPreview.value = URL.createObjectURL(file)
+        form.remove_thumbnail = false
+    }
+}
+
+const removeThumbnail = () => {
+    form.thumbnail = null
+    thumbnailPreview.value = null
+    form.remove_thumbnail = true
+}
+
+const handleBannerChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        form.banner = file
+        bannerPreview.value = URL.createObjectURL(file)
+        form.remove_banner = false
+    }
+}
+
+const removeBanner = () => {
+    form.banner = null
+    bannerPreview.value = null
+    form.remove_banner = true
+}
+
 const submitForm = () => {
     if (isCreate.value) {
-        form.post(route('visa.store'))
+        form.post(route('visa.store'), { forceFormData: true })
     } else {
-        form.post(route('visa.update', props.visa.id))
+        form.post(route('visa.update', props.visa.id), { forceFormData: true })
     }
 }
 </script>
