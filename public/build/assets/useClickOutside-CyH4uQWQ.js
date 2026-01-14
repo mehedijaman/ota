@@ -1,0 +1,1 @@
+import{r as s,o as u,J as a}from"./_plugin-vue_export-helper-Cbv8kd26.js";function i(t){const e=s(!1),n=o=>{t.value&&!t.value.contains(o.target)?e.value=!0:e.value=!1};return u(()=>{document.addEventListener("click",n)}),a(()=>{document.removeEventListener("click",n)}),{isClickOutside:e}}export{i as u};

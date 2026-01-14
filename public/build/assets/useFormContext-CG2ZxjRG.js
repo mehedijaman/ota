@@ -1,0 +1,1 @@
+import{r as t}from"./_plugin-vue_export-helper-Cbv8kd26.js";function n(){const e=t(),r=t();return e.value=route().current().includes(".create"),r.value=route().current().includes(".edit"),{isCreate:e,isEdit:r}}export{n as u};
