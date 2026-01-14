@@ -18,6 +18,8 @@ use Modules\Employee\Database\Seeders\EmployeeAclSeeder;
 use Modules\Employee\Database\Seeders\EmployeeSeeder;
 use Modules\Faq\Database\Seeders\FaqAclSeeder;
 use Modules\Faq\Database\Seeders\FaqSeeder;
+use Modules\Hotel\Database\Seeders\HotelAclSeeder;
+use Modules\Hotel\Database\Seeders\HotelDatabaseSeeder;
 use Modules\Menu\Database\Seeders\MenuAclSeeder;
 use Modules\Menu\Database\Seeders\MenuSeeder;
 use Modules\Page\Database\Seeders\PageAclSeeder;
@@ -28,10 +30,7 @@ use Modules\Slider\Database\Seeders\SliderSeeder;
 use Modules\Testimonial\Database\Seeders\TestimonialAclSeeder;
 use Modules\Testimonial\Database\Seeders\TestimonialSeeder;
 use Modules\Tour\Database\Seeders\TourAclSeeder;
-use Modules\Tour\Database\Seeders\TourBookingSeeder;
 use Modules\Tour\Database\Seeders\TourDatabaseSeeder;
-use Modules\Tour\Database\Seeders\TourReviewSeeder;
-use Modules\Tour\Database\Seeders\TourSeeder;
 use Modules\User\Database\Seeders\UserSeeder;
 use Modules\Visa\Database\Seeders\VisaAclSeeder;
 use Modules\Visa\Database\Seeders\VisaDatabaseSeeder;
@@ -61,6 +60,7 @@ class DatabaseSeeder extends Seeder
             EmployeeAclSeeder::class,
             TourAclSeeder::class,
             VisaAclSeeder::class,
+            HotelAclSeeder::class,
         ]);
 
         // Data Seeders
@@ -81,6 +81,7 @@ class DatabaseSeeder extends Seeder
 
             TourDatabaseSeeder::class,
             VisaDatabaseSeeder::class,
+            HotelDatabaseSeeder::class,
         ]);
     }
 }

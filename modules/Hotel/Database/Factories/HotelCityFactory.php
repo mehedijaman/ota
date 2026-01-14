@@ -31,8 +31,8 @@ class HotelCityFactory extends Factory
 
         return [
             'country_id' => HotelCountry::factory(),
-            'name' => $city['name'] . ' ' . $uniqueSuffix,
-            'slug' => Str::slug($city['name']) . '-' . $uniqueSuffix,
+            'name' => $city['name'].' '.$uniqueSuffix,
+            'slug' => Str::slug($city['name']).'-'.$uniqueSuffix,
             'latitude' => $city['lat'],
             'longitude' => $city['lng'],
             'timezone' => $city['timezone'],
