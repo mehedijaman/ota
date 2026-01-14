@@ -85,6 +85,32 @@ export default {
             ]
         },
 
+        {
+            label: 'Hotel Management',
+            permission: 'hotel.view',
+            icon: 'ri-hotel-line',
+            children: [
+                {
+                    label: 'Hotel Bookings',
+                    permission: 'hotel.booking.view',
+                    icon: 'ri-calendar-check-line',
+                    link: route('hotelBooking.index')
+                },
+                {
+                    label: 'Hotel List',
+                    permission: 'hotel.view',
+                    icon: 'ri-building-4-line',
+                    link: route('hotel.index')
+                },
+                {
+                    label: 'Hotel Reviews',
+                    permission: 'hotel.review.view',
+                    icon: 'ri-star-line',
+                    link: route('hotelReview.index')
+                }
+            ]
+        },
+
 
         {
             label: 'Customers',
