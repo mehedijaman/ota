@@ -1,0 +1,1 @@
+import{_ as e,u as a,v as n,z as o,L as t}from"./_plugin-vue_export-helper-DDCUmGhW.js";const r={};function c(s,l){return n(),a("label",{class:t(["block text-md",s.$attrs.class])},[o(s.$slots,"default")],2)}const m=e(r,[["render",c]]);export{m as _};

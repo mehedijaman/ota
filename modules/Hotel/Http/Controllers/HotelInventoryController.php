@@ -12,19 +12,23 @@ class HotelInventoryController extends BackendController
 {
     public function __construct(protected HotelInventoryService $service) {}
 
-    public function show(Hotel $hotel): Response
+    public function show(int $hotelId): Response
     {
+        $hotel = Hotel::findOrFail($hotelId);
+
         return inertia('HotelInventory/AvailabilityIndex', [
             'hotel' => $hotel,
         ]);
     }
 
-    public function getData(Request $request, Hotel $hotel)
+    public function getData(Request $request, int $hotelId)
     {
         $request->validate([
             'start' => 'required|date',
             'end' => 'required|date|after:start',
         ]);
+
+        $hotel = Hotel::findOrFail($hotelId);
 
         // FullCalendar sends start/end query params
         $data = $this->service->getCalendarData($hotel->id, $request->start, $request->end);
@@ -32,7 +36,7 @@ class HotelInventoryController extends BackendController
         return response()->json($data);
     }
 
-    public function update(Request $request, Hotel $hotel)
+    public function update(Request $request, int $hotelId)
     {
         $request->validate([
             'room_id' => 'required|exists:hotel_rooms,id',
@@ -41,6 +45,8 @@ class HotelInventoryController extends BackendController
             'total_inventory' => 'nullable|integer|min:0',
             'blocked' => 'nullable|integer|min:0',
         ]);
+
+        $hotel = Hotel::findOrFail($hotelId);
 
         $this->service->bulkUpdate($hotel->id, $request->all());
 

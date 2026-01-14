@@ -1,15 +1,13 @@
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useForm, Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { format, addDays, startOfToday, parseISO } from 'date-fns';
 import axios from 'axios';
-import InputLabel from '@/Components/InputLabel.vue';
-import TextInput from '@/Components/TextInput.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import Modal from '@/Components/Modal.vue';
-import SelectInput from '@/Components/SelectInput.vue';
+import AppLabel from '@/Components/Form/AppLabel.vue';
+import AppInputText from '@/Components/Form/AppInputText.vue';
+import AppButton from '@/Components/Misc/AppButton.vue';
+import AppModal from '@/Components/Overlay/AppModal.vue';
 
 const props = defineProps({
     hotel: Object,
@@ -37,8 +35,6 @@ const fetchData = async () => {
         const response = await axios.get(route('hotel.inventory.data', props.hotel.id), {
             params: {
                 start: dates.value[0],
-                // end date for query should cover the last day. 
-                // Service uses between [start, end].
                 end: dates.value[dates.value.length - 1] 
             }
         });
@@ -104,15 +100,15 @@ const getCellClass = (data) => {
 </script>
 
 <template>
-    <AppLayout :title="`${hotel.name} - Availability`">
+    <AuthenticatedLayout :title="`${hotel.name} - Availability`">
         <template #header>
             <div class="flex items-center justify-between">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     Inventory & Availability - {{ hotel.name }}
                 </h2>
-                <PrimaryButton @click="openBulkUpdate()">
+                <AppButton class="btn btn-primary" @click="openBulkUpdate()">
                     Bulk Update
-                </PrimaryButton>
+                </AppButton>
             </div>
         </template>
 
@@ -122,21 +118,21 @@ const getCellClass = (data) => {
                     
                     <!-- Controls -->
                     <div class="flex items-center gap-4 mb-6">
-                        <div>
-                            <InputLabel value="Start Date" />
-                            <TextInput type="date" v-model="startDate" class="mt-1 block w-full" />
+                        <div class="w-64">
+                            <AppLabel>Start Date</AppLabel>
+                            <AppInputText type="date" v-model="startDate" class="mt-1" />
                         </div>
                         <div class="flex-1"></div>
                         <div class="flex gap-2">
-                             <SecondaryButton @click="startDate = format(addDays(parseISO(startDate), -daysToShow), 'yyyy-MM-dd')">
+                             <AppButton class="btn btn-neutral" @click="startDate = format(addDays(parseISO(startDate), -daysToShow), 'yyyy-MM-dd')">
                                 <i class="ri-arrow-left-s-line"></i> Prev {{ daysToShow }} Days
-                             </SecondaryButton>
-                             <SecondaryButton @click="startDate = format(startOfToday(), 'yyyy-MM-dd')">
+                             </AppButton>
+                             <AppButton class="btn btn-neutral" @click="startDate = format(startOfToday(), 'yyyy-MM-dd')">
                                 Today
-                             </SecondaryButton>
-                             <SecondaryButton @click="startDate = format(addDays(parseISO(startDate), daysToShow), 'yyyy-MM-dd')">
+                             </AppButton>
+                             <AppButton class="btn btn-neutral" @click="startDate = format(addDays(parseISO(startDate), daysToShow), 'yyyy-MM-dd')">
                                 Next {{ daysToShow }} Days <i class="ri-arrow-right-s-line"></i>
-                             </SecondaryButton>
+                             </AppButton>
                         </div>
                     </div>
 
@@ -202,16 +198,12 @@ const getCellClass = (data) => {
         </div>
 
         <!-- Update Modal -->
-        <Modal :show="showBulkModal" @close="showBulkModal = false">
-            <div class="p-6">
-                <h2 class="text-lg font-medium text-gray-900 mb-4">
-                    Update Inventory
-                </h2>
-
+        <AppModal v-model="showBulkModal" title="Update Inventory">
+            <template #body>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="col-span-2">
-                        <InputLabel value="Room" />
-                        <select v-model="form.room_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                        <AppLabel>Room</AppLabel>
+                        <select v-model="form.room_id" class="mt-1 block w-full border-neutral-200 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500">
                             <option v-for="room in roomsData" :key="room.id" :value="room.id">
                                 {{ room.name }} ({{ room.room_type }})
                             </option>
@@ -220,37 +212,37 @@ const getCellClass = (data) => {
                     </div>
 
                     <div>
-                        <InputLabel value="Start Date" />
-                        <TextInput type="date" v-model="form.start_date" class="mt-1 block w-full" />
+                        <AppLabel>Start Date</AppLabel>
+                        <AppInputText type="date" v-model="form.start_date" class="mt-1" />
                         <div v-if="form.errors.start_date" class="text-red-500 text-sm mt-1">{{ form.errors.start_date }}</div>
                     </div>
 
                     <div>
-                        <InputLabel value="End Date" />
-                        <TextInput type="date" v-model="form.end_date" class="mt-1 block w-full" />
+                        <AppLabel>End Date</AppLabel>
+                        <AppInputText type="date" v-model="form.end_date" class="mt-1" />
                         <div v-if="form.errors.end_date" class="text-red-500 text-sm mt-1">{{ form.errors.end_date }}</div>
                     </div>
 
                     <div>
-                        <InputLabel value="Total Inventory" />
-                        <TextInput type="number" v-model="form.total_inventory" class="mt-1 block w-full" placeholder="Existing value" />
+                        <AppLabel>Total Inventory</AppLabel>
+                        <AppInputText type="number" v-model="form.total_inventory" class="mt-1" placeholder="Existing value" />
                         <div class="text-xs text-gray-500 mt-1">Leave empty to keep existing</div>
                     </div>
 
                     <div>
-                        <InputLabel value="Blocked Count" />
-                        <TextInput type="number" v-model="form.blocked" class="mt-1 block w-full" placeholder="Existing value" />
+                        <AppLabel>Blocked Count</AppLabel>
+                        <AppInputText type="number" v-model="form.blocked" class="mt-1" placeholder="Existing value" />
                         <div class="text-xs text-gray-500 mt-1">Set number of blocked rooms</div>
                     </div>
                 </div>
 
                 <div class="mt-6 flex justify-end gap-3">
-                    <SecondaryButton @click="showBulkModal = false">Cancel</SecondaryButton>
-                    <PrimaryButton @click="submitBulkUpdate" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                    <AppButton class="btn btn-neutral" @click="showBulkModal = false">Cancel</AppButton>
+                    <AppButton class="btn btn-primary" @click="submitBulkUpdate" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                         Save Changes
-                    </PrimaryButton>
+                    </AppButton>
                 </div>
-            </div>
-        </Modal>
-    </AppLayout>
+            </template>
+        </AppModal>
+    </AuthenticatedLayout>
 </template>

@@ -1,1 +1,0 @@
-import{c as e}from"./app-Bdx7Z2UX.js";import{b as o}from"./_plugin-vue_export-helper-Cbv8kd26.js";function c(){const r=o(()=>e().props.errors),s=o(()=>Object.keys(r.value));return{errors:r,errorsFields:s}}export{c as u};

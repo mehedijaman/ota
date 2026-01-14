@@ -1,0 +1,1 @@
+import{_ as t,N as o,y as s,v as r,D as _,z as c}from"./_plugin-vue_export-helper-DDCUmGhW.js";const a={};function i(e,l){const n=o("Link");return r(),s(n,{class:"text-primary-9 text-sm font-medium hover:underline"},{default:_(()=>[c(e.$slots,"default")]),_:3})}const p=t(a,[["render",i]]);export{p as _};

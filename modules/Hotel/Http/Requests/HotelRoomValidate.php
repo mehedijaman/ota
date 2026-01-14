@@ -25,7 +25,7 @@ class HotelRoomValidate extends Request
             'max_occupancy' => ['required', 'integer', 'min:1', 'max:30'],
             'standard_occupancy' => ['required', 'integer', 'min:1', 'max:10'],
             'room_size_sqm' => ['nullable', 'numeric', 'min:0', 'max:1000'],
-            'floor_level' => ['nullable', 'string', 'in:low,mid,high'],
+            'floor' => ['nullable', 'string', 'in:low,mid,high'],
             'view_type' => ['nullable', 'string', 'max:50'],
             'is_smoking' => ['boolean'],
             'is_accessible' => ['boolean'],

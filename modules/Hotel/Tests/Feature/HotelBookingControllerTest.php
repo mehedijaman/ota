@@ -58,7 +58,7 @@ describe('HotelBookingController', function () {
                     'adults' => 2,
                     'children' => 0,
                     'infants' => 0,
-                ]
+                ],
             ],
             'guests' => [],
         ];

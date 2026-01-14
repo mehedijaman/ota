@@ -27,11 +27,12 @@ class HotelCityFactory extends Factory
     public function definition(): array
     {
         $city = $this->faker->randomElement($this->bangladeshCities);
+        $uniqueSuffix = $this->faker->unique()->numberBetween(1, 1000000);
 
         return [
             'country_id' => HotelCountry::factory(),
-            'name' => $city['name'],
-            'slug' => Str::slug($city['name']),
+            'name' => $city['name'] . ' ' . $uniqueSuffix,
+            'slug' => Str::slug($city['name']) . '-' . $uniqueSuffix,
             'latitude' => $city['lat'],
             'longitude' => $city['lng'],
             'timezone' => $city['timezone'],

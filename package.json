@@ -39,6 +39,7 @@
     "dependencies": {
         "@splidejs/vue-splide": "^0.6.12",
         "chart.js": "^4.5.1",
+        "date-fns": "^4.1.0",
         "playwright": "^1.57.0",
         "vue-chartjs": "^5.3.3",
         "vuedraggable": "^4.1.0"
