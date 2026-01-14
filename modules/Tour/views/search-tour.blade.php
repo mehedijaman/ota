@@ -10,11 +10,26 @@
 
     <!-- Results -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {{-- <div class="flex items-center justify-between mb-6">
+            <p class="text-slate-600">
+                <span class="font-bold text-slate-800">{{ $tours->total() }}</span> tours found
+            </p>
+        </div> --}}
+
+        @if(request()->hasAny(['destination', 'category', 'duration']))
         <div class="flex items-center justify-between mb-6">
             <p class="text-slate-600">
                 <span class="font-bold text-slate-800">{{ $tours->total() }}</span> tours found
             </p>
+            <a href="{{ route('site.tour.search') }}"
+                class="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Clear Filters
+            </a>
         </div>
+        @endif
 
         @if($tours->count())
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

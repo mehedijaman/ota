@@ -5,68 +5,8 @@
 @section('meta-description', 'Find visa services for your destination country. Filter by country, category, and visa type.')
 
 @section('content')
-    <!-- Search Header -->
-    <div class="bg-gradient-to-r from-purple-700 to-fuchsia-700 pt-28 pb-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-white mb-6">Find Your Visa</h1>
 
-            <!-- Filter Form -->
-            <form action="{{ route('site.visa.search') }}" method="GET"
-                class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label
-                            class="text-xs font-bold text-white/70 uppercase tracking-widest pl-1 mb-2 block">Country</label>
-                        <select name="country"
-                            class="w-full bg-white/90 border-0 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-white/50 font-medium text-slate-700">
-                            <option value="">All Countries</option>
-                            @foreach($countries as $country)
-                                <option value="{{ $country->id }}" {{ request('country') == $country->id ? 'selected' : '' }}>
-                                    {{ $country->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label
-                            class="text-xs font-bold text-white/70 uppercase tracking-widest pl-1 mb-2 block">Category</label>
-                        <select name="category"
-                            class="w-full bg-white/90 border-0 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-white/50 font-medium text-slate-700">
-                            <option value="">All Categories</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-white/70 uppercase tracking-widest pl-1 mb-2 block">Sort
-                            By</label>
-                        <select name="sort"
-                            class="w-full bg-white/90 border-0 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-white/50 font-medium text-slate-700">
-                            <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Latest</option>
-                            <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to
-                                High</option>
-                            <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to
-                                Low</option>
-                            <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Most Popular</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit"
-                            class="w-full bg-white text-purple-700 py-3 px-6 rounded-xl font-bold hover:bg-purple-50 transition-colors flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            Search
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+    <x-visa-search-form :categories="$categories" :countries="$countries"/>
 
     <!-- Results -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
