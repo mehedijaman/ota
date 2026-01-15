@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Modules\Hotel\DTOs\HotelSearchRequest;
 use Modules\Hotel\Models\Hotel;
 use Modules\Hotel\Models\HotelBooking;
 use Modules\Hotel\Models\HotelBookingPayment;
@@ -13,6 +14,7 @@ use Modules\Hotel\Models\HotelReview;
 use Modules\Hotel\Services\GetHotelOptions;
 use Modules\Hotel\Services\HotelBookingService;
 use Modules\Hotel\Services\HotelSearchService;
+use Modules\Hotel\Services\UnifiedHotelSearchService;
 use Raziul\Sslcommerz\Facades\Sslcommerz;
 
 class SiteHotelController
@@ -20,7 +22,8 @@ class SiteHotelController
     public function __construct(
         protected HotelSearchService $searchService,
         protected HotelBookingService $bookingService,
-        protected GetHotelOptions $hotelOptions
+        protected GetHotelOptions $hotelOptions,
+        protected UnifiedHotelSearchService $unifiedSearchService,
     ) {}
 
     protected function reAuthenticateBookingOwner(HotelBooking $booking): void
@@ -577,5 +580,60 @@ class SiteHotelController
 
         return redirect()->back()
             ->with('success', 'Thank you for your review! It will be published after moderation.');
+    }
+
+    /**
+     * Unified search across all suppliers (local + APIs).
+     * Returns JSON for API consumption or AJAX.
+     */
+    public function unifiedSearch(Request $request)
+    {
+        $searchRequest = HotelSearchRequest::fromArray([
+            'destination' => $request->input('destination', $request->input('city')),
+            'check_in' => $request->input('check_in'),
+            'check_out' => $request->input('check_out'),
+            'rooms' => $request->input('rooms', 1),
+            'adults' => $request->input('adults', 2),
+            'children' => $request->input('children', 0),
+            'child_ages' => $request->input('child_ages', []),
+            'min_stars' => $request->input('min_stars'),
+            'max_stars' => $request->input('max_stars'),
+            'min_price' => $request->input('min_price'),
+            'max_price' => $request->input('max_price'),
+            'sort_by' => $request->input('sort_by'),
+            'currency' => $request->input('currency', 'BDT'),
+            'limit' => $request->input('limit', 50),
+        ]);
+
+        $results = $this->unifiedSearchService->search($searchRequest);
+
+        // If JSON is requested, return API response
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'count' => count($results),
+                'hotels' => array_map(fn ($r) => $r->toArray(), $results),
+            ]);
+        }
+
+        // Otherwise return the search view with unified results
+        return view('hotel::search', [
+            'hotels' => collect($results),
+            'filters' => $request->all(),
+            'countries' => $this->hotelOptions->getCountries(),
+            'propertyTypes' => $this->hotelOptions->getPropertyTypes(),
+            'amenities' => $this->hotelOptions->getHotelAmenities(),
+            'isUnifiedSearch' => true,
+        ]);
+    }
+
+    /**
+     * Get available suppliers and their health status.
+     */
+    public function supplierStatus()
+    {
+        return response()->json([
+            'suppliers' => $this->unifiedSearchService->healthCheck(),
+        ]);
     }
 }

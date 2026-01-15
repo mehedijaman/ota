@@ -269,7 +269,12 @@
             <AppCard>
                 <template #title>Special Requests</template>
                 <template #content>
-                    <AppTextArea v-model="form.special_requests" rows="4" placeholder="Any special requests for the hotel..." />
+                    <AppTextArea 
+                    id="special_requests"
+                    v-model="form.special_requests" 
+                    rows="5" 
+                    placeholder="Any special requests for the hotel..." 
+                    />
                 </template>
             </AppCard>
         </div>
@@ -458,10 +463,10 @@
 import { ref, computed, watch } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
-import AppCombobox from '@/Components/Form/AppCombobox.vue'
-import AppLabel from '@/Components/Form/AppLabel.vue'
-import AppInputText from '@/Components/Form/AppInputText.vue'
-import AppTextArea from '@/Components/Form/AppTextArea.vue'
+// import AppCombobox from '@/Components/Form/AppCombobox.vue'
+// import AppLabel from '@/Components/Form/AppLabel.vue'
+// import AppInputText from '@/Components/Form/AppInputText.vue'
+// import AppTextArea from '@/Components/Form/AppTextArea.vue'
 
 const props = defineProps({
     booking: { type: Object, default: null },

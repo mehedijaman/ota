@@ -24,7 +24,7 @@
                         :class="[
                             'flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all',
                             activeTab === tab.id
-                                ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg shadow-blue-500/25'
+                                ? 'bg-linear-to-r from-blue-600 to-teal-600 text-white shadow-lg shadow-blue-500/25'
                                 : 'bg-neutral-3 text-neutral-11 hover:bg-neutral-4 hover:text-neutral-12'
                         ]"
                     >
@@ -40,7 +40,7 @@
             <AppCard class="mb-4 w-full">
                 <template #title>
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/25">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/25">
                             <i class="ri-hotel-line text-lg text-white"></i>
                         </div>
                         <div>
@@ -142,7 +142,7 @@
             <AppCard class="mb-4 w-full">
                 <template #title>
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 shadow-lg shadow-teal-500/25">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-teal-500 to-emerald-600 shadow-lg shadow-teal-500/25">
                             <i class="ri-map-pin-line text-lg text-white"></i>
                         </div>
                         <div>
@@ -205,7 +205,7 @@
             <AppCard class="mb-4 w-full">
                 <template #title>
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
                             <i class="ri-phone-line text-lg text-white"></i>
                         </div>
                         <div>
@@ -238,7 +238,7 @@
             <AppCard class="mb-4 w-full">
                 <template #title>
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/25">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/25">
                             <i class="ri-time-line text-lg text-white"></i>
                         </div>
                         <div>
@@ -267,7 +267,7 @@
             <AppCard class="mb-4 w-full">
                 <template #title>
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
                             <i class="ri-service-line text-lg text-white"></i>
                         </div>
                         <div>
@@ -305,7 +305,7 @@
             <AppCard class="mb-4 w-full">
                 <template #title>
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
                             <i class="ri-toggle-line text-lg text-white"></i>
                         </div>
                         <div>
@@ -374,14 +374,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { Head, useForm, router } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { Head, useForm } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
-import AppCombobox from '@/Components/Form/AppCombobox.vue'
-import AppLabel from '@/Components/Form/AppLabel.vue'
-import AppInputText from '@/Components/Form/AppInputText.vue'
-import AppTextArea from '@/Components/Form/AppTextArea.vue'
-import AppFormErrors from '@/Components/Form/AppFormErrors.vue'
 
 const props = defineProps({
     hotel: { type: Object, default: null },
@@ -441,7 +436,8 @@ const form = useForm({
 
 const groupedAmenities = computed(() => {
     const grouped = {}
-    props.amenities.forEach(a => {
+    const amenitiesList = Array.isArray(props.amenities) ? props.amenities : []
+    amenitiesList.forEach(a => {
         if (!grouped[a.category]) grouped[a.category] = []
         grouped[a.category].push(a)
     })

@@ -12,6 +12,7 @@ class HotelDatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            // Base data seeders
             HotelSupplierSeeder::class,
             HotelCountrySeeder::class,
             HotelCitySeeder::class,
@@ -19,6 +20,11 @@ class HotelDatabaseSeeder extends Seeder
             HotelAmenitySeeder::class,
             HotelRoomAmenitySeeder::class,
             HotelAclSeeder::class,
+
+            // Data seeders (50 hotels, 50 reviews, 10 bookings)
+            HotelSeeder::class,
+            HotelReviewSeeder::class,
+            HotelBookingSeeder::class,
         ]);
     }
 }

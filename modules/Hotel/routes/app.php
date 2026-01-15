@@ -8,8 +8,8 @@ use Modules\Hotel\Http\Controllers\HotelRoomController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Hotels
-    Route::prefix('hotels')->controller(HotelController::class)->name('hotel.')->group(function () {
+    // Hotel
+    Route::prefix('hotel')->controller(HotelController::class)->name('hotel.')->group(function () {
         // Recycle Bin
         Route::get('/recycle-bin', 'recycleBin')->name('recycleBin')->can('hotel.view');
         Route::post('/recycle-bin/{id}/restore', 'restore')->name('restore')->can('hotel.restore');
@@ -36,7 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('{hotel}/inventory-update', 'update')->name('inventory.update')->can('hotel.edit');
         });
 
-        // Rooms (nested under hotels)
+        // Rooms (nested under hotel)
         Route::prefix('{hotelId}/rooms')->controller(HotelRoomController::class)->name('room.')->group(function () {
             Route::get('/recycle-bin', 'recycleBin')->name('recycleBin')->can('hotel.room.view');
             Route::post('/recycle-bin/{roomId}/restore', 'restore')->name('restore')->can('hotel.room.edit');
