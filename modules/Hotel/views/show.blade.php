@@ -1,191 +1,269 @@
 @extends('site-layout')
 
-@section('title', $hotel->name . ' - ' . $hotel->city?->name)
+@section('meta-title', $hotel->name . ' | ' . $hotel->city?->name . ' | ' . config('app.name'))
 
-@section('meta')
-    <meta name="description" content="{{ $hotel->meta_description ?? $hotel->excerpt }}">
-    <meta name="keywords" content="{{ $hotel->meta_keywords }}">
-@endsection
+@section('meta-description', $hotel->meta_description ?? $hotel->excerpt ?? Str::limit(strip_tags($hotel->description), 160))
 
 @section('content')
+    <!-- Hero Gallery Section -->
+    <section class="relative bg-slate-900">
+        <div class="max-w-7xl mx-auto">
+            <!-- Gallery Grid -->
+            <div class="grid grid-cols-4 grid-rows-2 gap-1 h-[450px]">
+                <div class="col-span-2 row-span-2 relative group overflow-hidden">
+                    <img src="{{ $hotel->thumbnail_url ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80' }}" 
+                         alt="{{ $hotel->name }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent"></div>
+                </div>
+                @foreach($hotel->gallery_urls ?? [] as $index => $image)
+                    @if($index < 4)
+                        <div class="relative group overflow-hidden">
+                            <img src="{{ $image }}" alt="{{ $hotel->name }}" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                    @endif
+                @endforeach
+                @for($i = count($hotel->gallery_urls ?? []); $i < 4; $i++)
+                    <div class="bg-slate-800 flex items-center justify-center">
+                        <i class="ri-image-line text-3xl text-slate-600"></i>
+                    </div>
+                @endfor
+            </div>
+        </div>
+    </section>
+
     <!-- Breadcrumb -->
-    <div class="bg-gray-100 border-b">
-        <div class="container mx-auto px-4 py-3">
-            <nav class="text-sm">
-                <a href="{{ route('site.hotel.index') }}" class="text-blue-600 hover:text-blue-800">Hotels</a>
-                <span class="mx-2 text-gray-400">/</span>
-                <a href="{{ route('site.hotel.search', ['city_id' => $hotel->city_id]) }}" class="text-blue-600 hover:text-blue-800">{{ $hotel->city?->name }}</a>
-                <span class="mx-2 text-gray-400">/</span>
-                <span class="text-gray-600">{{ $hotel->name }}</span>
+    <div class="bg-white border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <nav class="flex items-center gap-2 text-sm">
+                <a href="{{ route('site.hotel.index') }}" class="text-blue-600 hover:text-blue-700 transition-colors">Hotels</a>
+                <i class="ri-arrow-right-s-line text-slate-400"></i>
+                <a href="{{ route('site.hotel.search', ['city_id' => $hotel->city_id]) }}" class="text-blue-600 hover:text-blue-700 transition-colors">{{ $hotel->city?->name }}</a>
+                <i class="ri-arrow-right-s-line text-slate-400"></i>
+                <span class="text-slate-500 truncate max-w-[200px]">{{ $hotel->name }}</span>
             </nav>
         </div>
     </div>
 
-    <div class="bg-gray-50">
-        <div class="container mx-auto px-4 py-8">
-            <!-- Hotel Header -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-                <!-- Gallery -->
-                <div class="grid grid-cols-4 gap-1 h-80">
-                    <div class="col-span-2 row-span-2">
-                        <img src="{{ $hotel->thumbnail_url ?? '/images/hotel-placeholder.jpg' }}" alt="{{ $hotel->name }}"
-                             class="w-full h-full object-cover">
-                    </div>
-                    @foreach($hotel->gallery_urls ?? [] as $index => $image)
-                        @if($index < 4)
-                            <div>
-                                <img src="{{ $image }}" alt="{{ $hotel->name }}" class="w-full h-full object-cover">
-                            </div>
-                        @endif
-                    @endforeach
-                </div>
-
-                <div class="p-6">
-                    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                @for($i = 0; $i < $hotel->star_rating; $i++)
-                                    <i class="fas fa-star text-yellow-500"></i>
+    <!-- Main Content -->
+    <div class="bg-slate-50 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Hotel Header Card -->
+            <div class="bg-white rounded-2xl shadow-lg ring-1 ring-slate-100 p-6 mb-8">
+                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                    <div class="flex-1">
+                        <!-- Star Rating & Type -->
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="flex items-center gap-0.5">
+                                @for($i = 0; $i < ($hotel->star_rating ?? 3); $i++)
+                                    <i class="ri-star-fill text-amber-400 text-lg"></i>
                                 @endfor
-                                <span class="text-sm text-gray-500 ml-2">{{ ucfirst($hotel->property_type) }}</span>
                             </div>
-                            <h1 class="text-3xl font-bold text-gray-900">{{ $hotel->name }}</h1>
-                            <p class="text-gray-600 mt-2">
-                                <i class="fas fa-map-marker-alt mr-2"></i>
-                                {{ $hotel->full_address }}
-                            </p>
+                            <span class="text-sm text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">{{ ucfirst($hotel->property_type ?? 'Hotel') }}</span>
                         </div>
 
-                        <div class="flex items-center gap-4">
-                            @if($hotel->avg_rating)
-                                <div class="bg-blue-600 text-white rounded-lg px-4 py-3 text-center">
-                                    <div class="text-2xl font-bold">{{ number_format($hotel->avg_rating, 1) }}</div>
-                                    <div class="text-sm">{{ $hotel->reviews_count }} reviews</div>
-                                </div>
-                            @endif
+                        <!-- Hotel Name -->
+                        <h1 class="text-3xl lg:text-4xl font-bold text-slate-800 mb-3">{{ $hotel->name }}</h1>
+
+                        <!-- Location -->
+                        <div class="flex items-center gap-2 text-slate-600">
+                            <i class="ri-map-pin-2-fill text-blue-500"></i>
+                            <span>{{ $hotel->full_address ?? ($hotel->city?->name . ', ' . ($hotel->country?->name ?? 'Bangladesh')) }}</span>
                         </div>
                     </div>
+
+                    <!-- Rating Badge -->
+                    @if($hotel->avg_rating)
+                        <div class="flex items-center gap-4">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-sm font-semibold text-slate-700">
+                                    @if($hotel->avg_rating >= 4.5) Exceptional
+                                    @elseif($hotel->avg_rating >= 4) Excellent
+                                    @elseif($hotel->avg_rating >= 3.5) Very Good
+                                    @else Good
+                                    @endif
+                                </p>
+                                <p class="text-sm text-slate-500">{{ $hotel->reviews_count }} reviews</p>
+                            </div>
+                            <div class="bg-blue-600 text-white rounded-xl px-4 py-3 text-center min-w-[70px]">
+                                <div class="text-2xl font-bold">{{ number_format($hotel->avg_rating, 1) }}</div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Main Content -->
                 <div class="lg:col-span-2 space-y-8">
-                    <!-- Description -->
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <h2 class="text-xl font-bold text-gray-900 mb-4">About This Hotel</h2>
-                        <div class="prose max-w-none text-gray-600">
-                            {!! nl2br(e($hotel->description)) !!}
+                    <!-- About Section -->
+                    <div class="bg-white rounded-2xl shadow-lg ring-1 ring-slate-100 p-6">
+                        <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="ri-information-line text-blue-500"></i>
+                            About This Property
+                        </h2>
+                        <div class="prose prose-slate max-w-none text-slate-600 leading-relaxed">
+                            {!! nl2br(e($hotel->description ?? 'Experience comfort and luxury at this exceptional property.')) !!}
                         </div>
                     </div>
 
-                    <!-- Amenities -->
-                    @if($hotel->amenities->count())
-                        <div class="bg-white rounded-xl shadow-md p-6">
-                            <h2 class="text-xl font-bold text-gray-900 mb-4">Amenities</h2>
+                    <!-- Amenities Section -->
+                    @if($hotel->amenities && $hotel->amenities->count())
+                        <div class="bg-white rounded-2xl shadow-lg ring-1 ring-slate-100 p-6">
+                            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                <i class="ri-service-line text-blue-500"></i>
+                                Amenities & Services
+                            </h2>
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 @foreach($hotel->amenities as $amenity)
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                                            <i class="fas fa-{{ $amenity->icon ?? 'check' }} text-blue-600"></i>
+                                    <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-blue-50 transition-colors group">
+                                        <div class="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center group-hover:bg-blue-500 transition-colors">
+                                            <i class="ri-{{ $amenity->icon ?? 'check-line' }} text-blue-500 group-hover:text-white transition-colors"></i>
                                         </div>
-                                        <span class="text-gray-700">{{ $amenity->name }}</span>
+                                        <span class="text-slate-700 font-medium">{{ $amenity->name }}</span>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
                     @endif
 
-                    <!-- Rooms -->
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <h2 class="text-xl font-bold text-gray-900 mb-4">Available Rooms</h2>
+                    <!-- Available Rooms Section -->
+                    <div class="bg-white rounded-2xl shadow-lg ring-1 ring-slate-100 p-6">
+                        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <i class="ri-hotel-bed-line text-blue-500"></i>
+                            Available Rooms
+                        </h2>
                         <div class="space-y-4">
-                            @foreach($hotel->rooms as $room)
-                                <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                            @forelse($hotel->rooms ?? [] as $room)
+                                <div class="border border-slate-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-md transition-all">
                                     <div class="flex flex-col md:flex-row gap-4">
-                                        <div class="md:w-48 flex-shrink-0">
-                                            <div class="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden">
-                                                <img src="{{ $room->thumbnail_url ?? '/images/room-placeholder.jpg' }}" alt="{{ $room->name }}"
-                                                     class="w-full h-full object-cover">
+                                        <!-- Room Image -->
+                                        <div class="md:w-52 flex-shrink-0">
+                                            <div class="aspect-4/3 bg-slate-100 rounded-lg overflow-hidden">
+                                                <img src="{{ $room->thumbnail_url ?? 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&q=80' }}" 
+                                                     alt="{{ $room->name }}"
+                                                     class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
                                             </div>
                                         </div>
-                                        <div class="flex-1">
-                                            <h3 class="font-bold text-gray-900">{{ $room->name }}</h3>
-                                            <p class="text-sm text-gray-500">{{ $room->roomType?->name }}</p>
 
-                                            <div class="flex flex-wrap gap-3 mt-2 text-sm text-gray-600">
-                                                <span><i class="fas fa-bed mr-1"></i> {{ $room->bed_count }} {{ Str::title($room->bed_type) }}</span>
-                                                <span><i class="fas fa-users mr-1"></i> Max {{ $room->max_occupancy }} guests</span>
+                                        <!-- Room Details -->
+                                        <div class="flex-1">
+                                            <div class="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <h3 class="text-lg font-bold text-slate-800">{{ $room->name }}</h3>
+                                                    <p class="text-sm text-slate-500">{{ $room->roomType?->name }}</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Room Features -->
+                                            <div class="flex flex-wrap gap-4 mt-3 text-sm text-slate-600">
+                                                <span class="flex items-center gap-1.5">
+                                                    <i class="ri-hotel-bed-line text-blue-500"></i>
+                                                    {{ $room->bed_count ?? 1 }} {{ Str::title($room->bed_type ?? 'Bed') }}
+                                                </span>
+                                                <span class="flex items-center gap-1.5">
+                                                    <i class="ri-user-line text-blue-500"></i>
+                                                    Max {{ $room->max_occupancy ?? 2 }} guests
+                                                </span>
                                                 @if($room->room_size_sqm)
-                                                    <span><i class="fas fa-expand-arrows-alt mr-1"></i> {{ $room->room_size_sqm }} m²</span>
+                                                    <span class="flex items-center gap-1.5">
+                                                        <i class="ri-ruler-line text-blue-500"></i>
+                                                        {{ $room->room_size_sqm }} m²
+                                                    </span>
                                                 @endif
                                             </div>
 
-                                            @if($room->amenities->count())
+                                            <!-- Room Amenities Tags -->
+                                            @if($room->amenities && $room->amenities->count())
                                                 <div class="flex flex-wrap gap-2 mt-3">
                                                     @foreach($room->amenities->take(4) as $amenity)
-                                                        <span class="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">{{ $amenity->name }}</span>
+                                                        <span class="text-xs text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">{{ $amenity->name }}</span>
                                                     @endforeach
+                                                    @if($room->amenities->count() > 4)
+                                                        <span class="text-xs text-blue-600 font-medium">+{{ $room->amenities->count() - 4 }} more</span>
+                                                    @endif
                                                 </div>
                                             @endif
                                         </div>
-                                        <div class="md:w-40 flex-shrink-0 text-right">
-                                            @if($room->base_rate)
-                                                <div class="text-2xl font-bold text-blue-600">৳{{ number_format($room->base_rate) }}</div>
-                                                <div class="text-sm text-gray-500">per night</div>
-                                            @endif
+
+                                        <!-- Price & CTA -->
+                                        <div class="md:w-44 flex-shrink-0 flex flex-col items-end justify-between">
+                                            <div class="text-right">
+                                                @if($room->base_rate)
+                                                    <div class="text-2xl font-bold text-blue-600">৳{{ number_format($room->base_rate) }}</div>
+                                                    <div class="text-sm text-slate-500">per night</div>
+                                                @endif
+                                            </div>
                                             <a href="{{ route('site.hotel.booking', ['slug' => $hotel->slug, 'room_id' => $room->id, 'check_in' => request('check_in'), 'check_out' => request('check_out')]) }}"
-                                               class="inline-block mt-3 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                               class="mt-3 inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-5 rounded-xl transition-colors shadow-lg shadow-blue-500/25">
+                                                <i class="ri-check-line"></i>
                                                 Select Room
                                             </a>
                                         </div>
                                     </div>
                                 </div>
-                            @endforeach
+                            @empty
+                                <div class="text-center py-12 bg-slate-50 rounded-xl">
+                                    <i class="ri-hotel-bed-line text-4xl text-slate-300 mb-3"></i>
+                                    <p class="text-slate-500">No rooms available. Please check back later.</p>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
 
-                    <!-- Reviews -->
-                    @if($hotel->reviews->count())
-                        <div class="bg-white rounded-xl shadow-md p-6">
-                            <h2 class="text-xl font-bold text-gray-900 mb-4">Guest Reviews</h2>
-                            <div class="space-y-4">
+                    <!-- Reviews Section -->
+                    @if($hotel->reviews && $hotel->reviews->count())
+                        <div class="bg-white rounded-2xl shadow-lg ring-1 ring-slate-100 p-6">
+                            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                <i class="ri-chat-quote-line text-blue-500"></i>
+                                Guest Reviews
+                            </h2>
+                            <div class="space-y-5">
                                 @foreach($hotel->reviews as $review)
-                                    <div class="border-b border-gray-100 pb-4 last:border-0">
-                                        <div class="flex items-center justify-between mb-2">
+                                    <div class="pb-5 border-b border-slate-100 last:border-0 last:pb-0">
+                                        <div class="flex items-start justify-between gap-4 mb-3">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                                    <i class="fas fa-user text-gray-400"></i>
+                                                <div class="w-11 h-11 bg-linear-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold">
+                                                    {{ strtoupper(substr($review->reviewer_name ?? 'G', 0, 1)) }}
                                                 </div>
                                                 <div>
-                                                    <p class="font-medium text-gray-900">{{ $review->reviewer_name }}</p>
-                                                    <p class="text-xs text-gray-500">{{ $review->created_at->format('M d, Y') }}</p>
+                                                    <p class="font-semibold text-slate-800">{{ $review->reviewer_name ?? 'Guest' }}</p>
+                                                    <p class="text-xs text-slate-500">{{ $review->created_at->format('M d, Y') }}</p>
                                                 </div>
                                             </div>
-                                            <div class="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded">
+                                            <div class="bg-blue-600 text-white font-bold px-3 py-1.5 rounded-lg text-sm">
                                                 {{ number_format($review->overall_rating, 1) }}
                                             </div>
                                         </div>
-                                        <h4 class="font-medium text-gray-900">{{ $review->title }}</h4>
-                                        <p class="text-gray-600 text-sm mt-1">{{ $review->content }}</p>
+                                        @if($review->title)
+                                            <h4 class="font-semibold text-slate-800 mb-1">{{ $review->title }}</h4>
+                                        @endif
+                                        <p class="text-slate-600 leading-relaxed">{{ $review->content }}</p>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
                     @endif
 
-                    <!-- FAQs -->
-                    @if($hotel->faqs->count())
-                        <div class="bg-white rounded-xl shadow-md p-6">
-                            <h2 class="text-xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-                            <div class="space-y-4">
+                    <!-- FAQs Section -->
+                    @if($hotel->faqs && $hotel->faqs->count())
+                        <div class="bg-white rounded-2xl shadow-lg ring-1 ring-slate-100 p-6">
+                            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                <i class="ri-question-answer-line text-blue-500"></i>
+                                Frequently Asked Questions
+                            </h2>
+                            <div class="space-y-3">
                                 @foreach($hotel->faqs as $faq)
-                                    <details class="group">
-                                        <summary class="flex items-center justify-between cursor-pointer font-medium text-gray-900 py-3 border-b border-gray-100">
-                                            {{ $faq->question }}
-                                            <i class="fas fa-chevron-down group-open:rotate-180 transition-transform"></i>
+                                    <details class="group bg-slate-50 rounded-xl">
+                                        <summary class="flex items-center justify-between cursor-pointer font-medium text-slate-800 p-4 hover:bg-slate-100 rounded-xl transition-colors">
+                                            <span>{{ $faq->question }}</span>
+                                            <i class="ri-add-line text-blue-500 group-open:hidden"></i>
+                                            <i class="ri-subtract-line text-blue-500 hidden group-open:block"></i>
                                         </summary>
-                                        <p class="text-gray-600 py-3">{{ $faq->answer }}</p>
+                                        <div class="px-4 pb-4 text-slate-600">
+                                            {{ $faq->answer }}
+                                        </div>
                                     </details>
                                 @endforeach
                             </div>
@@ -196,106 +274,161 @@
                 <!-- Sidebar -->
                 <aside class="space-y-6">
                     <!-- Booking Card -->
-                    <div class="bg-white rounded-xl shadow-md p-6 sticky top-4">
-                        <h3 class="font-bold text-lg text-gray-900 mb-4">Check Availability</h3>
+                    <div class="bg-white rounded-2xl shadow-lg ring-1 ring-slate-100 p-6 sticky top-4">
+                        <h3 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
+                            <i class="ri-calendar-check-line text-blue-500"></i>
+                            Check Availability
+                        </h3>
                         <form action="{{ route('site.hotel.show', $hotel->slug) }}" method="GET" class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
-                                <input type="date" name="check_in" value="{{ request('check_in', date('Y-m-d')) }}"
-                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
-                                <input type="date" name="check_out" value="{{ request('check_out', date('Y-m-d', strtotime('+1 day'))) }}"
-                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Check-in</label>
+                                    <div class="relative">
+                                        <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="date" name="check_in" value="{{ request('check_in', date('Y-m-d')) }}"
+                                               class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Check-out</label>
+                                    <div class="relative">
+                                        <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="date" name="check_out" value="{{ request('check_out', date('Y-m-d', strtotime('+1 day'))) }}"
+                                               class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                                    </div>
+                                </div>
                             </div>
                             <div class="grid grid-cols-3 gap-3">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Rooms</label>
-                                    <input type="number" name="rooms" value="{{ request('rooms', 1) }}" min="1"
-                                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Rooms</label>
+                                    <select name="rooms" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <option value="{{ $i }}" {{ request('rooms', 1) == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                        @endfor
+                                    </select>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Adults</label>
-                                    <input type="number" name="adults" value="{{ request('adults', 2) }}" min="1"
-                                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Adults</label>
+                                    <select name="adults" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                                        @for($i = 1; $i <= 10; $i++)
+                                            <option value="{{ $i }}" {{ request('adults', 2) == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                        @endfor
+                                    </select>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Children</label>
-                                    <input type="number" name="children" value="{{ request('children', 0) }}" min="0"
-                                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Children</label>
+                                    <select name="children" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                                        @for($i = 0; $i <= 6; $i++)
+                                            <option value="{{ $i }}" {{ request('children', 0) == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                        @endfor
+                                    </select>
                                 </div>
                             </div>
-                            <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                            <button type="submit" class="w-full bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2">
+                                <i class="ri-search-line"></i>
                                 Check Availability
                             </button>
                         </form>
                     </div>
 
-                    <!-- Hotel Info -->
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <h3 class="font-bold text-lg text-gray-900 mb-4">Hotel Info</h3>
-                        <div class="space-y-3 text-sm">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-clock text-blue-600 w-5"></i>
-                                <span><strong>Check-in:</strong> {{ $hotel->check_in_time }}</span>
+                    <!-- Hotel Info Card -->
+                    <div class="bg-white rounded-2xl shadow-lg ring-1 ring-slate-100 p-6">
+                        <h3 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
+                            <i class="ri-hotel-line text-blue-500"></i>
+                            Property Info
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i class="ri-login-box-line text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase tracking-wider">Check-in</p>
+                                    <p class="font-semibold text-slate-800">{{ $hotel->check_in_time ?? '2:00 PM' }}</p>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-clock text-blue-600 w-5"></i>
-                                <span><strong>Check-out:</strong> {{ $hotel->check_out_time }}</span>
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <i class="ri-logout-box-line text-red-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase tracking-wider">Check-out</p>
+                                    <p class="font-semibold text-slate-800">{{ $hotel->check_out_time ?? '12:00 PM' }}</p>
+                                </div>
                             </div>
                             @if($hotel->phone)
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-phone text-blue-600 w-5"></i>
-                                    <a href="tel:{{ $hotel->phone }}" class="text-blue-600 hover:underline">{{ $hotel->phone }}</a>
-                                </div>
+                                <a href="tel:{{ $hotel->phone }}" class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-blue-50 transition-colors group">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors">
+                                        <i class="ri-phone-line text-blue-600 group-hover:text-white transition-colors"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-slate-500 uppercase tracking-wider">Phone</p>
+                                        <p class="font-semibold text-blue-600">{{ $hotel->phone }}</p>
+                                    </div>
+                                </a>
                             @endif
                             @if($hotel->email)
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-envelope text-blue-600 w-5"></i>
-                                    <a href="mailto:{{ $hotel->email }}" class="text-blue-600 hover:underline">{{ $hotel->email }}</a>
-                                </div>
+                                <a href="mailto:{{ $hotel->email }}" class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-blue-50 transition-colors group">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors">
+                                        <i class="ri-mail-line text-blue-600 group-hover:text-white transition-colors"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-slate-500 uppercase tracking-wider">Email</p>
+                                        <p class="font-semibold text-blue-600 text-sm truncate">{{ $hotel->email }}</p>
+                                    </div>
+                                </a>
                             @endif
                         </div>
                     </div>
 
-                    <!-- Map -->
+                    <!-- Map Card -->
                     @if($hotel->latitude && $hotel->longitude)
-                        <div class="bg-white rounded-xl shadow-md p-6">
-                            <h3 class="font-bold text-lg text-gray-900 mb-4">Location</h3>
-                            <div class="aspect-video bg-gray-200 rounded-lg">
+                        <div class="bg-white rounded-2xl shadow-lg ring-1 ring-slate-100 p-6">
+                            <h3 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
+                                <i class="ri-map-pin-line text-blue-500"></i>
+                                Location
+                            </h3>
+                            <div class="aspect-video bg-slate-100 rounded-xl overflow-hidden">
                                 <iframe
                                     src="https://maps.google.com/maps?q={{ $hotel->latitude }},{{ $hotel->longitude }}&z=15&output=embed"
-                                    class="w-full h-full rounded-lg"
+                                    class="w-full h-full"
                                     allowfullscreen
                                     loading="lazy">
                                 </iframe>
                             </div>
+                            <a href="https://maps.google.com/maps?q={{ $hotel->latitude }},{{ $hotel->longitude }}" 
+                               target="_blank"
+                               class="mt-4 flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm">
+                                <i class="ri-external-link-line"></i>
+                                Open in Google Maps
+                            </a>
                         </div>
                     @endif
                 </aside>
             </div>
 
             <!-- Related Hotels -->
-            @if($relatedHotels->count())
+            @if(isset($relatedHotels) && $relatedHotels->count())
                 <div class="mt-12">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Similar Hotels Nearby</h2>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <i class="ri-hotel-line text-blue-500"></i>
+                        Similar Hotels Nearby
+                    </h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         @foreach($relatedHotels as $related)
-                            <a href="{{ route('site.hotel.show', $related->slug) }}" class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                                <div class="aspect-[4/3]">
-                                    <img src="{{ $related->thumbnail_url ?? '/images/hotel-placeholder.jpg' }}" alt="{{ $related->name }}"
-                                         class="w-full h-full object-cover">
-                                </div>
-                                <div class="p-4">
-                                    <div class="flex items-center gap-1 mb-1">
-                                        @for($i = 0; $i < $related->star_rating; $i++)
-                                            <i class="fas fa-star text-yellow-500 text-xs"></i>
-                                        @endfor
-                                    </div>
-                                    <h3 class="font-bold text-gray-900">{{ $related->name }}</h3>
-                                </div>
-                            </a>
+                                                <hotel-card :hotel="{{ json_encode([
+                                'id' => $related->id,
+                                'url' => route('site.hotel.show', $related->slug),
+                                'thumbnail_url' => $related->thumbnail_url ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80',
+                                'name' => $related->name,
+                                'star_rating' => $related->star_rating,
+                                'avg_rating' => $related->avg_rating,
+                                'reviews_count' => $related->reviews_count,
+                                'is_featured' => $related->is_featured,
+                                'city_name' => $related->city?->name,
+                                'country_name' => $related->country?->name,
+                                'min_price' => $related->min_price
+                            ]) }}"></hotel-card>
                         @endforeach
                     </div>
                 </div>

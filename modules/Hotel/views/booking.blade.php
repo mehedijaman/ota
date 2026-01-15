@@ -33,7 +33,7 @@
                             <!-- Hotel Summary -->
                             <div class="bg-white rounded-xl shadow-md p-6">
                                 <div class="flex gap-4">
-                                    <img src="{{ $hotel->thumbnail_url ?? '/images/hotel-placeholder.jpg' }}" alt="{{ $hotel->name }}"
+                                    <img src="{{ $hotel->thumbnail_url ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80' }}" alt="{{ $hotel->name }}"
                                          class="w-24 h-24 rounded-lg object-cover">
                                     <div>
                                         <div class="flex items-center gap-1 mb-1">

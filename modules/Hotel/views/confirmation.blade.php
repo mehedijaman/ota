@@ -24,7 +24,7 @@
                     <!-- Hotel Header -->
                     <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
                         <div class="flex items-center gap-4">
-                            <img src="{{ $booking->hotel->thumbnail_url ?? '/images/hotel-placeholder.jpg' }}"
+                            <img src="{{ $booking->hotel->thumbnail_url ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80' }}"
                                 alt="{{ $booking->hotel->name }}" class="w-20 h-20 rounded-lg object-cover">
                             <div>
                                 <div class="flex items-center gap-1 mb-1">

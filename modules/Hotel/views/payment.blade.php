@@ -107,7 +107,7 @@
 
                             <!-- Hotel Info -->
                             <div class="flex gap-3 mb-4">
-                                <img src="{{ $booking->hotel->thumbnail_url ?? '/images/hotel-placeholder.jpg' }}" alt="{{ $booking->hotel->name }}"
+                                <img src="{{ $booking->hotel->thumbnail_url ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80' }}" alt="{{ $booking->hotel->name }}"
                                      class="w-16 h-16 rounded-lg object-cover">
                                 <div>
                                     <p class="font-bold text-gray-900">{{ $booking->hotel->name }}</p>
