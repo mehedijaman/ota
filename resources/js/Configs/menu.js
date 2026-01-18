@@ -111,6 +111,38 @@ export default {
             ]
         },
 
+        {
+            label: 'Flight Management',
+            permission: 'flight.view',
+            icon: 'ri-flight-takeoff-line',
+            children: [
+                {
+                    label: 'Flight Bookings',
+                    permission: 'flight.booking.view',
+                    icon: 'ri-calendar-check-line',
+                    link: route('flightBooking.index')
+                },
+                {
+                    label: 'Airlines',
+                    permission: 'flight.airline.view',
+                    icon: 'ri-plane-line',
+                    link: route('flight.airline.index')
+                },
+                {
+                    label: 'Airports',
+                    permission: 'flight.airport.view',
+                    icon: 'ri-flight-land-line',
+                    link: route('flight.airport.index')
+                },
+                {
+                    label: 'Master Data',
+                    permission: 'flight.view',
+                    icon: 'ri-database-2-line',
+                    link: route('flight.index')
+                }
+            ]
+        },
+
 
         {
             label: 'Customers',
