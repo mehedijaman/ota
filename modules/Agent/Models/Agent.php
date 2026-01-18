@@ -128,6 +128,22 @@ class Agent extends BaseModel implements HasMedia
         return $this->belongsTo(User::class, 'deleted_by');
     }
 
+    public function transactions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AgentWalletTransaction::class)->orderByDesc('id');
+    }
+
+    /**
+     * Check if agent has sufficient balance
+     * 
+     * @param float $amount
+     * @return bool
+     */
+    public function hasSufficientBalance(float $amount): bool
+    {
+        return $this->balance >= $amount;
+    }
+
     public function getRouteKeyName(): string
     {
         return 'uuid';

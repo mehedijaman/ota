@@ -23,6 +23,15 @@
 
                 <AppButton
                     v-if="can('agent-edit')"
+                    class="btn btn-secondary"
+                    @click="openDepositModal"
+                >
+                    <i class="ri-wallet-3-line mr-1"></i>
+                    {{ __('Deposit') }}
+                </AppButton>
+
+                <AppButton
+                    v-if="can('agent-edit')"
                     class="btn btn-primary"
                     @click="$inertia.visit(route('agent.edit', agent.uuid))"
                 >
@@ -395,6 +404,98 @@
         </AppCard>
     </div>
 
+    <!-- Wallet Transactions Section -->
+    <AppCard v-if="agent.transactions && agent.transactions.length" class="mt-6">
+        <template #title>
+            <div class="flex items-center gap-2">
+                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-100">
+                    <i class="ri-exchange-dollar-line text-lg text-teal-600"></i>
+                </div>
+                <span class="text-neutral-12 font-semibold">Wallet Transactions</span>
+            </div>
+        </template>
+        <template #content>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-500">
+                    <thead class="bg-gray-50 text-xs uppercase text-gray-700">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Date</th>
+                            <th scope="col" class="px-6 py-3">Type</th>
+                            <th scope="col" class="px-6 py-3">Amount</th>
+                            <th scope="col" class="px-6 py-3">Balance</th>
+                            <th scope="col" class="px-6 py-3">Ref</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="txn in agent.transactions"
+                            :key="txn.id"
+                            class="border-b bg-white hover:bg-gray-50"
+                        >
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {{ new Date(txn.created_at).toLocaleDateString() }}
+                                <span class="text-xs text-gray-400 block">{{ new Date(txn.created_at).toLocaleTimeString() }}</span>
+                            </td>
+                            <td class="px-6 py-4 capitalize">
+                                <span :class="{
+                                    'text-emerald-600 font-medium': txn.type === 'deposit',
+                                    'text-red-500': txn.type === 'withdraw' || txn.type === 'payment'
+                                }">
+                                    {{ txn.type }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 font-medium" :class="txn.amount > 0 ? (txn.type === 'deposit' ? 'text-emerald-600' : 'text-gray-900') : 'text-gray-900'">
+                                {{ formatCurrency(txn.amount) }}
+                            </td>
+                            <td class="px-6 py-4 text-gray-500">
+                                {{ formatCurrency(txn.balance_after) }}
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 truncate max-w-[150px]" :title="txn.reference">
+                                {{ txn.reference || '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize"
+                                    :class="{
+                                        'bg-green-100 text-green-800': txn.status === 'completed',
+                                        'bg-yellow-100 text-yellow-800': txn.status === 'pending',
+                                        'bg-red-100 text-red-800': txn.status === 'failed' || txn.status === 'rejected'
+                                    }"
+                                >
+                                    {{ txn.status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2" v-if="txn.type === 'deposit'">
+                                    <button
+                                        v-if="can('agent-edit')"
+                                        type="button"
+                                        class="text-blue-600 hover:text-blue-800"
+                                        title="Edit Transaction"
+                                        @click="editTransaction(txn)"
+                                    >
+                                        <i class="ri-pencil-line text-lg"></i>
+                                    </button>
+                                    <button
+                                        v-if="can('agent-edit')"
+                                        type="button"
+                                        class="text-red-600 hover:text-red-800"
+                                        title="Delete Transaction"
+                                        @click="confirmDeleteTransaction(txn)"
+                                    >
+                                        <i class="ri-delete-bin-line text-lg"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+    </AppCard>
+
     <!-- Documents Section -->
     <AppCard v-if="agent.documents && agent.documents.length" class="mt-6">
         <template #title>
@@ -461,6 +562,14 @@
         @close="showCreateUserModal = false"
     />
 
+    <!-- Deposit Modal -->
+    <AgentDepositModal
+        :isOpen="showDepositModal"
+        :agent="agent"
+        :transaction="selectedTransaction"
+        @close="showDepositModal = false"
+    />
+
     <AppConfirmDialog ref="confirmDialogRef"></AppConfirmDialog>
 </template>
 
@@ -470,6 +579,7 @@ import { Head } from '@inertiajs/vue3'
 import useTitle from '@/Composables/useTitle'
 import useAuthCan from '@/Composables/useAuthCan'
 import AgentCreateUserModal from './Partials/AgentCreateUserModal.vue'
+import AgentDepositModal from './Partials/AgentDepositModal.vue'
 
 const { can } = useAuthCan()
 const { title } = useTitle('Agent Details')
@@ -497,6 +607,28 @@ const showCreateUserModal = ref(false)
 
 const openCreateUserModal = () => {
     showCreateUserModal.value = true
+}
+
+// Deposit Modal
+const showDepositModal = ref(false)
+const selectedTransaction = ref(null)
+
+const openDepositModal = () => {
+    selectedTransaction.value = null
+    showDepositModal.value = true
+}
+
+const editTransaction = (txn) => {
+    selectedTransaction.value = txn
+    showDepositModal.value = true
+}
+
+const confirmDeleteTransaction = (txn) => {
+    confirmDialogRef.value.openModal(
+        route('agent.wallet.transaction.destroy', [props.agent.uuid, txn.id]),
+        'Delete Transaction',
+        'Are you sure you want to delete this transaction? This will reverse the balance adjustment. This action cannot be undone.'
+    )
 }
 
 const getInitials = (name) => {

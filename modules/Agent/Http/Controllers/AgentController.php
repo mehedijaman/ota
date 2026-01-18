@@ -45,7 +45,7 @@ class AgentController extends BackendController
     public function show(Agent $agent): Response
     {
         return inertia('Agent/AgentShow', [
-            'agent' => $agent->append('documents'),
+            'agent' => $agent->load(['transactions' => fn ($q) => $q->latest()->limit(10)])->append('documents'),
         ]);
     }
 

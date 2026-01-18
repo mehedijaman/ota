@@ -22,5 +22,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('{agent:uuid}', 'update')->name('update')->can('agent-edit');
         Route::delete('{agent:uuid}', 'destroy')->name('destroy')->can('agent-delete');
         Route::post('{agent:uuid}/create-user', 'createUser')->name('createUser')->can('agent-edit');
+        
+        // Wallet
+        Route::post('{agent:uuid}/wallet/deposit', [\Modules\Agent\Http\Controllers\AgentWalletController::class, 'store'])->name('wallet.deposit')->can('agent-edit');
+        Route::put('{agent:uuid}/wallet/transactions/{transaction}', [\Modules\Agent\Http\Controllers\AgentWalletController::class, 'update'])->name('wallet.transaction.update')->can('agent-edit');
+        Route::delete('{agent:uuid}/wallet/transactions/{transaction}', [\Modules\Agent\Http\Controllers\AgentWalletController::class, 'destroy'])->name('wallet.transaction.destroy')->can('agent-edit');
     });
 });
