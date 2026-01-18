@@ -41,6 +41,8 @@ class GetHotelOptions
                 'name' => $country->name,
                 'code' => $country->iso2,
                 'phone_code' => $country->phone_code,
+                'value' => $country->id,
+                'label' => $country->name,
             ])
             ->toArray();
     }
@@ -57,6 +59,8 @@ class GetHotelOptions
                 'id' => $city->id,
                 'name' => $city->name,
                 'country_id' => $city->country_id,
+                'value' => $city->id,
+                'label' => $city->name,
             ])
             ->toArray();
     }
@@ -68,6 +72,13 @@ class GetHotelOptions
             ->active()
             ->orderBy('name')
             ->get()
+            ->map(fn ($chain) => [
+                'id' => $chain->id,
+                'name' => $chain->name,
+                'code' => $chain->code,
+                'value' => $chain->id,
+                'label' => $chain->name,
+            ])
             ->toArray();
     }
 

@@ -14,7 +14,6 @@ class HotelDatabaseSeeder extends Seeder
         $this->call([
             // Base data seeders
             HotelSupplierSeeder::class,
-            HotelCountrySeeder::class,
             HotelCitySeeder::class,
             HotelRoomTypeSeeder::class,
             HotelAmenitySeeder::class,

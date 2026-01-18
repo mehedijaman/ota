@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('supplier_id')->nullable()->constrained('hotel_suppliers')->nullOnDelete()->comment('NULL for manual inventory');
             $table->string('supplier_hotel_id')->nullable()->comment('External ID from supplier');
             $table->foreignId('chain_id')->nullable()->constrained('hotel_chains')->nullOnDelete()->comment('NULL for independent');
-            $table->foreignId('country_id')->constrained('hotel_countries')->restrictOnDelete();
+            $table->foreignId('country_id')->constrained('countries')->restrictOnDelete();
             $table->foreignId('city_id')->constrained('hotel_cities')->restrictOnDelete();
             $table->foreignId('area_id')->nullable()->constrained('hotel_areas')->nullOnDelete();
 

@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use Modules\Hotel\Models\Hotel;
 use Modules\Hotel\Models\HotelChain;
 use Modules\Hotel\Models\HotelCity;
-use Modules\Hotel\Models\HotelCountry;
 use Modules\Hotel\Models\HotelSupplier;
 
 class HotelFactory extends Factory
@@ -60,7 +59,7 @@ class HotelFactory extends Factory
             'supplier_id' => null,
             'supplier_hotel_id' => null,
             'chain_id' => $this->faker->optional(0.3)->randomElement(HotelChain::pluck('id')->toArray() ?: [null]),
-            'country_id' => HotelCountry::factory(),
+            'country_id' => \Nnjeim\World\Models\Country::inRandomOrder()->first()?->id ?? \Nnjeim\World\Models\Country::create(['name' => 'Bangladesh', 'iso2' => 'BD', 'iso3' => 'BGD', 'phone_code' => '880', 'region' => 'Asia', 'subregion' => 'Southern Asia'])->id,
             'city_id' => HotelCity::factory(),
             'area_id' => null,
             'name' => $name,

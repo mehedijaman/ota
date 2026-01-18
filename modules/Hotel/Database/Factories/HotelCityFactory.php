@@ -5,7 +5,7 @@ namespace Modules\Hotel\Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Modules\Hotel\Models\HotelCity;
-use Modules\Hotel\Models\HotelCountry;
+
 
 class HotelCityFactory extends Factory
 {
@@ -30,7 +30,7 @@ class HotelCityFactory extends Factory
         $uniqueSuffix = $this->faker->unique()->numberBetween(1, 1000000);
 
         return [
-            'country_id' => HotelCountry::factory(),
+            'country_id' => \Nnjeim\World\Models\Country::inRandomOrder()->first()?->id ?? \Nnjeim\World\Models\Country::create(['name' => 'Bangladesh', 'iso2' => 'BD', 'iso3' => 'BGD', 'phone_code' => '880', 'region' => 'Asia', 'subregion' => 'Southern Asia'])->id,
             'name' => $city['name'].' '.$uniqueSuffix,
             'slug' => Str::slug($city['name']).'-'.$uniqueSuffix,
             'latitude' => $city['lat'],

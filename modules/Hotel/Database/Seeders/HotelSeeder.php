@@ -18,7 +18,7 @@ class HotelSeeder extends Seeder
     public function run(): void
     {
         // Ensure we have countries and cities first
-        $countries = HotelCountry::all();
+        $countries = \Nnjeim\World\Models\Country::all();
         $cities = HotelCity::all();
         $roomTypes = HotelRoomType::all();
         $amenities = HotelAmenity::all();

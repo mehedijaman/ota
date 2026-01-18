@@ -75,7 +75,7 @@ class Hotel extends BaseModel implements HasMedia
 
     public function country(): BelongsTo
     {
-        return $this->belongsTo(HotelCountry::class, 'country_id');
+        return $this->belongsTo(\Nnjeim\World\Models\Country::class, 'country_id');
     }
 
     public function city(): BelongsTo

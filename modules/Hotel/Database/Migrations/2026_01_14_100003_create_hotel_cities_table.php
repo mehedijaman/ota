@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('hotel_cities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('country_id')->constrained('hotel_countries')->cascadeOnDelete();
+            $table->foreignId('country_id')->constrained('countries')->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('state_province')->nullable();
