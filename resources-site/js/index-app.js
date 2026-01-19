@@ -2,6 +2,7 @@ import { createVueApp } from './create-vue-app.js'
 import ScrollToTop from './Components/ScrollToTop.vue'
 import TestimonialsCarousel from './Components/Testimonial/TestimonialsCarousel.vue'
 import LatestPostsCarousel from './Components/Blog/LatestPostsCarousel.vue'
+import BlogToolbar from './Components/Blog/BlogToolbar.vue'
 
 // Tour Components
 import TourCard from './Components/Tour/TourCard.vue'
@@ -24,6 +25,7 @@ createVueApp({
     ScrollToTop,
     TestimonialsCarousel,
     LatestPostsCarousel,
+    BlogToolbar,
 
     // Visa components
     VisaCard,

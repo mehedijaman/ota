@@ -237,14 +237,17 @@
                 {{ $siteSettings->site_name ?? 'TriptonicBD' }}. All rights
                 reserved.
             </p>
-            <div class="flex gap-6 text-sm">
-                <a href="#" class="text-slate-500 transition-colors hover:text-white">
-                    Sitemap
-                </a>
-                <a href="#" class="text-slate-500 transition-colors hover:text-white">
-                    Cookies
-                </a>
-            </div>
+            @if ($footerMenu && $footerMenu->count() > 0)
+                <nav class="flex flex-wrap justify-center gap-6 text-sm">
+                    @foreach ($footerMenu as $item)
+                        <a href="{{ $item->url }}" 
+                           class="text-slate-400 transition-colors hover:text-white"
+                           @if($item->target) target="{{ $item->target }}" @endif>
+                            {{ $item->title }}
+                        </a>
+                    @endforeach
+                </nav>
+            @endif
         </div>
     </div>
 </footer>

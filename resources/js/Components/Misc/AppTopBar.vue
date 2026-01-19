@@ -159,7 +159,7 @@
 
                     <AppDropdownItem 
                         class="text-danger hover:bg-danger-light" 
-                        @click="$inertia.visit(route('adminAuth.logout'))"
+                        @click="$inertia.visit(route('auth.logout'))"
                     >
                         <i class="ri-logout-box-r-line mr-2"></i>
                         {{ __('Logout') }}

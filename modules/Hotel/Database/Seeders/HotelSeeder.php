@@ -6,9 +6,9 @@ use Illuminate\Database\Seeder;
 use Modules\Hotel\Models\Hotel;
 use Modules\Hotel\Models\HotelAmenity;
 use Modules\Hotel\Models\HotelCity;
-use Modules\Hotel\Models\HotelCountry;
 use Modules\Hotel\Models\HotelRoom;
 use Modules\Hotel\Models\HotelRoomType;
+use Nnjeim\World\Models\Country;
 
 class HotelSeeder extends Seeder
 {
@@ -18,13 +18,13 @@ class HotelSeeder extends Seeder
     public function run(): void
     {
         // Ensure we have countries and cities first
-        $countries = \Nnjeim\World\Models\Country::all();
+        $countries = Country::all();
         $cities = HotelCity::all();
         $roomTypes = HotelRoomType::all();
         $amenities = HotelAmenity::all();
 
         if ($countries->isEmpty() || $cities->isEmpty()) {
-            $this->command->warn('Please run HotelCountrySeeder and HotelCitySeeder first.');
+            $this->command->warn('Please run world:install and HotelCitySeeder first.');
 
             return;
         }
@@ -40,7 +40,7 @@ class HotelSeeder extends Seeder
                 // Attach random amenities to each hotel
                 if ($amenities->isNotEmpty()) {
                     $hotel->amenities()->attach(
-                        $amenities->random(rand(5, 15))->pluck('id')
+                        $amenities->random(rand(5, min(15, $amenities->count())))->pluck('id')
                     );
                 }
 

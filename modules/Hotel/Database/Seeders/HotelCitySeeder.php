@@ -5,7 +5,7 @@ namespace Modules\Hotel\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Modules\Hotel\Models\HotelCity;
-use Modules\Hotel\Models\HotelCountry;
+use Nnjeim\World\Models\Country;
 
 class HotelCitySeeder extends Seeder
 {
@@ -29,9 +29,12 @@ class HotelCitySeeder extends Seeder
 
     public function run(): void
     {
-        $bangladesh = HotelCountry::where('code', 'BGD')->first();
+        // Use the World package's Country model
+        $bangladesh = Country::where('iso2', 'BD')->orWhere('iso3', 'BGD')->first();
 
         if (! $bangladesh) {
+            $this->command->warn('Bangladesh country not found. Please run world:install first.');
+
             return;
         }
 
@@ -57,5 +60,7 @@ class HotelCitySeeder extends Seeder
                 ]
             );
         }
+
+        $this->command->info('Created '.count($this->bangladeshCities).' hotel cities.');
     }
 }
