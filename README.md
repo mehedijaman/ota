@@ -93,6 +93,5 @@ For technical or operational support:
 ---
 
 ## 📄 License
+OTA is open-source software licensed under the MIT license.
 
-This project is proprietary.
-Unauthorized copying, distribution, or use is strictly prohibited.
