@@ -96,7 +96,3 @@ For technical or operational support:
 
 This project is proprietary.
 Unauthorized copying, distribution, or use is strictly prohibited.
-
----
-
-**Project Manager:** SA Faroque **Lead Developer:** Mehedi Jaman
